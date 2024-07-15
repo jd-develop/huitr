@@ -37,99 +37,116 @@ TOKEN_TYPES = [
 
 WHITESPACES = " \N{NBSP}\N{NNBSP}\t"
 
+class Position:
+    def __init__(self,  line_number:int, index:int, colon:int,  filename:str|None=None) -> None:
+        self.line_number = line_number
+        self.index = index
+        self.colon = colon
+        self.filename = filename
+
+        self.end_of_line = False
+
+    def init(self, current_char:str):
+        if current_char == "\n":
+            self.end_of_line = True
+
+    def advance(self, current_char:str|None=None):
+        self.index += 1
+        self.colon += 1
+
+        if self.end_of_line:  # Last char was \n
+            self.line_number += 1
+            self.colon = 0
+            self.end_of_line = False
+        if current_char == "\n":  # Previous if will be executed next char
+            self.end_of_line = True
+
+    def __repr__(self) -> str:
+        if self.filename:
+            return f"[{self.filename} {self.line_number}:{self.colon}]"
+        return f"[{self.line_number}:{self.colon}]"
+
+    def __str__(self):
+        return repr(self)
+
+    def copy(self):
+        return Position(self.line_number, self.index, self.colon, self.filename)
 
 class Token:
     def __init__(
         self,
         token_type: str,
         value: str | None,
-        line: int,
-        start_index: int,
-        end_index: int,
+        start_pos: Position,
+        end_pos: Position,
     ) -> None:
         self.type = token_type
         self.value = value
-        self.line = line
-        self.start_index = start_index
-        self.end_index = end_index
+        self.start_pos = start_pos
+        self.end_pos = end_pos
 
     def __repr__(self) -> str:
         if self.value is not None:
             if self.type == "STRING":
-                return f'[{self.line}:{self.start_index}-{self.end_index}]{self.type}:"{self.value}"'
-            return f"[{self.line}:{self.start_index}-{self.end_index}]{self.type}:{self.value}"
-        return f"[{self.line}:{self.start_index}-{self.end_index}]{self.type}"
+                return f'{self.type}:"{self.value}"'
+            return f"{self.type}:{self.value}"
+        return f"{self.type}"
 
     def __str__(self):
         return repr(self)
 
 
 class Lexer:
-    def __init__(self, source: str) -> None:
+    def __init__(self, source: str, filename:str|None=None) -> None:
         self.source = source
-        self.cursor_pos = 0
-        self.cursor_pos_in_line = 0
-        self.current_line = 0
-        self.end_of_line = False
+        self.cursor_pos = Position(0,0,0,filename)
 
         # Init self.current
         if len(self.source) < 1:
             self.current = None
         else:
             self.current = self.source[0]
-        if self.current == "\n":
-            self.current_line += 1
+            self.cursor_pos.init(self.current)
 
-        # if all([c in WHITESPACES for c in source]):
-        #     self.current = None
         self.tokens: list[Token] = []
         self.error = None
 
     def next(self, n: int = 1):
         for _ in range(n):  # Not to skip \n when n>1
-            self.cursor_pos += 1
-            self.cursor_pos_in_line += 1
-            if self.cursor_pos >= len(self.source):
+            if self.cursor_pos.index+1 >= len(self.source):
                 self.current = None
             else:
-                self.current = self.source[self.cursor_pos]
-
-            if self.end_of_line:  # Last char was \n
-                self.current_line += 1
-                self.cursor_pos_in_line = 0
-                self.end_of_line = False
-            if self.current == "\n":  # Previous if will be executed next char
-                self.end_of_line = True
+                self.current = self.source[self.cursor_pos.index+1]
+            
+            self.cursor_pos.advance(self.current)
 
     def get_next(self, n: int = 1):
-        if self.cursor_pos + n >= len(self.source):
+        if self.cursor_pos.index + n >= len(self.source):
             return None
-        return self.source[self.cursor_pos + n]
+        return self.source[self.cursor_pos.index + n]
 
     def new_token(
         self,
         token_type: str,
         value: str | None = None,
-        line: int | None = None,
-        start: int | None = None,
-        end: int | None = None
+        start: Position | None = None,
+        end: Position | None = None
     ):
         """
         Arguments:
             token_type: element of TOKEN_TYPES
             value (optional): the token value
-            start (optional): the index in the line at which the token begins. Defaults to self.cursor_pos_in_line if ommited.
-            end (optional): the index in the line at which the token ends. Defaults to self.cursor_pos_in_line if ommited.
-            line (optional): the line number in code at which the token starts (first is 0). Defaults to self.current_line if ommited.
+            start (optional): the index in the line at which the token begins. Defaults to self.cursor_pos if ommited.
+            end (optional): the index in the line at which the token ends. Defaults to self.cursor_pos if ommited.
         """
         assert token_type in TOKEN_TYPES, "Undefined token type"
+
         self.tokens.append(
             Token(
                 token_type,
                 value,
-                line if line is not None else self.current_line,
-                start if start is not None else self.cursor_pos_in_line,
-                end if end is not None else self.cursor_pos_in_line,
+                start if start is not None else self.cursor_pos.copy(),
+                end if end is not None else self.cursor_pos.copy()
             )
         )
 
@@ -167,7 +184,7 @@ class Lexer:
                         self.error = "incorrect use of leading :"
                         break
 
-                    start_index = self.cursor_pos_in_line
+                    start_pos = self.cursor_pos.copy()
 
                     libpath = self.current
                     while (
@@ -180,11 +197,11 @@ class Lexer:
                     self.new_token(
                         "LIBPATH",
                         libpath,
-                        start=start_index,
+                        start=start_pos,
                     )
 
                 case _:
-                    start_index = self.cursor_pos_in_line
+                    start_pos = self.cursor_pos.copy()
                     
                     # Int
                     if self.current in DIGITS:
@@ -192,7 +209,7 @@ class Lexer:
                         while self.get_next() and self.get_next() in DIGITS:
                             self.next()
                             number += self.current
-                        self.new_token("INT", number, start=start_index)
+                        self.new_token("INT", number, start=start_pos)
 
                     # Identifier (no reserved keywords in this language)
                     elif self.current in IDENTIFIERS_LEGAL_CHARS + ":":
@@ -203,7 +220,7 @@ class Lexer:
                         ):
                             self.next()
                             identifier += self.current
-                        self.new_token("IDENTIFIER", identifier, start=start_index)
+                        self.new_token("IDENTIFIER", identifier, start=start_pos)
 
                     # String
                     elif self.current in STRING_DELIMITERS.keys():
@@ -214,7 +231,7 @@ class Lexer:
                             string += self.current
                         self.next() # Place cursor on tailing string delimiter
 
-                        self.new_token("STRING", string, start=start_index)
+                        self.new_token("STRING", string, start=start_pos)
 
             self.next()
 
