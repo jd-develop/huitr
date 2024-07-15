@@ -1,0 +1,12 @@
+# This file is not directly parsed by the Huitr interpreter, used for devs to know quickly how the parser parses.
+# Note: This is a draft
+
+statements ::= (statement)?*
+
+statement ::= chain SEMICOLON
+
+list ::= chain (COMMA atom)*
+
+chain ::= (list | atom)? (CHAINOP atom)?*
+
+atom ::= string_literal | number_literal | identifier
