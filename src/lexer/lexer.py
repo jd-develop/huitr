@@ -14,6 +14,12 @@ LETTERS = string.ascii_letters
 LETTERS_DIGITS = LETTERS + DIGITS
 IDENTIFIERS_LEGAL_CHARS = LETTERS + "_"
 
+STRING_DELIMITERS = {
+        "'":"'",
+        '"':'"',
+        "«":"»",
+}
+
 TOKEN_TYPES = [
     "LPAREN",
     "RPAREN",
@@ -158,7 +164,7 @@ class Lexer:
                             self.next()
                 case ":":
                     if not self.get_next() == ":":
-                        self.error = "Syntax error: incorrect use of :"
+                        self.error = "incorrect use of leading :"
                         break
 
                     start_index = self.cursor_pos_in_line
@@ -198,6 +204,17 @@ class Lexer:
                             self.next()
                             identifier += self.current
                         self.new_token("IDENTIFIER", identifier, start=start_index)
+
+                    # String
+                    elif self.current in STRING_DELIMITERS.keys():
+                        matching_delimiter = STRING_DELIMITERS[self.current]
+                        string = ""
+                        while(self.get_next() and not self.get_next() == matching_delimiter):
+                            self.next()
+                            string += self.current
+                        self.next() # Place cursor on tailing string delimiter
+
+                        self.new_token("STRING", string, start=start_index)
 
             self.next()
 
