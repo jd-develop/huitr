@@ -129,9 +129,10 @@ class Lexer:
 
     def tokenize(self):
         while self.current is not None and self.error is None:
+            if self.current in WHITESPACES:
+                self.next()
+                continue
             match self.current:
-                case "\n":
-                    pass
                 case "(":
                     self.new_token("LPAREN")
                 case ")":
@@ -176,9 +177,11 @@ class Lexer:
                         start=start_index,
                     )
 
-                case _:  # multi-char
+                case _:
                     start_index = self.cursor_pos_in_line
-                    if self.current in DIGITS:  # INT
+                    
+                    # Int
+                    if self.current in DIGITS:
                         number = self.current
                         while self.get_next() and self.get_next() in DIGITS:
                             self.next()
