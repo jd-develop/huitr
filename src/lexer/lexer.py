@@ -1,3 +1,12 @@
+#!/usr/bin/env python3
+# -*- coding:utf-8 -*-
+
+# Huitr - a purely functional programming language.
+# Copyright (C) 2024  3fxcf9, jd-develop
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 import string
 
 DIGITS = "0123456789"
@@ -67,10 +76,10 @@ class Lexer:
 
         # if all([c in WHITESPACES for c in source]):
         #     self.current = None
-        self.tokens = []
+        self.tokens: list[Token] = []
         self.error = None
 
-    def next(self, n=1):
+    def next(self, n: int = 1):
         for _ in range(n):  # Not to skip \n when n>1
             self.cursor_pos += 1
             self.cursor_pos_in_line += 1
@@ -86,13 +95,18 @@ class Lexer:
             if self.current == "\n":  # Previous if will be executed next char
                 self.end_of_line = True
 
-    def get_next(self, n=1):
+    def get_next(self, n: int = 1):
         if self.cursor_pos + n >= len(self.source):
             return None
         return self.source[self.cursor_pos + n]
 
-    def newToken(
-        self, token_type: str, value: str | None = None, line=None, start=None, end=None
+    def new_token(
+        self,
+        token_type: str,
+        value: str | None = None,
+        line: int | None = None,
+        start: int | None = None,
+        end: int | None = None
     ):
         """
         Arguments:
@@ -102,8 +116,7 @@ class Lexer:
             end (optional): the index in the line at which the token ends. Defaults to self.cursor_pos_in_line if ommited.
             line (optional): the line number in code at which the token starts (first is 0). Defaults to self.current_line if ommited.
         """
-        if token_type not in TOKEN_TYPES:
-            raise "Undefined token type"
+        assert token_type in TOKEN_TYPES, "Undefined token type"
         self.tokens.append(
             Token(
                 token_type,
@@ -120,19 +133,19 @@ class Lexer:
                 case "\n":
                     pass
                 case "(":
-                    self.newToken("LPAREN")
+                    self.new_token("LPAREN")
                 case ")":
-                    self.newToken("RPAREN")
+                    self.new_token("RPAREN")
                 case "[":
-                    self.newToken("LSQUARE")
+                    self.new_token("LSQUARE")
                 case "]":
-                    self.newToken("RSQUARE")
+                    self.new_token("RSQUARE")
                 case ">":
-                    self.newToken("CHAINOP")
+                    self.new_token("CHAINOP")
                 case ",":
-                    self.newToken("COMMA")
+                    self.new_token("COMMA")
                 case ";":
-                    self.newToken("SEMICOLON")
+                    self.new_token("SEMICOLON")
                 case ".":  # Comments
                     self.next()
                     if self.current == ".":
@@ -151,13 +164,13 @@ class Lexer:
 
                     libpath = self.current
                     while (
-                        self.get_next()
+                        self.get_next() is not None
                         and self.get_next() in IDENTIFIERS_LEGAL_CHARS + ":"
                     ):
                         self.next()
                         libpath += self.current
 
-                    self.newToken(
+                    self.new_token(
                         "LIBPATH",
                         libpath,
                         start=start_index,
@@ -170,7 +183,7 @@ class Lexer:
                         while self.get_next() and self.get_next() in DIGITS:
                             self.next()
                             number += self.current
-                        self.newToken("INT", number, start=start_index)
+                        self.new_token("INT", number, start=start_index)
 
                     # Identifier (no reserved keywords in this language)
                     elif self.current in IDENTIFIERS_LEGAL_CHARS + ":":
@@ -181,7 +194,7 @@ class Lexer:
                         ):
                             self.next()
                             identifier += self.current
-                        self.newToken("IDENTIFIER", identifier, start=start_index)
+                        self.new_token("IDENTIFIER", identifier, start=start_index)
 
             self.next()
 
