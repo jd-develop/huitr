@@ -10,6 +10,7 @@
 import string
 
 DIGITS = "0123456789"
+ALLOWED_CHARS_IN_INT = "_"
 LETTERS = string.ascii_letters
 LETTERS_DIGITS = LETTERS + DIGITS
 IDENTIFIERS_LEGAL_CHARS = LETTERS + "_"
@@ -35,13 +36,13 @@ TOKEN_TYPES = [
     "LIBPATH",  # ::std::math for example
 ]
 
-WHITESPACES = " \N{NBSP}\N{NNBSP}\t"
+WHITESPACES = " \n\N{NBSP}\N{NNBSP}\t"
 
 class Position:
-    def __init__(self,  line_number:int, index:int, colon:int,  filename:str|None=None) -> None:
+    def __init__(self,  line_number:int, index:int, column:int,  filename:str|None=None) -> None:
         self.line_number = line_number
         self.index = index
-        self.colon = colon
+        self.column = column
         self.filename = filename
 
         self.end_of_line = False
@@ -52,25 +53,25 @@ class Position:
 
     def advance(self, current_char:str|None=None):
         self.index += 1
-        self.colon += 1
+        self.column += 1
 
         if self.end_of_line:  # Last char was \n
             self.line_number += 1
-            self.colon = 0
+            self.column = 0
             self.end_of_line = False
         if current_char == "\n":  # Previous if will be executed next char
             self.end_of_line = True
 
     def __repr__(self) -> str:
         if self.filename:
-            return f"[{self.filename} {self.line_number}:{self.colon}]"
-        return f"[{self.line_number}:{self.colon}]"
+            return f"[{self.filename} {self.line_number}:{self.column}]"
+        return f"[{self.line_number}:{self.column}]"
 
     def __str__(self):
         return repr(self)
 
     def copy(self):
-        return Position(self.line_number, self.index, self.colon, self.filename)
+        return Position(self.line_number, self.index, self.column, self.filename)
 
 class Token:
     def __init__(
@@ -203,20 +204,30 @@ class Lexer:
                 case _:
                     start_pos = self.cursor_pos.copy()
                     
-                    # Int
-                    if self.current in DIGITS:
+                    # Float / int
+                    if self.current in DIGITS+'.': # FIXME: Change comment symbol to make float starting with a period to work
                         number = self.current
-                        while self.get_next() and self.get_next() in DIGITS:
+                        last_was_e=False
+                        while self.get_next() and (self.get_next() in DIGITS+ALLOWED_CHARS_IN_INT+"eE." or (self.get_next() == "-" and last_was_e)) :
                             self.next()
-                            number += self.current
-                        self.new_token("INT", number, start=start_pos)
+
+                            last_was_e = False
+                            if self.current.lower() == 'e':
+                                last_was_e = True
+
+                            number += self.current.lower()
+
+                        if not any(c in number for c in ['.', 'e']):
+                            self.new_token("INT", number, start=start_pos)
+                        else:
+                            self.new_token("FLOAT", number, start=start_pos)
 
                     # Identifier (no reserved keywords in this language)
-                    elif self.current in IDENTIFIERS_LEGAL_CHARS + ":":
+                    elif self.current in IDENTIFIERS_LEGAL_CHARS:
                         identifier = self.current
                         while (
                             self.get_next()
-                            and self.get_next() in IDENTIFIERS_LEGAL_CHARS
+                            and self.get_next() in IDENTIFIERS_LEGAL_CHARS + ":" + DIGITS
                         ):
                             self.next()
                             identifier += self.current
@@ -232,6 +243,10 @@ class Lexer:
                         self.next() # Place cursor on tailing string delimiter
 
                         self.new_token("STRING", string, start=start_pos)
+
+                    else:
+                        self.error = f"Unexpected char at line {self.cursor_pos.line_number}, column {self.cursor_pos.column}"
+                        break
 
             self.next()
 
