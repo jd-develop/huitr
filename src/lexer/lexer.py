@@ -7,12 +7,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+# Global Python imports
+import string
+
 # IMPORTS
 # Huitr API imports
 from src.lexer.position import Position
 from src.lexer.token import Token
-# Global Python imports
-import string
 
 DIGITS = "0123456789"
 ALLOWED_CHARS_IN_INT = "_"

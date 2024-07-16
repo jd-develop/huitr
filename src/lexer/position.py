@@ -10,6 +10,7 @@
 # IMPORTS
 # no imports
 
+
 class Position:
     def __init__(
         self, line_number: int, index: int, column: int, filename: str | None = None
