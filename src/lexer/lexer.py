@@ -149,9 +149,10 @@ class Lexer:
                     ):  # FIXME: Change comment symbol to make float starting with a period to work
                         number = self.current
                         last_was_e = False
-                        while self.get_next() and (
-                            self.get_next() in DIGITS + ALLOWED_CHARS_IN_INT + "eE."
-                            or (self.get_next() == "-" and last_was_e)
+                        next = self.get_next()
+                        while next is not None and (
+                            next in DIGITS + ALLOWED_CHARS_IN_INT + "eE."
+                            or (next == "-" and last_was_e)
                         ):
                             self.next()
 
@@ -160,6 +161,7 @@ class Lexer:
                                 last_was_e = True
 
                             number += self.current.lower()
+                            next = self.get_next()
 
                         if not any(c in number for c in [".", "e"]):
                             self.new_token("INT", number, start=start_pos)
@@ -169,12 +171,14 @@ class Lexer:
                     # Identifier (no reserved keywords in this language)
                     elif self.current in IDENTIFIERS_LEGAL_CHARS:
                         identifier = self.current
+                        next = self.get_next()
                         while (
-                            self.get_next()
-                            and self.get_next() in IDENTIFIERS_LEGAL_CHARS + DIGITS
+                            next is not None
+                            and next in IDENTIFIERS_LEGAL_CHARS + DIGITS
                         ):
                             self.next()
                             identifier += self.current
+                            next = self.get_next()
                         self.new_token("IDENTIFIER", identifier, start=start_pos)
 
                     # String
@@ -182,7 +186,7 @@ class Lexer:
                         matching_delimiter = STRING_DELIMITERS[self.current]
                         string = ""
                         while (
-                            self.get_next()
+                            self.get_next() is not None
                             and not self.get_next() == matching_delimiter
                         ):
                             self.next()
