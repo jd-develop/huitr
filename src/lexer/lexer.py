@@ -33,7 +33,7 @@ TOKEN_TYPES = [
     "INT",
     "FLOAT",
     "IDENTIFIER",
-    "LIBPATH",  # ::std::math for example
+    "NAMESP",  # ::
 ]
 
 WHITESPACES = " \n\N{NBSP}\N{NNBSP}\t"
@@ -128,22 +128,14 @@ class Lexer:
                             self.next()
                 case ":":
                     if not self.get_next() == ":":
-                        self.error = "incorrect use of leading :"
+                        self.error = "incorrect use of :"
                         break
 
                     start_pos = self.cursor_pos.copy()
-
-                    libpath = self.current
-                    while (
-                        self.get_next() is not None
-                        and self.get_next() in IDENTIFIERS_LEGAL_CHARS + ":"
-                    ):
-                        self.next()
-                        libpath += self.current
+                    self.next()
 
                     self.new_token(
-                        "LIBPATH",
-                        libpath,
+                        "NAMESP",
                         start=start_pos,
                     )
 
@@ -178,8 +170,7 @@ class Lexer:
                         identifier = self.current
                         while (
                             self.get_next()
-                            and self.get_next()
-                            in IDENTIFIERS_LEGAL_CHARS + ":" + DIGITS
+                            and self.get_next() in IDENTIFIERS_LEGAL_CHARS + DIGITS
                         ):
                             self.next()
                             identifier += self.current
