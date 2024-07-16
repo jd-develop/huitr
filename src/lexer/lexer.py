@@ -16,9 +16,9 @@ LETTERS_DIGITS = LETTERS + DIGITS
 IDENTIFIERS_LEGAL_CHARS = LETTERS + "_"
 
 STRING_DELIMITERS = {
-        "'":"'",
-        '"':'"',
-        "«":"»",
+    "'": "'",
+    '"': '"',
+    "«": "»",
 }
 
 TOKEN_TYPES = [
@@ -38,69 +38,15 @@ TOKEN_TYPES = [
 
 WHITESPACES = " \n\N{NBSP}\N{NNBSP}\t"
 
-class Position:
-    def __init__(self,  line_number:int, index:int, column:int,  filename:str|None=None) -> None:
-        self.line_number = line_number
-        self.index = index
-        self.column = column
-        self.filename = filename
 
-        self.end_of_line = False
-
-    def init(self, current_char:str):
-        if current_char == "\n":
-            self.end_of_line = True
-
-    def advance(self, current_char:str|None=None):
-        self.index += 1
-        self.column += 1
-
-        if self.end_of_line:  # Last char was \n
-            self.line_number += 1
-            self.column = 0
-            self.end_of_line = False
-        if current_char == "\n":  # Previous if will be executed next char
-            self.end_of_line = True
-
-    def __repr__(self) -> str:
-        if self.filename:
-            return f"[{self.filename} {self.line_number}:{self.column}]"
-        return f"[{self.line_number}:{self.column}]"
-
-    def __str__(self):
-        return repr(self)
-
-    def copy(self):
-        return Position(self.line_number, self.index, self.column, self.filename)
-
-class Token:
-    def __init__(
-        self,
-        token_type: str,
-        value: str | None,
-        start_pos: Position,
-        end_pos: Position,
-    ) -> None:
-        self.type = token_type
-        self.value = value
-        self.start_pos = start_pos
-        self.end_pos = end_pos
-
-    def __repr__(self) -> str:
-        if self.value is not None:
-            if self.type == "STRING":
-                return f'{self.type}:"{self.value}"'
-            return f"{self.type}:{self.value}"
-        return f"{self.type}"
-
-    def __str__(self):
-        return repr(self)
+from src.lexer.position import Position
+from src.lexer.token import Token
 
 
 class Lexer:
-    def __init__(self, source: str, filename:str|None=None) -> None:
+    def __init__(self, source: str, filename: str | None = None) -> None:
         self.source = source
-        self.cursor_pos = Position(0,0,0,filename)
+        self.cursor_pos = Position(0, 0, 0, filename)
 
         # Init self.current
         if len(self.source) < 1:
@@ -114,11 +60,11 @@ class Lexer:
 
     def next(self, n: int = 1):
         for _ in range(n):  # Not to skip \n when n>1
-            if self.cursor_pos.index+1 >= len(self.source):
+            if self.cursor_pos.index + 1 >= len(self.source):
                 self.current = None
             else:
-                self.current = self.source[self.cursor_pos.index+1]
-            
+                self.current = self.source[self.cursor_pos.index + 1]
+
             self.cursor_pos.advance(self.current)
 
     def get_next(self, n: int = 1):
@@ -131,7 +77,7 @@ class Lexer:
         token_type: str,
         value: str | None = None,
         start: Position | None = None,
-        end: Position | None = None
+        end: Position | None = None,
     ):
         """
         Arguments:
@@ -147,7 +93,7 @@ class Lexer:
                 token_type,
                 value,
                 start if start is not None else self.cursor_pos.copy(),
-                end if end is not None else self.cursor_pos.copy()
+                end if end is not None else self.cursor_pos.copy(),
             )
         )
 
@@ -203,21 +149,26 @@ class Lexer:
 
                 case _:
                     start_pos = self.cursor_pos.copy()
-                    
+
                     # Float / int
-                    if self.current in DIGITS+'.': # FIXME: Change comment symbol to make float starting with a period to work
+                    if (
+                        self.current in DIGITS + "."
+                    ):  # FIXME: Change comment symbol to make float starting with a period to work
                         number = self.current
-                        last_was_e=False
-                        while self.get_next() and (self.get_next() in DIGITS+ALLOWED_CHARS_IN_INT+"eE." or (self.get_next() == "-" and last_was_e)) :
+                        last_was_e = False
+                        while self.get_next() and (
+                            self.get_next() in DIGITS + ALLOWED_CHARS_IN_INT + "eE."
+                            or (self.get_next() == "-" and last_was_e)
+                        ):
                             self.next()
 
                             last_was_e = False
-                            if self.current.lower() == 'e':
+                            if self.current.lower() == "e":
                                 last_was_e = True
 
                             number += self.current.lower()
 
-                        if not any(c in number for c in ['.', 'e']):
+                        if not any(c in number for c in [".", "e"]):
                             self.new_token("INT", number, start=start_pos)
                         else:
                             self.new_token("FLOAT", number, start=start_pos)
@@ -227,7 +178,8 @@ class Lexer:
                         identifier = self.current
                         while (
                             self.get_next()
-                            and self.get_next() in IDENTIFIERS_LEGAL_CHARS + ":" + DIGITS
+                            and self.get_next()
+                            in IDENTIFIERS_LEGAL_CHARS + ":" + DIGITS
                         ):
                             self.next()
                             identifier += self.current
@@ -237,10 +189,13 @@ class Lexer:
                     elif self.current in STRING_DELIMITERS.keys():
                         matching_delimiter = STRING_DELIMITERS[self.current]
                         string = ""
-                        while(self.get_next() and not self.get_next() == matching_delimiter):
+                        while (
+                            self.get_next()
+                            and not self.get_next() == matching_delimiter
+                        ):
                             self.next()
                             string += self.current
-                        self.next() # Place cursor on tailing string delimiter
+                        self.next()  # Place cursor on tailing string delimiter
 
                         self.new_token("STRING", string, start=start_pos)
 
