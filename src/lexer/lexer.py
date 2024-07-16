@@ -7,6 +7,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+# IMPORTS
+# Huitr API imports
+from src.lexer.position import Position
+from src.lexer.token import Token
+# Global Python imports
 import string
 
 DIGITS = "0123456789"
@@ -37,10 +42,6 @@ TOKEN_TYPES = [
 ]
 
 WHITESPACES = " \n\N{NBSP}\N{NNBSP}\t"
-
-
-from src.lexer.position import Position
-from src.lexer.token import Token
 
 
 class Lexer:
