@@ -10,8 +10,8 @@
 # Global Python imports
 import string
 
-# IMPORTS
 # Huitr API imports
+from src.error.error import Error
 from src.lexer.position import Position
 from src.lexer.token import Token
 
@@ -48,17 +48,17 @@ WHITESPACES = " \n\N{NBSP}\N{NNBSP}\t"
 class Lexer:
     def __init__(self, source: str, filename: str | None = None) -> None:
         self.source = source
-        self.cursor_pos = Position(0, 0, 0, filename)
+        self.cursor_pos = Position(0, 0, 0, filename, self.source)
 
         # Init self.current
         if len(self.source) < 1:
             self.current = None
         else:
             self.current = self.source[0]
-            self.cursor_pos.init(self.current)
+            self.cursor_pos.set_position(current_char=self.current)
 
         self.tokens: list[Token] = []
-        self.error = None
+        self.error: Error | None = None
 
     def next(self, n: int = 1):
         for _ in range(n):  # Not to skip \n when n>1
@@ -130,7 +130,9 @@ class Lexer:
                             self.next()
                 case ":":
                     if not self.get_next() == ":":
-                        self.error = "incorrect use of :"
+                        self.error = Error(
+                            "SyntaxError", "incorrect use of `:`", self.cursor_pos
+                        )
                         break
 
                     start_pos = self.cursor_pos.copy()
@@ -197,7 +199,11 @@ class Lexer:
                         self.new_token("STRING", string, start=start_pos)
 
                     else:
-                        self.error = f"unexpected char at line {self.cursor_pos.line_number}, column {self.cursor_pos.column}"
+                        self.error = Error(
+                            "SyntaxError",
+                            "unexpected char",
+                            self.cursor_pos,
+                        )
                         break
 
             self.next()

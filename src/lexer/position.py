@@ -7,22 +7,48 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-# IMPORTS
-# no imports
-
 
 class Position:
     def __init__(
-        self, line_number: int, index: int, column: int, filename: str | None = None
+        self,
+        line_number: int,
+        index: int,
+        column: int,
+        filename: str = "<undefined>",
+        file_source: str | None = None,
+        current_char: str = "",
     ):
         self.line_number = line_number
         self.index = index
         self.column = column
         self.filename = filename
+        self.file_source = file_source
+
+        if current_char == "\n":
+            self.end_of_line = True
 
         self.end_of_line = False
 
-    def init(self, current_char: str):
+    def set_position(
+        self,
+        line_number: int | None = None,
+        index: int | None = None,
+        column: int | None = None,
+        filename: str | None = None,
+        file_source: str | None = None,
+        current_char: str | None = None,
+    ) -> None:
+        if line_number:
+            self.line_number = line_number
+        if index:
+            self.index = index
+        if column:
+            self.column = column
+        if filename:
+            self.filename = filename
+        if file_source:
+            self.file_source = file_source
+
         if current_char == "\n":
             self.end_of_line = True
 
@@ -37,9 +63,13 @@ class Position:
         if current_char == "\n":  # Previous if will be executed next char
             self.end_of_line = True
 
+    def get_line(self):
+        lines = self.file_source.split("\n")
+        if self.line_number >= len(lines):
+            return None
+        return lines[self.line_number]
+
     def __repr__(self) -> str:
-        if self.filename:
-            return f"[{self.filename} {self.line_number}:{self.column}]"
         return f"[{self.line_number}:{self.column}]"
 
     def __str__(self):
