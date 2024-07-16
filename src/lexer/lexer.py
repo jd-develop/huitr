@@ -149,10 +149,10 @@ class Lexer:
                     ):  # FIXME: Change comment symbol to make float starting with a period to work
                         number = self.current
                         last_was_e = False
-                        next = self.get_next()
-                        while next is not None and (
-                            next in DIGITS + ALLOWED_CHARS_IN_INT + "eE."
-                            or (next == "-" and last_was_e)
+                        next_ = self.get_next()
+                        while next_ is not None and (
+                            next_ in DIGITS + ALLOWED_CHARS_IN_INT + "eE."
+                            or (next_ == "-" and last_was_e)
                         ):
                             self.next()
 
@@ -161,7 +161,7 @@ class Lexer:
                                 last_was_e = True
 
                             number += self.current.lower()
-                            next = self.get_next()
+                            next_ = self.get_next()
 
                         if not any(c in number for c in [".", "e"]):
                             self.new_token("INT", number, start=start_pos)
@@ -171,14 +171,14 @@ class Lexer:
                     # Identifier (no reserved keywords in this language)
                     elif self.current in IDENTIFIERS_LEGAL_CHARS:
                         identifier = self.current
-                        next = self.get_next()
+                        next_ = self.get_next()
                         while (
-                            next is not None
-                            and next in IDENTIFIERS_LEGAL_CHARS + DIGITS
+                            next_ is not None
+                            and next_ in IDENTIFIERS_LEGAL_CHARS + DIGITS
                         ):
                             self.next()
                             identifier += self.current
-                            next = self.get_next()
+                            next_ = self.get_next()
                         self.new_token("IDENTIFIER", identifier, start=start_pos)
 
                     # String
