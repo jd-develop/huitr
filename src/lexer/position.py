@@ -38,15 +38,15 @@ class Position:
         file_source: str | None = None,
         current_char: str | None = None,
     ) -> None:
-        if line_number:
+        if line_number is not None:
             self.line_number = line_number
-        if index:
+        if index is not None:
             self.index = index
-        if column:
+        if column is not None:
             self.column = column
-        if filename:
+        if filename is not None:
             self.filename = filename
-        if file_source:
+        if file_source is not None:
             self.file_source = file_source
 
         if current_char == "\n":

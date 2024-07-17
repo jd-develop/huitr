@@ -98,7 +98,7 @@ class Lexer:
             )
         )
 
-    def tokenize(self):
+    def tokenize(self) -> tuple[list[Token], None | SyntaxError]:
         while self.current is not None:
             if self.current in WHITESPACES:
                 self.next()

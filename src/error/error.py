@@ -25,7 +25,7 @@ class Error:
         self.type = error_type
         self.message = error_message
         self.start_pos = start_pos
-        if end_pos:
+        if end_pos is not None:
             self.end_pos = end_pos
         else:
             self.end_pos = self.start_pos
