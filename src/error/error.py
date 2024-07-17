@@ -13,15 +13,11 @@ from typing import Literal
 # Huitr API imports
 from src.lexer.position import Position
 
-ErrorTypes = Literal[
-    "SyntaxError", "ReferenceError", "ModuleNotFoundError", "InternalError"
-]
-
 
 class Error:
     def __init__(
         self,
-        error_type: ErrorTypes,
+        error_type: str,
         error_message: str,
         start_pos: Position,
         end_pos: Position | None = None,
@@ -48,3 +44,33 @@ class Error:
 
     def __str__(self):
         return repr(self)
+
+
+class SyntaxError(Error):
+    def __init__(
+        self,
+        error_message: str,
+        start_pos: Position,
+        end_pos: Position | None = None,
+    ):
+        super().__init__("SyntaxError", error_message, start_pos, end_pos)
+
+
+class ReferenceError(Error):
+    def __init__(
+        self,
+        error_message: str,
+        start_pos: Position,
+        end_pos: Position | None = None,
+    ):
+        super().__init__("ReferenceError", error_message, start_pos, end_pos)
+
+
+class ModuleNotFoundError(Error):
+    def __init__(
+        self,
+        error_message: str,
+        start_pos: Position,
+        end_pos: Position | None = None,
+    ):
+        super().__init__("ModuleNotFoundError", error_message, start_pos, end_pos)

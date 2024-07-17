@@ -11,7 +11,7 @@
 import string
 
 # Huitr API imports
-from src.error.error import Error
+from src.error.error import SyntaxError
 from src.lexer.position import Position
 from src.lexer.token import Token
 
@@ -58,7 +58,6 @@ class Lexer:
             self.cursor_pos.set_position(current_char=self.current)
 
         self.tokens: list[Token] = []
-        self.error: Error | None = None
 
     def next(self, n: int = 1):
         for _ in range(n):  # Not to skip \n when n>1
@@ -100,7 +99,7 @@ class Lexer:
         )
 
     def tokenize(self):
-        while self.current is not None and self.error is None:
+        while self.current is not None:
             if self.current in WHITESPACES:
                 self.next()
                 continue
@@ -130,9 +129,7 @@ class Lexer:
                             self.next()
                 case ":":
                     if not self.get_next() == ":":
-                        self.error = Error(
-                            "SyntaxError", "incorrect use of `:`", self.cursor_pos
-                        )
+                        return [], SyntaxError("incorrect use of `:`", self.cursor_pos)
                         break
 
                     start_pos = self.cursor_pos.copy()
@@ -199,8 +196,12 @@ class Lexer:
                         self.new_token("STRING", string, start=start_pos)
 
                     else:
-                        self.error = Error(
-                            "SyntaxError",
+                        if self.current == "»":
+                            return [], SyntaxError(
+                                "`»` was never opened", self.cursor_pos
+                            )
+
+                        return [], SyntaxError(
                             "unexpected char",
                             self.cursor_pos,
                         )
@@ -208,4 +209,4 @@ class Lexer:
 
             self.next()
 
-        return self.tokens, self.error
+        return self.tokens, None
