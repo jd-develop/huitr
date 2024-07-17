@@ -40,7 +40,8 @@ TOKEN_TYPES = [
     "FLOAT",
     "IDENTIFIER",
     "NAMESP",  # ::
-    "EOF"
+    "EOF",
+    "PIPE"  # |
 ]
 
 WHITESPACES = " \n\N{NBSP}\N{NNBSP}\t"
@@ -119,6 +120,8 @@ class Lexer:
                     self.new_token("COMMA")
                 case ";":
                     self.new_token("SEMICOLON")
+                case "|":
+                    self.new_token("PIPE")
                 case ".":  # Comments
                     self.next()
                     if self.current == ".":
@@ -209,5 +212,5 @@ class Lexer:
 
             self.next()
 
-        self.new_token("EOF", None, self.cursor_pos.copy(), self.cursor_pos.copy())
+        self.new_token("EOF")
         return self.tokens, None
