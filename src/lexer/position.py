@@ -14,14 +14,14 @@ class Position:
         line_number: int,
         index: int,
         column: int,
-        filename: str = "<undefined>",
+        filename: str | None = None,
         file_source: str | None = None,
         current_char: str = "",
     ):
         self.line_number = line_number
         self.index = index
         self.column = column
-        self.filename = filename
+        self.filename = filename if filename is not None else "<undefined>"
         self.file_source = file_source
 
         if current_char == "\n":
@@ -70,7 +70,7 @@ class Position:
         return lines[self.line_number]
 
     def __repr__(self) -> str:
-        return f"[{self.line_number}:{self.column}]"
+        return f"[{self.filename}:{self.line_number}:{self.column}]"
 
     def __str__(self):
         return repr(self)
