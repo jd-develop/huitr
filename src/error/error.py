@@ -10,6 +10,8 @@
 # Huitr API imports
 from src.lexer.position import Position
 
+TAB_WIDTH = 4
+
 
 class Error:
     def __init__(
@@ -31,9 +33,21 @@ class Error:
         error_text = f"In file {self.start_pos.filename}, line {self.start_pos.line_number + 1}:\n"
 
         error_line = self.start_pos.get_line()
+
         if error_line:
-            error_text += f"  {error_line}\n"
-            error_text += f"  {' ' * self.start_pos.column}{'^' * (self.end_pos.column - self.start_pos.column + 1)}\n"
+            # Replace tabs by TAB_WIDTH number of spaces and update the error position
+            before_tab_count = error_line[: self.start_pos.column].count("\t")
+            start_offset = before_tab_count * (TAB_WIDTH - 1)  # \t was removed
+
+            error_tab_count = error_line[
+                self.start_pos.column : self.end_pos.column + 1
+            ].count("\t")
+            end_offset = error_tab_count * (TAB_WIDTH - 1)  # \t was removed
+
+            error_line = error_line.expandtabs(4)
+
+            error_text += f"  {error_line}"
+            error_text += f"  {' ' * (self.start_pos.column + start_offset)}{'^' * (self.end_pos.column - self.start_pos.column + 1 + end_offset)}\n"
 
         error_text += f"{self.type}: {self.message}"
 
