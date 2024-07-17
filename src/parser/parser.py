@@ -10,7 +10,7 @@
 # Huitr API imports
 from src.lexer.token import Token
 from src.error.error import Error
-from src.parser.nodes import Node
+from src.parser.nodes import Node, ChainNode, ListNode, BasicNode
 
 
 class Parser:
@@ -33,34 +33,38 @@ class Parser:
     def chain(self, first_element: Node | None = None) -> tuple[Node, None] | tuple[None, Error]:
         # this is a messy draft
         chain: list[Node] = []
+
         if first_element is not None:
             chain.append(first_element)
-        if self.current_token is not None and self.current_token.type == "CHAINOP":
-            chain.append(None)
+        elif self.current_token is not None and self.current_token.type == "CHAINOP":
+            chain.append(ListNode(self.current_token.start_pos, self.current_token.start_pos, []))
             self.advance()
-        chain.append(self.current_token)
+        
+        chain.append(BasicNode(self.current_token))
         self.advance()
+
         while self.current_token is not None and self.current_token.type == "CHAINOP":
             self.advance()
-            chain.append(self.current_token)
+            chain.append(BasicNode(self.current_token))
             self.advance()
         if self.current_token is not None and self.current_token.type == "COMMA":
             self.advance()
-            return self.list(chain)
+            return self.list(ChainNode(chain[0].pos_start, chain[-1].pos_end, chain))
             
-        return chain
+        return ChainNode(chain[0].pos_start, chain[-1].pos_end, chain), None
 
     def list(self, first_element: Node | None = None) -> tuple[Node, None] | tuple[None, Error]:
         """assuming current token is the first element of the list"""
         list_: list[Node] = []
         if first_element is not None:
             list_.append(first_element)
-        list_.append(self.current_token)
+        list_.append(BasicNode(self.current_token))
         self.advance()
         while self.current_token is not None and self.current_token.type == "COMMA":
             self.advance()
-            list_.append(self.current_token)
+            list_.append(BasicNode(self.current_token))
             self.advance()
         if self.current_token is not None and self.current_token.type == "CHAINOP":
             self.advance()
-            return self.chain(list_)
+            return self.chain(ListNode(list_[0].pos_start, list_[-1].pos_end, list_))
+        return ListNode(list_[0].pos_start, list_[-1].pos_end, list_), None
