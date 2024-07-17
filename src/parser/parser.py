@@ -30,5 +30,30 @@ class Parser:
     def parse(self):
         ...
 
-    def chain(self) -> tuple[Node, None] | tuple[None, Error]:
-        ...
+    def chain(self, first_element: object | None = None) -> tuple[Node, None] | tuple[None, Error]:
+        # this is a messy draft
+        chain: list[object] = []
+        if first_element is not None:
+            chain.append(first_element)
+        if self.current_token is not None and self.current_token.type == "CHAINOP":
+            chain.append(None)
+            self.advance()
+        chain.append(self.current_token)
+        self.advance()
+        while self.current_token is not None and self.current_token.type == "CHAINOP":
+            self.advance()
+            chain.append(self.current_token)
+            self.advance()
+        if self.current_token is not None and self.current_token.type == "COMMA":
+            list_: list[object] = [chain]
+            self.advance()
+            list_.append(self.current_token)
+            self.advance()
+            while self.current_token is not None and self.current_token.type == "COMMA":
+                self.advance()
+                list_.append(self.current_token)
+                self.advance()
+            if self.current_token is not None and self.current_token.type == "CHAINOP":
+                self.advance()
+                return self.chain(list_)
+        return chain
