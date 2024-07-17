@@ -30,9 +30,9 @@ class Parser:
     def parse(self):
         ...
 
-    def chain(self, first_element: object | None = None) -> tuple[Node, None] | tuple[None, Error]:
+    def chain(self, first_element: Node | None = None) -> tuple[Node, None] | tuple[None, Error]:
         # this is a messy draft
-        chain: list[object] = []
+        chain: list[Node] = []
         if first_element is not None:
             chain.append(first_element)
         if self.current_token is not None and self.current_token.type == "CHAINOP":
@@ -45,15 +45,22 @@ class Parser:
             chain.append(self.current_token)
             self.advance()
         if self.current_token is not None and self.current_token.type == "COMMA":
-            list_: list[object] = [chain]
+            self.advance()
+            return self.list(chain)
+            
+        return chain
+
+    def list(self, first_element: Node | None = None) -> tuple[Node, None] | tuple[None, Error]:
+        """assuming current token is the first element of the list"""
+        list_: list[Node] = []
+        if first_element is not None:
+            list_.append(first_element)
+        list_.append(self.current_token)
+        self.advance()
+        while self.current_token is not None and self.current_token.type == "COMMA":
             self.advance()
             list_.append(self.current_token)
             self.advance()
-            while self.current_token is not None and self.current_token.type == "COMMA":
-                self.advance()
-                list_.append(self.current_token)
-                self.advance()
-            if self.current_token is not None and self.current_token.type == "CHAINOP":
-                self.advance()
-                return self.chain(list_)
-        return chain
+        if self.current_token is not None and self.current_token.type == "CHAINOP":
+            self.advance()
+            return self.chain(list_)
