@@ -77,3 +77,15 @@ class Position:
 
     def copy(self):
         return Position(self.line_number, self.index, self.column, self.filename)
+    
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, Position):
+            return False
+        return (
+            self.line_number == other.line_number and
+            self.index == other.index and
+            self.column == other.column and
+            self.filename == other.filename and
+            self.file_source == other.file_source and
+            self.end_of_line == other.end_of_line
+        )

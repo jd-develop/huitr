@@ -40,6 +40,7 @@ TOKEN_TYPES = [
     "FLOAT",
     "IDENTIFIER",
     "NAMESP",  # ::
+    "EOF"
 ]
 
 WHITESPACES = " \n\N{NBSP}\N{NNBSP}\t"
@@ -76,7 +77,7 @@ class Lexer:
     def new_token(
         self,
         token_type: str,
-        value: str | None = None,
+        value: str | int | float | None = None,
         start: Position | None = None,
         end: Position | None = None,
     ):
@@ -130,7 +131,6 @@ class Lexer:
                 case ":":
                     if not self.get_next() == ":":
                         return [], SyntaxError("incorrect use of `:`", self.cursor_pos)
-                        break
 
                     start_pos = self.cursor_pos.copy()
                     self.next()
@@ -164,9 +164,9 @@ class Lexer:
                             next_ = self.get_next()
 
                         if not any(c in number for c in [".", "e"]):
-                            self.new_token("INT", number, start=start_pos)
+                            self.new_token("INT", int(number), start=start_pos)
                         else:
-                            self.new_token("FLOAT", number, start=start_pos)
+                            self.new_token("FLOAT", float(number), start=start_pos)
 
                     # Identifier (no reserved keywords in this language)
                     elif self.current in IDENTIFIERS_LEGAL_CHARS:
@@ -209,4 +209,5 @@ class Lexer:
 
             self.next()
 
+        self.new_token("EOF", None, self.cursor_pos.copy(), self.cursor_pos.copy())
         return self.tokens, None
