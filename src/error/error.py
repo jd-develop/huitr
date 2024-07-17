@@ -7,9 +7,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-# Global Python imports
-from typing import Literal
-
 # Huitr API imports
 from src.lexer.position import Position
 

@@ -64,6 +64,8 @@ class Position:
             self.end_of_line = True
 
     def get_line(self):
+        if self.file_source is None:
+            return None
         lines = self.file_source.split("\n")
         if self.line_number >= len(lines):
             return None
