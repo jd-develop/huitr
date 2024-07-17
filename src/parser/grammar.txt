@@ -1,12 +1,24 @@
-# This file is not directly parsed by the Huitr interpreter, used for devs to know quickly how the parser parses.
+# This file is not directly parsed by the Huitr interpreter, but is useful for devs.
 # Note: This is a draft
 
-statements ::= (statement)?*
+# ? means "optional"
+# * means "at least 1"
+# + means "at least 0" (opional + as many as desired)
+
+statements ::= (statement)+
 
 statement ::= chain SEMICOLON
 
 list ::= chain (COMMA atom)*
 
-chain ::= (list | atom)? (CHAINOP atom)?*
+chain ::= (list | atom)? (CHAINOP atom)+
 
-atom ::= string_literal | number_literal | identifier
+atom ::= string_literal | number_literal | identifier | function | LPAREN statement RPAREN
+
+string_literal ::= STRING
+
+number_litteral ::= INT | FLOAT
+
+identifier ::= NAMESP? IDENTIFIER (NAMESP IDENTIFIER)+
+
+function ::= LSQUARE statements RSQUARE

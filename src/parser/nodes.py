@@ -56,6 +56,8 @@ class ChainNode(Node):
         )
     
     def __repr__(self):
+        if len(self.chain) == 1:
+            return f"c({self.chain[0]})"
         return " > ".join(map(str, self.chain))
 
 
