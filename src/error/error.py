@@ -34,7 +34,7 @@ class Error:
 
         error_line = self.start_pos.get_line()
 
-        if error_line:
+        if error_line is not None:
             # Replace tabs by TAB_WIDTH number of spaces and update the error position
             before_tab_count = error_line[: self.start_pos.column].count("\t")
             start_offset = before_tab_count * (TAB_WIDTH - 1)  # \t was removed
