@@ -97,3 +97,23 @@ class FloatNode(Node):
 class NoNode(Node):
     def __repr__(self):
         return "NoNode"
+
+
+class IdentifierNode(Node):
+    def __init__(self, identifiers_list: list[Token]):
+        self.identifiers_list = identifiers_list
+        self.pos_start = identifiers_list[0].start_pos
+        self.pos_end = identifiers_list[-1].end_pos
+
+    def __repr__(self):
+        return "i" + repr(self.identifiers_list)
+
+
+class LibIdentifierNode(Node):
+    def __init__(self, identifiers_list: list[Token], pos_start: Position, pos_end: Position):
+        self.identifiers_list = identifiers_list
+        self.pos_start = pos_start
+        self.pos_end = pos_end
+
+    def __repr__(self):
+        return "l" + repr(self.identifiers_list)

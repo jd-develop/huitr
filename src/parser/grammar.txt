@@ -5,9 +5,9 @@
 # * means "at least 1"
 # + means "at least 0" (opional + as many as desired)
 
-statements ::= (statement)+
+statements ::= SEMICOLON+ (statement SEMICOLON)+ statement? SEMICOLON+
 
-statement ::= chain SEMICOLON
+statement ::= chain
 
 list ::= chain (COMMA atom)*
 
