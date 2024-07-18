@@ -59,6 +59,7 @@ class Lexer:
     def next(self, n: int = 1):
         for _ in range(n):  # Not to skip \n when n>1
             self.current = self.cursor_pos.advance()
+        return self.current
 
     def get_next(self, n: int = 1):
         if self.cursor_pos.index + n >= len(self.source):
@@ -115,12 +116,16 @@ class Lexer:
                 case ".":  # Comments
                     self.next()
                     if self.current == ".":
-                        while not self.current == self.get_next() == ".":
-                            self.next()
+                        while not (self.current == self.get_next() == "."):
+                            n = self.next()
+                            if n is None:  # end of file
+                                break
                         self.next()  # Multi-line comments ends with .. (double dot)
                     else:
-                        while not self.current == "\n":
-                            self.next()
+                        while self.current != "\n":
+                            n = self.next()
+                            if n is None:  # end of file
+                                break
                 case ":":
                     if not self.get_next() == ":":
                         return [], SyntaxError("incorrect use of `:`", self.cursor_pos)
@@ -198,7 +203,6 @@ class Lexer:
                             "unexpected char",
                             self.cursor_pos,
                         )
-                        break
 
             self.next()
 
