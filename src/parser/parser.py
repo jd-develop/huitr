@@ -9,8 +9,8 @@
 
 # Huitr API imports
 from src.lexer.token import Token
-from src.error.error import Error
-from src.parser.nodes import Node, ChainNode, ListNode, BasicNode
+from src.error.error import Error, SyntaxError
+from src.parser.nodes import Node, ChainNode, ListNode, StringNode, IntNode, FloatNode
 
 
 class Parser:
@@ -40,13 +40,22 @@ class Parser:
             chain.append(ListNode(self.current_token.start_pos, self.current_token.start_pos, []))
             self.advance()
         
-        chain.append(BasicNode(self.current_token))
+        node, err = self.atom()
+        if err is not None:
+            return None, err
+        assert node is not None
+        chain.append(node)
         self.advance()
 
         while self.current_token is not None and self.current_token.type == "CHAINOP":
             self.advance()
-            chain.append(BasicNode(self.current_token))
+            node, err = self.atom()
+            if err is not None:
+                return None, err
+            assert node is not None
+            chain.append(node)
             self.advance()
+        
         if self.current_token is not None and self.current_token.type == "COMMA":
             self.advance()
             return self.list(ChainNode(chain[0].pos_start, chain[-1].pos_end, chain))
@@ -56,15 +65,40 @@ class Parser:
     def list(self, first_element: Node | None = None) -> tuple[Node, None] | tuple[None, Error]:
         """assuming current token is the first element of the list"""
         list_: list[Node] = []
+
         if first_element is not None:
             list_.append(first_element)
-        list_.append(BasicNode(self.current_token))
+        
+        node, err = self.atom()
+        if err is not None:
+            return None, err
+        assert node is not None
+        list_.append(node)
         self.advance()
+
         while self.current_token is not None and self.current_token.type == "COMMA":
             self.advance()
-            list_.append(BasicNode(self.current_token))
+            node, err = self.atom()
+            if err is not None:
+                return None, err
+            assert node is not None
+            list_.append(node)
             self.advance()
+        
         if self.current_token is not None and self.current_token.type == "CHAINOP":
             self.advance()
             return self.chain(ListNode(list_[0].pos_start, list_[-1].pos_end, list_))
+
         return ListNode(list_[0].pos_start, list_[-1].pos_end, list_), None
+    
+    def atom(self) -> tuple[Node, None] | tuple[None, Error]:
+        if self.current_token is None:
+            return None, SyntaxError("expected valid expression", self.tokens[-1].end_pos)
+        elif self.current_token.type == "STRING":
+            return StringNode(self.current_token), None
+        elif self.current_token.type == "INT":
+            return IntNode(self.current_token), None
+        elif self.current_token.type == "FLOAT":
+            return FloatNode(self.current_token), None
+        else:
+            return None, SyntaxError("expected valid expression", self.current_token.start_pos, self.current_token.end_pos)

@@ -28,17 +28,6 @@ class Node:
         return repr(self)
 
 
-class BasicNode(Node):
-    """For dev and debug purposes. Todo: remove this once parser is finished"""
-    def __init__(self, token: Token):
-        self.token = token
-        self.pos_start = token.start_pos
-        self.pos_end = token.end_pos
-
-    def __repr__(self):
-        return repr(self.token)
-
-
 class ChainNode(Node):
     def __init__(self, pos_start: Position, pos_end: Position, chain: list[Node]):
         self.chain = chain
@@ -73,3 +62,38 @@ class ListNode(Node):
     
     def __repr__(self):
         return "[" + ", ".join(map(str, self.list)) + "]"
+    
+
+class StringNode(Node):
+    def __init__(self, string_token: Token):
+        self.string_token = string_token
+        self.pos_start = string_token.start_pos
+        self.pos_end = string_token.end_pos
+
+    def __repr__(self):
+        return repr(self.string_token)
+    
+
+class IntNode(Node):
+    def __init__(self, int_token: Token):
+        self.int_token = int_token
+        self.pos_start = int_token.start_pos
+        self.pos_end = int_token.end_pos
+
+    def __repr__(self):
+        return repr(self.int_token)
+    
+
+class FloatNode(Node):
+    def __init__(self, float_token: Token):
+        self.float_token = float_token
+        self.pos_start = float_token.start_pos
+        self.pos_end = float_token.end_pos
+
+    def __repr__(self):
+        return repr(self.float_token)
+
+
+class NoNode(Node):
+    def __repr__(self):
+        return "NoNode"
