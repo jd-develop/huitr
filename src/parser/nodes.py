@@ -24,9 +24,6 @@ class Node:
     def __eq__(self, other: object) -> bool:
         return False
     
-    def __ne__(self, other: object) -> bool:
-        return not self == other
-    
     def __str__(self):
         return repr(self)
 
