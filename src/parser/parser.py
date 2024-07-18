@@ -32,12 +32,16 @@ class Parser:
     def parse(self) -> tuple[Node, None] | tuple[None, Error]:
         return self.statements()
 
-    def statements(self) -> tuple[Node, None] | tuple[None, Error]:
+    def statements(self, stop: list[str] | None = None) -> tuple[Node, None] | tuple[None, Error]:
+        """Register statements, stops at any token listed in `stop` (don’t forget EOF)"""
+        if stop is None:
+            stop = ["EOF"]
+
         statements_list: list[Node] = []
         while self.current_token is not None:
             while self.current_token.type == "SEMICOLON":
                 self.advance()
-            if self.current_token.type == "EOF":
+            if self.current_token.type in stop:
                 break
 
             node, err = self.statement()
@@ -46,12 +50,12 @@ class Parser:
             assert node is not None
             statements_list.append(node)
 
-            if self.current_token.type not in ["EOF", "SEMICOLON"]:
+            if self.current_token.type not in stop + ["SEMICOLON"]:
                 return None, SyntaxError("expected semicolon to finish the line", self.current_token.start_pos, self.current_token.end_pos)
             self.advance()
             while self.current_token.type == "SEMICOLON":
                 self.advance()
-            if self.current_token.type == "EOF":
+            if self.current_token.type in stop:
                 break
             
         if len(statements_list) == 0:
