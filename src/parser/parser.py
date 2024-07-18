@@ -19,7 +19,6 @@ class Parser:
         self.tokens = tokens
         self.tokens_index = 0
         self.current_token = tokens[0]
-        self.advance_count = 0
 
     def advance(self, return_old_token: bool = False):
         old_tok = self.current_token
@@ -28,22 +27,11 @@ class Parser:
             self.current_token = None
         else:
             self.tokens_index += 1
-            self.advance_count += 1
             self.current_token = self.tokens[self.tokens_index]
         
         if return_old_token:
             return old_tok
         return self.current_token
-    
-    def reverse(self):
-        """Reverse `self.advance_count` times. Resets `self.advance_count`"""
-        self.tokens_index -= self.advance_count
-        self.current_token = self.tokens[self.tokens_index]
-        self.reset_advance_count()
-        return self.current_token
-    
-    def reset_advance_count(self):
-        self.advance_count = 0
 
     def parse(self) -> tuple[Node, None] | tuple[None, Error]:
         return self.statements()
@@ -233,7 +221,6 @@ class Parser:
         assert self.current_token is not None
         pos = (self.current_token.start_pos, self.current_token.end_pos)
         self.advance()  # LSQUARE
-        self.reset_advance_count()
 
         # we check for pipe only
         if self.current_token.type == "PIPE":
