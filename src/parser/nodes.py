@@ -29,7 +29,7 @@ class Node:
 
 
 class ChainNode(Node):
-    def __init__(self, pos_start: Position, pos_end: Position, chain: list[Node]):
+    def __init__(self, chain: list[Node], pos_start: Position, pos_end: Position):
         self.chain = chain
         self.pos_start = pos_start
         self.pos_end = pos_end
@@ -48,7 +48,7 @@ class ChainNode(Node):
 
 
 class ListNode(Node):
-    def __init__(self, pos_start: Position, pos_end: Position, list_: list[Node]):
+    def __init__(self, list_: list[Node], pos_start: Position, pos_end: Position):
         self.list = list_
         self.pos_start = pos_start
         self.pos_end = pos_end
@@ -117,3 +117,17 @@ class LibIdentifierNode(Node):
 
     def __repr__(self):
         return "l" + repr(self.identifiers_list)
+
+
+class FuncDefNode(Node):
+    def __init__(self, body_node: Node, pos_start: Position, pos_end: Position, header: Node | None = None):
+        self.body_node = body_node
+        self.header = header
+
+        self.pos_start = pos_start
+        self.pos_end = pos_end
+
+    def __repr__(self):
+        if self.header is not None:
+            return "f[" + str(self.header) + " | " + str(self.body_node) + "]"
+        return "f[" + str(self.body_node) + "]"

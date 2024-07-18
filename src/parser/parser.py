@@ -11,7 +11,7 @@
 from src.lexer.token import Token
 from src.error.error import Error, SyntaxError
 from src.parser.nodes import Node, ChainNode, ListNode, StringNode, IntNode, FloatNode, NoNode, LibIdentifierNode
-from src.parser.nodes import IdentifierNode
+from src.parser.nodes import IdentifierNode, FuncDefNode
 
 
 class Parser:
@@ -19,6 +19,7 @@ class Parser:
         self.tokens = tokens
         self.tokens_index = 0
         self.current_token = tokens[0]
+        self.advance_count = 0
 
     def advance(self, return_old_token: bool = False):
         old_tok = self.current_token
@@ -27,22 +28,43 @@ class Parser:
             self.current_token = None
         else:
             self.tokens_index += 1
+            self.advance_count += 1
             self.current_token = self.tokens[self.tokens_index]
         
         if return_old_token:
             return old_tok
         return self.current_token
+    
+    def reverse(self):
+        """Reverse `self.advance_count` times. Resets `self.advance_count`"""
+        self.tokens_index -= self.advance_count
+        self.current_token = self.tokens[self.tokens_index]
+        self.reset_advance_count()
+        return self.current_token
+    
+    def reset_advance_count(self):
+        self.advance_count = 0
 
     def parse(self) -> tuple[Node, None] | tuple[None, Error]:
         return self.statements()
 
-    def statements(self, stop: list[str] | None = None) -> tuple[Node, None] | tuple[None, Error]:
+    def statements(self, stop: list[str] | None = None, first_statement: Node | None = None) -> tuple[Node, None] | tuple[None, Error]:
         """Register statements, stops at any token listed in `stop` (don’t forget EOF)"""
         if stop is None:
             stop = ["EOF"]
 
         statements_list: list[Node] = []
+        should_look_for_semicolon = False
+        if first_statement is not None:
+            statements_list.append(first_statement)
+            should_look_for_semicolon = True
+
         while self.current_token is not None:
+            if should_look_for_semicolon and self.current_token.type not in stop + ["SEMICOLON"]:
+                return None, SyntaxError("expected semicolon to finish the line", self.current_token.start_pos, self.current_token.end_pos)
+            elif should_look_for_semicolon:
+                should_look_for_semicolon = False
+            
             while self.current_token.type == "SEMICOLON":
                 self.advance()
             if self.current_token.type in stop:
@@ -56,15 +78,16 @@ class Parser:
 
             if self.current_token.type not in stop + ["SEMICOLON"]:
                 return None, SyntaxError("expected semicolon to finish the line", self.current_token.start_pos, self.current_token.end_pos)
-            self.advance()
+            
             while self.current_token.type == "SEMICOLON":
                 self.advance()
+            
             if self.current_token.type in stop:
                 break
             
         if len(statements_list) == 0:
             return NoNode(), None
-        return ListNode(statements_list[0].pos_start, statements_list[-1].pos_end, statements_list), None
+        return ListNode(statements_list, statements_list[0].pos_start, statements_list[-1].pos_end), None
 
     def statement(self) -> tuple[Node, None] | tuple[None, Error]:
         node, err = self.chain()
@@ -80,7 +103,7 @@ class Parser:
         if first_element is not None:
             chain.append(first_element)
         elif self.current_token is not None and self.current_token.type == "CHAINOP":
-            chain.append(ListNode(self.current_token.start_pos, self.current_token.start_pos, []))
+            chain.append(ListNode([], self.current_token.start_pos, self.current_token.start_pos))
             self.advance()
         
         node, err = self.atom()
@@ -99,9 +122,9 @@ class Parser:
         
         if self.current_token is not None and self.current_token.type == "COMMA":
             self.advance()
-            return self.list(ChainNode(chain[0].pos_start, chain[-1].pos_end, chain))
+            return self.list(ChainNode(chain, chain[0].pos_start, chain[-1].pos_end))
             
-        return ChainNode(chain[0].pos_start, chain[-1].pos_end, chain), None
+        return ChainNode(chain, chain[0].pos_start, chain[-1].pos_end), None
 
     def list(self, first_element: Node | None = None) -> tuple[Node, None] | tuple[None, Error]:
         """assuming current token is the first element of the list"""
@@ -129,9 +152,9 @@ class Parser:
         
         if self.current_token is not None and self.current_token.type == "CHAINOP":
             self.advance()
-            return self.chain(ListNode(list_[0].pos_start, list_[-1].pos_end, list_))
+            return self.chain(ListNode(list_, list_[0].pos_start, list_[-1].pos_end))
 
-        return ListNode(list_[0].pos_start, list_[-1].pos_end, list_), None
+        return ListNode(list_, list_[0].pos_start, list_[-1].pos_end), None
     
     def atom(self) -> tuple[Node, None] | tuple[None, Error]:
         if self.current_token is None:
@@ -158,10 +181,12 @@ class Parser:
 
             rparen = self.advance(True)
             if rparen is None or rparen.type != "RPAREN":
-                return None, SyntaxError("unmatched ')'", *pos)
+                return None, SyntaxError("unmatched '('", *pos)
             return statement, None
         elif self.current_token.type in ["NAMESP", "IDENTIFIER"]:
             return self.identifier()
+        elif self.current_token.type == "LSQUARE":
+            return self.function()
         else:
             return None, SyntaxError("expected valid expression", self.current_token.start_pos, self.current_token.end_pos)
 
@@ -181,9 +206,15 @@ class Parser:
         identifiers_list.append(self.current_token)
         new_token = self.advance()
 
+        should_check_for_unnecessary_namesp = False
         while new_token is not None and new_token.type == "NAMESP":
             self.advance()
             if self.current_token.type != "IDENTIFIER":
+                if len(identifiers_list) == 1 and identifiers_list[0].value == "reg" and self.current_token.type == "INT":
+                    identifiers_list.append(self.current_token)
+                    new_token = self.advance()
+                    should_check_for_unnecessary_namesp = True
+                    break
                 if lib_identifier:
                     identifiers_list.append(new_token)
                     break
@@ -191,6 +222,46 @@ class Parser:
             identifiers_list.append(self.current_token)
             new_token = self.advance()
         
+        if should_check_for_unnecessary_namesp and new_token is not None and new_token.type == "NAMESP":
+            return None, SyntaxError("didn’t except '::' here", self.current_token.start_pos, self.current_token.end_pos)
+
         if lib_identifier:
             return LibIdentifierNode(identifiers_list, pos_start, identifiers_list[-1].end_pos), None
         return IdentifierNode(identifiers_list), None
+
+    def function(self) -> tuple[Node, None] | tuple[None, Error]:
+        assert self.current_token is not None
+        pos = (self.current_token.start_pos, self.current_token.end_pos)
+        self.advance()  # LSQUARE
+        self.reset_advance_count()
+
+        # we check for pipe only
+        if self.current_token.type == "PIPE":
+            self.advance()
+            header = NoNode()
+            first_statement = None
+        else:
+            # we check for statement then pipe
+            header, err = self.statement()
+            if err is not None:
+                return None, err
+            assert header is not None
+
+            first_statement = None
+            # There is no pipe: let’s reverse
+            if self.current_token.type != "PIPE":
+                first_statement = header
+                header = None
+            else:  # There is a pipe: we can now register statements
+                self.advance()
+        
+        body, err = self.statements(["RSQUARE", "EOF"], first_statement)
+        if err is not None:
+            return None, err
+        if self.current_token.type != "RSQUARE":
+            return None, SyntaxError("unmatched '['", *pos)
+        pos_end = self.current_token.end_pos
+        self.advance()
+
+        assert body is not None
+        return FuncDefNode(body, pos[0], pos_end, header), None
