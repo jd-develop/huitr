@@ -108,7 +108,10 @@ class Parser:
         list_: list[Node] = []
 
         if first_element is not None:
-            list_.append(first_element)
+            if isinstance(first_element, ChainNode) and len(first_element.chain) == 1:
+                list_.append(first_element.chain[0])
+            else:
+                list_.append(first_element)
         
         node, err = self.atom()
         if err is not None:
