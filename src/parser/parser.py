@@ -20,13 +20,17 @@ class Parser:
         self.tokens_index = 0
         self.current_token = tokens[0]
 
-    def advance(self):
+    def advance(self, return_old_token: bool = False):
+        old_tok = self.current_token
         if self.current_token is None or self.current_token.is_eof():
             self.tokens_index = -1
             self.current_token = None
         else:
             self.tokens_index += 1
             self.current_token = self.tokens[self.tokens_index]
+        
+        if return_old_token:
+            return old_tok
         return self.current_token
 
     def parse(self) -> tuple[Node, None] | tuple[None, Error]:
@@ -141,6 +145,18 @@ class Parser:
             token = self.current_token
             self.advance()
             return FloatNode(token), None
+        elif self.current_token.type == "LPAREN":
+            pos = (self.current_token.start_pos, self.current_token.end_pos)
+            self.advance()
+            statement, err = self.statement()
+            if err is not None:
+                return None, err
+            assert statement is not None
+
+            rparen = self.advance(True)
+            if rparen is None or rparen.type != "RPAREN":
+                return None, SyntaxError("unmatched ')'", *pos)
+            return statement, None
         elif self.current_token.type in ["NAMESP", "IDENTIFIER"]:
             return self.identifier()
         else:
