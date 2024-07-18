@@ -41,7 +41,7 @@ TOKEN_TYPES = [
     "IDENTIFIER",
     "NAMESP",  # ::
     "EOF",
-    "PIPE"  # |
+    "PIPE",  # |
 ]
 
 WHITESPACES = " \n\N{NBSP}\N{NNBSP}\t"
@@ -52,23 +52,14 @@ class Lexer:
         self.source = source
         self.cursor_pos = Position(0, 0, 0, filename, self.source)
 
-        # Init self.current
-        if len(self.source) < 1:
-            self.current = None
-        else:
-            self.current = self.source[0]
-            self.cursor_pos.set_position(current_char=self.current)
-
         self.tokens: list[Token] = []
+
+        self.current = self.cursor_pos.get_char_at_pos()
 
     def next(self, n: int = 1):
         for _ in range(n):  # Not to skip \n when n>1
-            if self.cursor_pos.index + 1 >= len(self.source):
-                self.current = None
-            else:
-                self.current = self.source[self.cursor_pos.index + 1]
-
-            self.cursor_pos.advance(self.current)
+            self.current = self.cursor_pos.advance()
+        return self.current
 
     def get_next(self, n: int = 1):
         if self.cursor_pos.index + n >= len(self.source):
@@ -125,12 +116,16 @@ class Lexer:
                 case ".":  # Comments
                     self.next()
                     if self.current == ".":
-                        while not self.current == self.get_next() == ".":
-                            self.next()
+                        while not (self.current == self.get_next() == "."):
+                            n = self.next()
+                            if n is None:  # end of file
+                                break
                         self.next()  # Multi-line comments ends with .. (double dot)
                     else:
-                        while not self.current == "\n":
-                            self.next()
+                        while self.current != "\n":
+                            n = self.next()
+                            if n is None:  # end of file
+                                break
                 case ":":
                     if not self.get_next() == ":":
                         return [], SyntaxError("incorrect use of `:`", self.cursor_pos)
@@ -208,7 +203,6 @@ class Lexer:
                             "unexpected char",
                             self.cursor_pos,
                         )
-                        break
 
             self.next()
 
