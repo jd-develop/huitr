@@ -194,24 +194,15 @@ class Parser:
         identifiers_list.append(self.current_token)
         new_token = self.advance()
 
-        should_check_for_unnecessary_namesp = False
         while new_token is not None and new_token.type == "NAMESP":
             self.advance()
             if self.current_token.type != "IDENTIFIER":
-                if len(identifiers_list) == 1 and identifiers_list[0].value == "reg" and self.current_token.type == "INT":
-                    identifiers_list.append(self.current_token)
-                    new_token = self.advance()
-                    should_check_for_unnecessary_namesp = True
-                    break
                 if lib_identifier:
                     identifiers_list.append(new_token)
                     break
                 return None, SyntaxError("expected identifier", self.current_token.start_pos, self.current_token.end_pos)
             identifiers_list.append(self.current_token)
             new_token = self.advance()
-        
-        if should_check_for_unnecessary_namesp and new_token is not None and new_token.type == "NAMESP":
-            return None, SyntaxError("didn’t except '::' here", self.current_token.start_pos, self.current_token.end_pos)
 
         if lib_identifier:
             return LibIdentifierNode(identifiers_list, pos_start, identifiers_list[-1].end_pos), None
