@@ -181,6 +181,7 @@ class Lexer:
 
                     # String
                     elif self.current in STRING_DELIMITERS.keys():
+                        delimiter = self.current
                         matching_delimiter = STRING_DELIMITERS[self.current]
                         string = ""
                         while (
@@ -189,10 +190,14 @@ class Lexer:
                         ):
                             self.next()
                             string += self.current
+                        if self.get_next() is None:
+                            return [], SyntaxError(
+                                f"`{delimiter}` was never closed",
+                                self.cursor_pos
+                            )
                         self.next()  # Place cursor on tailing string delimiter
 
                         self.new_token("STRING", string, start=start_pos)
-
                     else:
                         if self.current == "»":
                             return [], SyntaxError(
