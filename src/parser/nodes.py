@@ -106,7 +106,7 @@ class IdentifierNode(Node):
         self.pos_end = identifiers_list[-1].end_pos
 
     def __repr__(self):
-        return "i" + repr(self.identifiers_list)
+        return "i[" + "::".join(str(i.value) for i in self.identifiers_list) + "]"
 
 
 class LibIdentifierNode(Node):
@@ -116,7 +116,7 @@ class LibIdentifierNode(Node):
         self.pos_end = pos_end
 
     def __repr__(self):
-        return "l" + repr(self.identifiers_list)
+        return "l[" + "::".join(str(i.value) for i in self.identifiers_list) + "]"
 
 
 class FuncDefNode(Node):
