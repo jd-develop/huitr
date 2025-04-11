@@ -93,126 +93,126 @@ class Lexer:
 
     def tokenize(self) -> tuple[list[Token], None | SyntaxError]:
         while self.current is not None:
+            start_pos = self.cursor_pos.copy()
             if self.current in WHITESPACES:
                 self.next()
                 continue
-            match self.current:
-                case "(":
-                    self.new_token("LPAREN")
-                case ")":
-                    self.new_token("RPAREN")
-                case "[":
-                    self.new_token("LSQUARE")
-                case "]":
-                    self.new_token("RSQUARE")
-                case ">":
-                    self.new_token("CHAINOP")
-                case ",":
-                    self.new_token("COMMA")
-                case ";":
-                    self.new_token("SEMICOLON")
-                case "|":
-                    self.new_token("PIPE")
-                case ".":  # Comments
-                    self.next()
-                    if self.current == ".":
-                        while not (self.current == self.get_next() == "."):
-                            n = self.next()
-                            if n is None:  # end of file
-                                break
-                        self.next()  # Multi-line comments ends with .. (double dot)
-                    else:
-                        while self.current != "\n":
-                            n = self.next()
-                            if n is None:  # end of file
-                                break
-                case ":":
-                    if not self.get_next() == ":":
-                        return [], SyntaxError("incorrect use of `:`", self.cursor_pos)
+            if self.current == "(":
+                self.new_token("LPAREN")
+            elif self.current == ")":
+                self.new_token("RPAREN")
+            elif self.current == "[":
+                self.new_token("LSQUARE")
+            elif self.current == "]":
+                self.new_token("RSQUARE")
+            elif self.current == ">":
+                self.new_token("CHAINOP")
+            elif self.current == ",":
+                self.new_token("COMMA")
+            elif self.current == ";":
+                self.new_token("SEMICOLON")
+            elif self.current == "|":
+                self.new_token("PIPE")
+            elif self.current == ".":  # Comments
+                self.next()
+                if self.current == ".":
+                    while not (self.current == self.get_next() == "."):
+                        n = self.next()
+                        if n is None:  # end of file
+                            break
+                    self.next()  # Multi-line comments ends with .. (double dot)
+                else:
+                    while self.current != "\n":
+                        n = self.next()
+                        if n is None:  # end of file
+                            break
+            elif self.current == ":":
+                if not self.get_next() == ":":
+                    return [], SyntaxError("incorrect use of `:`", self.cursor_pos)
 
-                    start_pos = self.cursor_pos.copy()
+                start_pos = self.cursor_pos.copy()
+                self.next()
+
+                self.new_token(
+                    "NAMESP",
+                    start=start_pos,
+                )
+
+            # Float / int
+            elif (self.current in DIGITS + "."):  # FIXME: Change comment symbol to make float starting with a period to work
+                number = self.current
+                last_was_e = False
+                seen_e = False
+                seen_dot = False
+                next_ = self.get_next()
+                while next_ is not None and (
+                    next_ in DIGITS + ALLOWED_CHARS_IN_INT + "eE."
+                    or (next_ == "-" and last_was_e)
+                ):
                     self.next()
 
-                    self.new_token(
-                        "NAMESP",
-                        start=start_pos,
+                    last_was_e = self.current.lower() == "e"
+                    seen_e = seen_e or last_was_e
+                    if self.current.lower() == ".":
+                        if seen_dot:
+                            return [], SyntaxError(
+                                "a number can not have more than one dot", self.cursor_pos
+                            )
+                        if seen_e:
+                            return [], SyntaxError(
+                                "exponent of scientific notation should be an integer, not float", self.cursor_pos
+                            )
+                        seen_dot = True
+
+                    number += self.current.lower()
+                    next_ = self.get_next()
+
+                if not any(c in number for c in [".", "e"]):
+                    self.new_token("INT", int(number), start=start_pos)
+                else:
+                    self.new_token("FLOAT", float(number), start=start_pos)
+
+            # Identifier (no reserved keywords in this language)
+            elif self.current in IDENTIFIERS_LEGAL_CHARS:
+                identifier = self.current
+                next_ = self.get_next()
+                while (
+                    next_ is not None
+                    and next_ in IDENTIFIERS_LEGAL_CHARS + DIGITS
+                ):
+                    self.next()
+                    identifier += self.current
+                    next_ = self.get_next()
+                self.new_token("IDENTIFIER", identifier, start=start_pos)
+
+            # String
+            elif self.current in STRING_DELIMITERS.keys():
+                delimiter = self.current
+                matching_delimiter = STRING_DELIMITERS[self.current]
+                string = ""
+                while (
+                    self.get_next() is not None
+                    and not self.get_next() == matching_delimiter
+                ):
+                    self.next()
+                    string += self.current
+                if self.get_next() is None:
+                    return [], SyntaxError(
+                        f"`{delimiter}` was never closed",
+                        self.cursor_pos
                     )
+                self.next()  # Place cursor on tailing string delimiter
 
-                case _:
-                    start_pos = self.cursor_pos.copy()
-
-                    # Float / int
-                    if (self.current in DIGITS + "."):  # FIXME: Change comment symbol to make float starting with a period to work
-                        number = self.current
-                        last_was_e = False
-                        seen_e = False
-                        seen_dot = False
-                        next_ = self.get_next()
-                        while next_ is not None and (
-                            next_ in DIGITS + ALLOWED_CHARS_IN_INT + "eE."
-                            or (next_ == "-" and last_was_e)
-                        ):
-                            self.next()
-
-                            last_was_e = self.current.lower() == "e"
-                            seen_e = seen_e or last_was_e
-                            if self.current.lower() == ".":
-                                if seen_dot:
-                                    return [], SyntaxError("a number can not have more than one dot", self.cursor_pos)
-                                if seen_e:
-                                    return [], SyntaxError("exponent of scientific notation should be an integer, not float", self.cursor_pos)
-                                seen_dot = True
-
-                            number += self.current.lower()
-                            next_ = self.get_next()
-
-                        if not any(c in number for c in [".", "e"]):
-                            self.new_token("INT", int(number), start=start_pos)
-                        else:
-                            self.new_token("FLOAT", float(number), start=start_pos)
-
-                    # Identifier (no reserved keywords in this language)
-                    elif self.current in IDENTIFIERS_LEGAL_CHARS:
-                        identifier = self.current
-                        next_ = self.get_next()
-                        while (
-                            next_ is not None
-                            and next_ in IDENTIFIERS_LEGAL_CHARS + DIGITS
-                        ):
-                            self.next()
-                            identifier += self.current
-                            next_ = self.get_next()
-                        self.new_token("IDENTIFIER", identifier, start=start_pos)
-
-                    # String
-                    elif self.current in STRING_DELIMITERS.keys():
-                        delimiter = self.current
-                        matching_delimiter = STRING_DELIMITERS[self.current]
-                        string = ""
-                        while (
-                            self.get_next() is not None
-                            and not self.get_next() == matching_delimiter
-                        ):
-                            self.next()
-                            string += self.current
-                        if self.get_next() is None:
-                            return [], SyntaxError(
-                                f"`{delimiter}` was never closed",
-                                self.cursor_pos
-                            )
-                        self.next()  # Place cursor on tailing string delimiter
-
-                        self.new_token("STRING", string, start=start_pos)
-                    else:
-                        if self.current == "»":
-                            return [], SyntaxError(
-                                "`»` was never opened", self.cursor_pos
-                            )
-
-                        return [], SyntaxError(
-                            "unexpected char",
-                            self.cursor_pos,
-                        )
+                self.new_token("STRING", string, start=start_pos)
+            elif self.current == "»":
+                return [], SyntaxError(
+                    "`»` was never opened", self.cursor_pos
+                )
+            else:
+                return [], SyntaxError(
+                    "unexpected char",
+                    self.cursor_pos,
+                )
 
             self.next()
 
