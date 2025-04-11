@@ -142,11 +142,11 @@ class Lexer:
                     start_pos = self.cursor_pos.copy()
 
                     # Float / int
-                    if (
-                        self.current in DIGITS + "."
-                    ):  # FIXME: Change comment symbol to make float starting with a period to work
+                    if (self.current in DIGITS + "."):  # FIXME: Change comment symbol to make float starting with a period to work
                         number = self.current
                         last_was_e = False
+                        seen_e = False
+                        seen_dot = False
                         next_ = self.get_next()
                         while next_ is not None and (
                             next_ in DIGITS + ALLOWED_CHARS_IN_INT + "eE."
@@ -154,9 +154,14 @@ class Lexer:
                         ):
                             self.next()
 
-                            last_was_e = False
-                            if self.current.lower() == "e":
-                                last_was_e = True
+                            last_was_e = self.current.lower() == "e"
+                            seen_e = seen_e or last_was_e
+                            if self.current.lower() == ".":
+                                if seen_dot:
+                                    return [], SyntaxError("a number can not have more than one dot", self.cursor_pos)
+                                if seen_e:
+                                    return [], SyntaxError("exponent of scientific notation should be an integer, not float", self.cursor_pos)
+                                seen_dot = True
 
                             number += self.current.lower()
                             next_ = self.get_next()
