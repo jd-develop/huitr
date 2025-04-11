@@ -13,7 +13,7 @@ list ::= chain (COMMA atom)*
 
 chain ::= (list | atom)? (CHAINOP atom)+
 
-atom ::= string_literal | number_literal | identifier | function | LPAREN statement RPAREN
+atom ::= string_literal | number_literal | identifier | function | LPAREN statement RPAREN | unit
 
 string_literal ::= STRING
 
@@ -22,3 +22,5 @@ number_litteral ::= INT | FLOAT
 identifier ::= NAMESP? IDENTIFIER (NAMESP IDENTIFIER)+
 
 function ::= LSQUARE (statement? PIPE)? statements RSQUARE
+
+unit ::= LPAREN RPAREN

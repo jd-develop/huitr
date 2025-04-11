@@ -2,7 +2,7 @@
 # -*- coding:utf-8 -*-
 
 # Huitr - a purely functional programming language.
-# Copyright (C) 2025  3fxcf9, jd-develop
+# Copyright (C) 2024-2025  3fxcf9, jd-develop
 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
@@ -134,3 +134,12 @@ class FuncDefNode(Node):
         if self.header is not None:
             return "f[" + str(self.header) + " | " + str(self.body_node) + "]"
         return "f[" + str(self.body_node) + "]"
+
+
+class UnitNode(Node):
+    def __init__(self, pos_start: _Position, pos_end: _Position):
+        self.pos_start = pos_start
+        self.pos_end = pos_end
+
+    def __repr__(self):
+        return "()"

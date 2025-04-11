@@ -2,7 +2,7 @@
 # -*- coding:utf-8 -*-
 
 # Huitr - a purely functional programming language.
-# Copyright (C) 2025  3fxcf9, jd-develop
+# Copyright (C) 2024-2025  3fxcf9, jd-develop
 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
@@ -11,7 +11,7 @@
 from src.lexer.token import Token
 from src.error.error import Error, SyntaxError
 from src.parser.nodes import Node, ChainNode, ListNode, StringNode, IntNode, FloatNode, NoNode, LibIdentifierNode
-from src.parser.nodes import IdentifierNode, FuncDefNode
+from src.parser.nodes import IdentifierNode, FuncDefNode, UnitNode
 
 
 class Parser:
@@ -107,11 +107,11 @@ class Parser:
                 return None, err
             assert node is not None
             chain.append(node)
-        
+
         if self.current_token is not None and self.current_token.type == "COMMA":
             self.advance()
             return self.list(ChainNode(chain, chain[0].pos_start, chain[-1].pos_end))
-            
+
         return ChainNode(chain, chain[0].pos_start, chain[-1].pos_end), None
 
     def list(self, first_element: Node | None = None) -> tuple[Node, None] | tuple[None, Error]:
@@ -123,7 +123,7 @@ class Parser:
                 list_.append(first_element.chain[0])
             else:
                 list_.append(first_element)
-        
+
         node, err = self.atom()
         if err is not None:
             return None, err
@@ -137,13 +137,13 @@ class Parser:
                 return None, err
             assert node is not None
             list_.append(node)
-        
+
         if self.current_token is not None and self.current_token.type == "CHAINOP":
             self.advance()
             return self.chain(ListNode(list_, list_[0].pos_start, list_[-1].pos_end))
 
         return ListNode(list_, list_[0].pos_start, list_[-1].pos_end), None
-    
+
     def atom(self) -> tuple[Node, None] | tuple[None, Error]:
         if self.current_token is None:
             return None, SyntaxError("expected valid expression", self.tokens[-1].end_pos)
@@ -161,7 +161,11 @@ class Parser:
             return FloatNode(token), None
         elif self.current_token.type == "LPAREN":
             pos = (self.current_token.start_pos, self.current_token.end_pos)
-            self.advance()
+            cur_tok = self.advance()
+            if cur_tok is not None and cur_tok.type == "RPAREN":
+                self.advance()
+                return UnitNode(pos[0], self.current_token.end_pos), None
+
             statement, err = self.statement()
             if err is not None:
                 return None, err
@@ -186,11 +190,11 @@ class Parser:
         if self.current_token.type == "NAMESP":
             self.advance()
             lib_identifier = True
-        
+
         identifiers_list: list[Token] = []
         if self.current_token.type != "IDENTIFIER":
             return None, SyntaxError("expected identifier", self.current_token.start_pos, self.current_token.end_pos)
-        
+
         identifiers_list.append(self.current_token)
         new_token = self.advance()
 
@@ -232,7 +236,7 @@ class Parser:
                 header = None
             else:  # There is a pipe: we can now register statements
                 self.advance()
-        
+
         body, err = self.statements(["RSQUARE", "EOF"], first_statement)
         if err is not None:
             return None, err
