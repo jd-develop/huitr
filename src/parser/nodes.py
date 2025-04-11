@@ -120,19 +120,13 @@ class LibIdentifierNode(Node):
 
 
 class FuncDefNode(Node):
-    def __init__(self, body_node: Node, pos_start: _Position, pos_end: _Position, header: Node | None = None):
+    def __init__(self, body_node: Node, pos_start: _Position, pos_end: _Position):
         self.body_node = body_node
-        self.header = header
-        if isinstance(header, NoNode):
-            header.pos_start = pos_start.copy()
-            header.pos_end = body_node.pos_start.copy()
 
         self.pos_start = pos_start
         self.pos_end = pos_end
 
     def __repr__(self):
-        if self.header is not None:
-            return "f[" + str(self.header) + " | " + str(self.body_node) + "]"
         return "f[" + str(self.body_node) + "]"
 
 

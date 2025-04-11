@@ -36,23 +36,14 @@ class Parser:
     def parse(self) -> tuple[Node, None] | tuple[None, Error]:
         return self.statements()
 
-    def statements(self, stop: list[str] | None = None, first_statement: Node | None = None) -> tuple[Node, None] | tuple[None, Error]:
+    def statements(self, stop: list[str] | None = None) -> tuple[Node, None] | tuple[None, Error]:
         """Register statements, stops at any token listed in `stop` (don’t forget EOF)"""
         if stop is None:
             stop = ["EOF"]
 
         statements_list: list[Node] = []
-        should_look_for_semicolon = False
-        if first_statement is not None:
-            statements_list.append(first_statement)
-            should_look_for_semicolon = True
 
         while self.current_token is not None:
-            if should_look_for_semicolon and self.current_token.type not in stop + ["SEMICOLON"]:
-                return None, SyntaxError("expected semicolon to finish the line", self.current_token.start_pos, self.current_token.end_pos)
-            elif should_look_for_semicolon:
-                should_look_for_semicolon = False
-            
             while self.current_token.type == "SEMICOLON":
                 self.advance()
             if self.current_token.type in stop:
@@ -66,13 +57,13 @@ class Parser:
 
             if self.current_token.type not in stop + ["SEMICOLON"]:
                 return None, SyntaxError("expected semicolon to finish the line", self.current_token.start_pos, self.current_token.end_pos)
-            
+
             while self.current_token.type == "SEMICOLON":
                 self.advance()
-            
+
             if self.current_token.type in stop:
                 break
-            
+
         if len(statements_list) == 0:
             return NoNode(), None
         return ListNode(statements_list, statements_list[0].pos_start, statements_list[-1].pos_end), None
@@ -93,7 +84,7 @@ class Parser:
         elif self.current_token is not None and self.current_token.type == "CHAINOP":
             chain.append(ListNode([], self.current_token.start_pos, self.current_token.start_pos))
             self.advance()
-        
+
         node, err = self.atom()
         if err is not None:
             return None, err
@@ -217,27 +208,7 @@ class Parser:
         pos = (self.current_token.start_pos, self.current_token.end_pos)
         self.advance()  # LSQUARE
 
-        # we check for pipe only
-        if self.current_token.type == "PIPE":
-            self.advance()
-            header = NoNode()
-            first_statement = None
-        else:
-            # we check for statement then pipe
-            header, err = self.statement()
-            if err is not None:
-                return None, err
-            assert header is not None
-
-            first_statement = None
-            # There is no pipe: let’s reverse
-            if self.current_token.type != "PIPE":
-                first_statement = header
-                header = None
-            else:  # There is a pipe: we can now register statements
-                self.advance()
-
-        body, err = self.statements(["RSQUARE", "EOF"], first_statement)
+        body, err = self.statements(["RSQUARE", "EOF"])
         if err is not None:
             return None, err
         if self.current_token.type != "RSQUARE":
@@ -246,4 +217,4 @@ class Parser:
         self.advance()
 
         assert body is not None
-        return FuncDefNode(body, pos[0], pos_end, header), None
+        return FuncDefNode(body, pos[0], pos_end), None

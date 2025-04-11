@@ -21,6 +21,6 @@ number_litteral ::= INT | FLOAT
 
 identifier ::= NAMESP? IDENTIFIER (NAMESP IDENTIFIER)+
 
-function ::= LSQUARE (statement? PIPE)? statements RSQUARE
+function ::= LSQUARE statements RSQUARE
 
 unit ::= LPAREN RPAREN
