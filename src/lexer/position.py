@@ -2,7 +2,7 @@
 # -*- coding:utf-8 -*-
 
 # Huitr - a purely functional programming language.
-# Copyright (C) 2024  3fxcf9, jd-develop
+# Copyright (C) 2024-2025  3fxcf9, jd-develop
 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
@@ -38,7 +38,7 @@ class Position:
         filename: str | None = None,
         file_source: str | None = None,
         current_char: str | None = None,
-    ) -> None:
+    ) -> str | None:
         if line_number is not None:
             self.line_number = line_number
         if index is not None:

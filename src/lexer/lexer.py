@@ -40,8 +40,7 @@ TOKEN_TYPES = [
     "FLOAT",
     "IDENTIFIER",
     "NAMESP",  # ::
-    "EOF",
-    "PIPE",  # |
+    "EOF"
 ]
 
 WHITESPACES = " \n\N{NBSP}\N{NNBSP}\t"
@@ -111,8 +110,6 @@ class Lexer:
                 self.new_token("COMMA")
             elif self.current == ";":
                 self.new_token("SEMICOLON")
-            elif self.current == "|":
-                self.new_token("PIPE")
             elif self.current == ".":  # Comments
                 self.next()
                 if self.current == ".":
@@ -210,7 +207,7 @@ class Lexer:
                 )
             else:
                 return [], SyntaxError(
-                    "unexpected char",
+                    f"unexpected char U+{hex(ord(self.current))[2:].upper()}",
                     self.cursor_pos,
                 )
 
