@@ -2,7 +2,7 @@
 # -*- coding:utf-8 -*-
 
 # Huitr - a purely functional programming language.
-# Copyright (C) 2024  3fxcf9, jd-develop
+# Copyright (C) 2025  3fxcf9, jd-develop
 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
@@ -24,7 +24,7 @@ class Value:
         self.call_with_module_context: bool = False
         self.module_context: Context | None = None
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "BaseValue"
 
     def __str__(self):
