@@ -61,3 +61,13 @@ class List(Value):
     def __repr__(self) -> str:
         return "[" + ",".join(map(repr, self.value)) + "]"
 
+
+class Unit(Value):
+    """unit"""
+    def __init__(self, pos_start: Position, pos_end: Position, context: Context):
+        super().__init__(pos_start, pos_end, context)
+        self.type: str = "unit"
+
+    def __repr__(self) -> str:
+        return "()"
+

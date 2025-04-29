@@ -7,6 +7,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+# Global Python imports
+from typing import Any
 # Huitr API imports
 from src.lexer.position import Position
 from src.runtime.context import Context
@@ -23,6 +25,8 @@ class Value:
         self.attributes: dict[str|int, Value] = {}
         self.call_with_module_context: bool = False
         self.module_context: Context | None = None
+
+        self.value: Any = None
 
     def __repr__(self) -> str:
         return "BaseValue"
