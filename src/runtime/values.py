@@ -33,3 +33,31 @@ class Float(Value):
 
     def __repr__(self):
         return str(self.value)
+
+
+class String(Value):
+    """String"""
+    def __init__(self, pos_start: Position, pos_end: Position, context: Context, value: str):
+        super().__init__(pos_start, pos_end, context)
+        self.type: str = "str"
+        self.value: str = value
+
+    def __repr__(self) -> str:
+        value_to_print = self.value
+        if "\"" in value_to_print:
+            if "'" in value_to_print:
+                return f'"{value_to_print.replace("\"", "\\\"")}"'
+            return f"'{value_to_print}'"
+        return f'"{self.value}"'
+
+
+class List(Value):
+    """List of values"""
+    def __init__(self, pos_start: Position, pos_end: Position, context: Context, value: list[Value]):
+        super().__init__(pos_start, pos_end, context)
+        self.type: str = "list"
+        self.value: list[Value] = value
+
+    def __repr__(self) -> str:
+        return "[" + ",".join(map(repr, self.value)) + "]"
+
