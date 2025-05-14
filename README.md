@@ -15,4 +15,4 @@ Huitr – a purely functional programming language.
 
 ### Grammar
 
-[Ici](src/parser/grammar.txt)
+[Here](src/parser/grammar.txt)

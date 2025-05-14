@@ -119,10 +119,10 @@ class Lexer:
                             return [], SyntaxError("Unclosed multi-line comment", self.cursor_pos)
                     self.next()  # Multi-line comments ends with .. (double dot)
                 else:
-                    while self.current != ".":
+                    while self.current != "\n":
                         n = self.next()
-                        if n is None or self.current == "\n":  # end of file
-                            return [], SyntaxError("Unclosed single-line comment", self.cursor_pos)
+                        if n is None:  # end of file
+                            break
             elif self.current == ":":
                 if not self.get_next() == ":":
                     return [], SyntaxError("incorrect use of `:`", self.cursor_pos)
