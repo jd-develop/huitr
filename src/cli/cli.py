@@ -18,14 +18,21 @@ def main_cli():
     arg_parser = argparse.ArgumentParser(
         prog="Huitr file executor",
         description="Execute a Huitr program written in a file",
-        epilog="“Huitr” stands for “Huitr is tough to read”."
+        epilog="""Huitr – a purely functional programming language."
+                “Huitr” stands for “Huitr is tough to read”."""
         )
     arg_parser.add_argument(
         'filename',
         type=str,
         help="File where the Huitr program is"
         )
+    arg_parser.add_argument(
+        "-d",
+        "--debug",
+        action="store_true",
+        help="print tokens structure"
+        )
 
     args = arg_parser.parse_args()
 
-    execute_file(args.filename)
+    execute_file(args.filename, args.debug)

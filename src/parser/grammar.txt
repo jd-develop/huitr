@@ -29,6 +29,7 @@ unit ::= LPAREN RPAREN
 SEMICOLON ::= ";"
 COMMA ::= ","
 DOT ::= "."
+DDOT ::= ".."
 LPAREN ::= "("
 RPAREN ::= ")"
 LSQUARE ::= "["
@@ -38,4 +39,4 @@ NAMESP ::= "::"
 
 # To make a comment
 comment ::= DOT string_literal DOT
-multiline_comment = DOT DOT string_literal DOT DOT
+multiline_comment = DDOT string_literal DDOT

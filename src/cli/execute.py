@@ -16,7 +16,7 @@ from src.parser.parser import Parser
 from src.runtime. interpreter import visit
 
 
-def execute_file(filename: str):
+def execute_file(filename: str, debug: bool):
     if not os.path.exists(filename):
         print(f"File {filename} not found")
         return
@@ -30,6 +30,8 @@ def execute_file(filename: str):
             if file_output[0] is None:
                 print(file_output[1])
             else:
+                if debug:
+                    print(file_output[0])
                 print(visit(file_output[0]))
         else:
             print(file_tokens[1])
