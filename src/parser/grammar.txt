@@ -24,3 +24,18 @@ identifier ::= NAMESP? IDENTIFIER (NAMESP IDENTIFIER)+
 function ::= LSQUARE statements RSQUARE
 
 unit ::= LPAREN RPAREN
+
+# Punctuation
+SEMICOLON ::= ";"
+COMMA ::= ","
+DOT ::= "."
+LPAREN ::= "("
+RPAREN ::= ")"
+LSQUARE ::= "["
+RSQUARE ::= "]"
+CHAINOP ::= ">"
+NAMESP ::= "::"
+
+# To make a comment
+comment ::= DOT string_literal DOT
+multiline_comment = DOT DOT string_literal DOT DOT
