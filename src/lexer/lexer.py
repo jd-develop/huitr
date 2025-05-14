@@ -116,7 +116,7 @@ class Lexer:
                     while not (self.current == self.get_next() == "."):
                         n = self.next()
                         if n is None:  # end of file
-                            break
+                            return [], SyntaxError("Unclosed multi-line comment", self.cursor_pos)
                     self.next()  # Multi-line comments ends with .. (double dot)
                 else:
                     while self.current != "\n":

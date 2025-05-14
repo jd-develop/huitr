@@ -6,3 +6,13 @@
 Huitr – a purely functional programming language.
 
 “Huitr” stands for “Huitr is tough to read”.
+
+### Execute
+
+```bash
+./main.py path_to_your_file
+```
+
+### Grammar
+
+[Here](src/parser/grammar.txt)
