@@ -2,16 +2,16 @@
 # Note: This is a draft
 
 # ? means "optional"
-# * means "at least 1"
-# + means "at least 0" (opional + as many as desired)
+# + means "at least 1"
+# * means "at least 0" (opional + as many as desired)
 
-statements ::= SEMICOLON+ (statement SEMICOLON)+ statement? SEMICOLON+
+statements ::= SEMICOLON* (statement SEMICOLON)* statement? SEMICOLON*
 
 statement ::= chain
 
-list ::= chain (COMMA atom)*
+list ::= chain (COMMA atom)+
 
-chain ::= (list | atom)? (CHAINOP atom)+
+chain ::= (list | atom)? (CHAINOP atom)*
 
 atom ::= string_literal | number_literal | identifier | function | LPAREN statement RPAREN | unit
 
@@ -19,7 +19,7 @@ string_literal ::= STRING
 
 number_litteral ::= INT | FLOAT
 
-identifier ::= NAMESP? IDENTIFIER (NAMESP IDENTIFIER)+
+identifier ::= NAMESP? IDENTIFIER (NAMESP IDENTIFIER)*
 
 function ::= LSQUARE statements RSQUARE
 
@@ -38,5 +38,5 @@ CHAINOP ::= ">"
 NAMESP ::= "::"
 
 # To make a comment
-comment ::= DOT string_literal DOT
+comment ::= DOT string_literal
 multiline_comment = DDOT string_literal DDOT
