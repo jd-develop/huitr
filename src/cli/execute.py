@@ -13,7 +13,8 @@ import os
 # Huitr API imports
 from src.lexer.lexer import Lexer
 from src.parser.parser import Parser
-from src.runtime. interpreter import visit
+from src.runtime.interpreter import visit
+from src.runtime.context import Context
 
 
 def execute_file(filename: str, debug: bool):
@@ -32,6 +33,6 @@ def execute_file(filename: str, debug: bool):
             else:
                 if debug:
                     print(file_output[0])
-                print(visit(file_output[0]))
+                print(visit(file_output[0], Context()))
         else:
             print(file_tokens[1])

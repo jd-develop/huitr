@@ -11,7 +11,7 @@
 import string
 
 # Huitr API imports
-from src.error.error import SyntaxError
+from src.error.error import HuitrSyntaxError
 from src.lexer.position import Position
 from src.lexer.token import Token
 
@@ -90,7 +90,7 @@ class Lexer:
             )
         )
 
-    def tokenize(self) -> tuple[list[Token], None | SyntaxError]:
+    def tokenize(self) -> tuple[list[Token], None | HuitrSyntaxError]:
         while self.current is not None:
             start_pos = self.cursor_pos.copy()
             if self.current in WHITESPACES:
@@ -116,7 +116,7 @@ class Lexer:
                     while not (self.current == self.get_next() == "."):
                         n = self.next()
                         if n is None:  # end of file
-                            return [], SyntaxError("Unclosed multi-line comment", self.cursor_pos)
+                            return [], HuitrSyntaxError("Unclosed multi-line comment", self.cursor_pos)
                     self.next()  # Multi-line comments ends with .. (double dot)
                 else:
                     while self.current != "\n":
@@ -125,7 +125,7 @@ class Lexer:
                             break
             elif self.current == ":":
                 if not self.get_next() == ":":
-                    return [], SyntaxError("incorrect use of `:`", self.cursor_pos)
+                    return [], HuitrSyntaxError("incorrect use of `:`", self.cursor_pos)
 
                 start_pos = self.cursor_pos.copy()
                 self.next()
@@ -152,11 +152,11 @@ class Lexer:
                     seen_e = seen_e or last_was_e
                     if self.current.lower() == ".":
                         if seen_dot:
-                            return [], SyntaxError(
+                            return [], HuitrSyntaxError(
                                 "a number can not have more than one dot", self.cursor_pos
                             )
                         if seen_e:
-                            return [], SyntaxError(
+                            return [], HuitrSyntaxError(
                                 "exponent of scientific notation should be an integer, not float", self.cursor_pos
                             )
                         seen_dot = True
@@ -194,7 +194,7 @@ class Lexer:
                     self.next()
                     string += self.current
                 if self.get_next() is None:
-                    return [], SyntaxError(
+                    return [], HuitrSyntaxError(
                         f"`{delimiter}` was never closed",
                         self.cursor_pos
                     )
@@ -202,11 +202,11 @@ class Lexer:
 
                 self.new_token("STRING", string, start=start_pos)
             elif self.current == "»":
-                return [], SyntaxError(
+                return [], HuitrSyntaxError(
                     "`»` was never opened", self.cursor_pos
                 )
             else:
-                return [], SyntaxError(
+                return [], HuitrSyntaxError(
                     f"unexpected char U+{hex(ord(self.current))[2:].upper()}",
                     self.cursor_pos,
                 )

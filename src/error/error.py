@@ -13,7 +13,7 @@ from src.lexer.position import Position
 TAB_WIDTH = 4
 
 
-class Error:
+class HuitrError:
     def __init__(
         self,
         error_type: str,
@@ -57,7 +57,7 @@ class Error:
         return repr(self)
 
 
-class SyntaxError(Error):
+class HuitrSyntaxError(HuitrError):
     def __init__(
         self,
         error_message: str,
@@ -67,7 +67,7 @@ class SyntaxError(Error):
         super().__init__("SyntaxError", error_message, start_pos, end_pos)
 
 
-class ReferenceError(Error):
+class HuitrReferenceError(HuitrError):
     def __init__(
         self,
         error_message: str,
@@ -77,7 +77,7 @@ class ReferenceError(Error):
         super().__init__("ReferenceError", error_message, start_pos, end_pos)
 
 
-class ModuleNotFoundError(Error):
+class HuitrModuleNotFoundError(HuitrError):
     def __init__(
         self,
         error_message: str,
