@@ -16,7 +16,7 @@ class Position:
         column: int,
         filename: str | None = None,
         file_source: str | None = None,
-        current_char: str | None = None,
+        # current_char: str | None = None,
     ):
         self.line_number = line_number
         self.index = index
@@ -25,7 +25,8 @@ class Position:
         self.file_source = file_source
         self.end_of_line = False
 
-        current = current_char if current_char is not None else self.get_char_at_pos()
+        # current = current_char if current_char is not None else self.get_char_at_pos()
+        current = self.get_char_at_pos()
 
         if current == "\n":
             self.end_of_line = True
