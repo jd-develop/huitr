@@ -15,7 +15,7 @@ type position = {
     mutable index : int;
 };;
 
-let init_position
+let create_position
     (_filename : string option)
     (_file_source : string)
     (_line_number : int)
@@ -63,7 +63,7 @@ let advance
     (pos : position)
     (n : int)
     : unit =
-    for i = 1 to n do
+    for _ = 1 to n do
         pos.column_number <- pos.column_number + 1;
         pos.index <- pos.index + 1;
 
@@ -85,6 +85,7 @@ let copy_position
         index = pos.index;
     };;
 
+(*
 let (=)
     (pos1 : position)
     (pos2 : position)
@@ -94,6 +95,7 @@ let (=)
     pos1.column_number = pos2.column_number &&
     pos1.filename = pos2.filename &&
     pos1.file_source = pos2.file_source;;
+*)
 
 let print_position
     (pos : position)
