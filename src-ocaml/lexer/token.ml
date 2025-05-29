@@ -19,14 +19,14 @@ type token_type =
     | Float_token
     | Identifier
     | Namesp (* :: *)
-    | Eof;;
+    | Eof
 
 
 type huitr_value =
     | S of string
     | I of int
     | F of float
-    | None;;
+    | None
 
 (*
 let (=)
@@ -47,7 +47,7 @@ type token = {
     value : huitr_value;
     start_pos : Position.position;
     end_pos : Position.position;
-};;
+}
 
 let matches
     (t : token)

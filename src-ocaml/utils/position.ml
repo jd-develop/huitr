@@ -13,7 +13,7 @@ type position = {
     mutable line_number : int;
     mutable column_number : int;
     mutable index : int;
-};;
+}
 
 let create_position
     (_filename : string option)
@@ -30,7 +30,7 @@ let create_position
         line_number = _line_number;
         column_number = _column_number;
         index = _index;
-    };;
+    }
 
 let get_line
     (pos : position)
@@ -38,25 +38,25 @@ let get_line
     let lines = String.split_on_char '\n' pos.file_source in
     if pos.line_number >= List.length lines
         then None
-        else Some((Array.of_list lines).(pos.line_number) ^ "\n");;
+        else Some((Array.of_list lines).(pos.line_number) ^ "\n")
 
 let get_char
     (pos : position)
     : char option =
-    let line = get_line(pos) in
+    let line = get_line pos in
     match line with
     | None -> None
     | Some(l) -> if pos.column_number >= String.length l
         then None
-        else Some(l.[pos.column_number]);;
+        else Some l.[pos.column_number]
 
 let end_of_line
     (* true if pos points at the end of a line and false else *)
     (pos : position)
     : bool =
-    match get_char(pos) with
+    match get_char pos with
     | None -> false
-    | Some(c) -> c = '\n';;
+    | Some(c) -> c = '\n'
 
 let advance
     (* Advances the position by n character, return the character it landed at or None if impossible *)
@@ -72,7 +72,7 @@ let advance
                 pos.line_number <- pos.line_number + 1;
                 pos.column_number <- 0;
             end
-    done;;
+    done
 
 let copy_position
     (pos : position)
@@ -83,7 +83,7 @@ let copy_position
         line_number = pos.line_number;
         column_number = pos.column_number;
         index = pos.index;
-    };;
+    }
 
 (*
 let (=)
@@ -106,4 +106,4 @@ let print_position
     print_int pos.line_number;
     print_string ":";
     print_int pos.column_number;
-    print_string "]";;
+    print_string "]"

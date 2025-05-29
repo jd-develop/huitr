@@ -44,7 +44,7 @@ class HuitrError:
             ].count("\t")
             end_offset = error_tab_count * (TAB_WIDTH - 1)  # \t was removed
 
-            error_line = error_line.expandtabs(4)
+            error_line = error_line.expandtabs(TAB_WIDTH)
 
             error_text += f"  {error_line}"
             error_text += f"  {' ' * (self.start_pos.column + start_offset)}{'^' * (self.end_pos.column - self.start_pos.column + 1 + end_offset)}\n"
