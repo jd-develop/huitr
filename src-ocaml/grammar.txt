@@ -1,0 +1,42 @@
+# This file is not directly parsed by the Huitr interpreter, but is useful for devs.
+# Note: This is a draft
+
+# ? means "optional"
+# + means "at least 1"
+# * means "at least 0" (opional + as many as desired)
+
+statements ::= SEMICOLON* (statement SEMICOLON)* statement? SEMICOLON*
+
+statement ::= chain
+
+list ::= chain (COMMA atom)+
+
+chain ::= (list | atom)? (CHAINOP atom)*
+
+atom ::= string_literal | number_literal | identifier | function | LPAREN statement RPAREN | unit
+
+string_literal ::= STRING
+
+number_litteral ::= INT | FLOAT
+
+identifier ::= NAMESP? IDENTIFIER (NAMESP IDENTIFIER)*
+
+function ::= LSQUARE statements RSQUARE
+
+unit ::= LPAREN RPAREN
+
+# Punctuation
+SEMICOLON ::= ";"
+COMMA ::= ","
+DOT ::= "."
+DDOT ::= ".."
+LPAREN ::= "("
+RPAREN ::= ")"
+LSQUARE ::= "["
+RSQUARE ::= "]"
+CHAINOP ::= ">"
+NAMESP ::= "::"
+
+# To make a comment
+comment ::= DOT string_literal
+multiline_comment = DDOT string_literal DDOT

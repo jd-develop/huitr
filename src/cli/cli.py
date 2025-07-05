@@ -16,9 +16,9 @@ from src.cli.execute import execute_file
 
 def main_cli():
     arg_parser = argparse.ArgumentParser(
-        prog="Huitr file executor",
+        prog="Huitr file interpreter",
         description="Execute a Huitr program written in a file",
-        epilog="""Huitr – a purely functional programming language."
+        epilog="""Huitr – a purely functional programming language.
                 “Huitr” stands for “Huitr is tough to read”."""
         )
     arg_parser.add_argument(
