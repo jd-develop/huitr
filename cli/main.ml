@@ -30,7 +30,7 @@ let debug =
     )
 
 let command =
-    let version = "0.0.1" in
+    let version = "0.1.0" in
     let doc = "Huitr file interpreter" in
     let man = [
         `S Manpage.s_description;
