@@ -1,10 +1,10 @@
 (*
-Huitr - a purely functional programming language.
-Copyright (C) 2024-2025  3fxcf9, jd-develop, Hugo Vangilluwen
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*)
+ * Huitr - a purely functional programming language.
+ * Copyright (C) 2024-2025  3fxcf9, jd-develop, Hugo Vangilluwen
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *)
 
 type lexer_type = {
     source : string;
@@ -53,12 +53,14 @@ let new_token
     (tt : Token.token_type)
     : unit =
     (*
-    Arguments:
-        token_type: type of the new token
-        token_value (optional): the token value
-        index_start (optional): the index in the line at which the token begins. Defaults to self.cursor_pos if ommited.
-        index_end (optional): the index in the line at which the token ends. Defaults to self.cursor_pos if ommited.
-    *)
+     * Arguments:
+     *  tt (token type): type of the new token
+     *  token_value (optional): the token value
+     *  index_start (optional): the index in the line at which the token begins.
+     *                          Defaults to self.cursor_pos if ommited.
+     *  index_end (optional): the index in the line at which the token ends.
+     *                        Defaults to self.cursor_pos if ommited.
+     *)
     lexer.tokens <- {
         own_type = tt;
         value = token_value;

@@ -19,16 +19,17 @@ Huitr – a purely functional programming language.
 
 ### OCaml
 
-This branch aim to translate Python code into OCaml.
+This branch aims to translate the Python code into OCaml.
 
-To build :
+To build:
 ```bash
 dune build
 ```
 
-To run :
+To run:
 ```bash
 dune exec -- huitr [OPTION]… FILENAME
 ```
 
-To see specific information for Debian-based distro, read [debian.md](debian.md)
+To see specific information for Debian-based distros, read
+[debian.md](debian.md).
