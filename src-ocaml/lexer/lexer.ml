@@ -6,29 +6,68 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *)
 
-type lexer_type = {
-    source : string;
-    mutable cursor_pos : Position.position;
-    mutable tokens : Token.token list;
-}
+(*
+ * Cette fonction transforme une chaîne de caractères en liste de caractères.
+ * Elle provient de
+ * <https://caml.inria.fr/pub/old_caml_site/FAQ/FAQ_EXPERT-eng.html#strings>
+ *)
+let explode (s: string) : char list =
+  let rec exp i l =
+    if i < 0 then l else exp (i-1) (s.[i]::l) in
+  exp (String.length s - 1) []
 
-let create_lexer
-    (_filename : string option)
-    (_source : string)
-    : lexer_type =
-    {
-        source = _source;
-        cursor_pos = Position.create_position
-            _filename
-            _source
-            0
-            0
-            0
-        ;
-        tokens = [];
-    }
 
-let current_char
+(*
+ * Cette fonction transforme une liste de caractères en chaîne de caractères.
+ * C’est l’exact opposé de `explode`.
+ * Elle ne vient pas du site de l’INRIA
+ *)
+let implode (l: char list) =
+  String.of_seq (List.to_seq l)
+
+
+(* Créée une liste de lexèmes à partir d’une liste de caractères d’entrée.
+ * * `source` est la liste de caractères d’entrée. Elle pert son premier
+ *   élément à chaque appel récursif au fur et à mesure de l’analyse lexicale
+ * * `source_string` est l’entrée sous forme de chaîne de caractères. C’est une
+ *   constante utilisée pour construire des Position.t
+ * * `currently_registering` est à true si l’état de l’analyseur est « en train
+ *   d’analyser un lexème » et à false dans l’état « attente de nouveau lexème »
+ * * `current_tok_type` est le type du lexème courant (si
+ *   `currently_registering` est à true)
+ * * `current_tok` est le lexème courant (si `currently_registering` est à true)
+ *
+ * Notes : dans le doute pour `current_tok_type`, on choisira le type le + large
+ * (int au lieu de float, identifier au lieu de keyword), et on ajuste dès
+ * qu’on a assez d’information pour déterminer dans quel cas on se situe.
+ *)
+let rec tokenize_aux
+    (source: char list)
+    (source_string: string)
+    (already_tokenized: Token.t list)
+    (currently_registering: bool)
+    (current_tok_type: Token.token_type option)
+    (current_tok: char list)
+    : (Token.t list, Huitr_error.t) Result.t =
+  match source with
+  | [] -> Ok(already_tokenized)
+  | x::q ->
+      let new_tok: Token.t = {
+        own_type = Identifier;
+        value = S (String.make 1 x);
+        start_pos = Position.create_position None source_string 0 0 0;
+        end_pos = Position.create_position None source_string 0 0 0
+      }
+      in tokenize_aux q source_string (new_tok::already_tokenized) false None []
+
+
+let tokenize (source : string) : (Token.token list, Huitr_error.t) Result.t =
+  match tokenize_aux (explode source) source [] false None [] with
+  | Ok(l) -> Ok(List.rev l)
+  | Error(e) -> Error(e)
+
+
+(*let current_char
     (lexer : lexer_type)
     : char option =
     Position.get_char lexer.cursor_pos
@@ -71,7 +110,8 @@ let new_token
             | None -> Position.copy_position lexer.cursor_pos
             | Some(p) -> p);
     } :: lexer.tokens
-
+*)
+(*
 let rec tokenize
     (lexer : lexer_type)
     : (Token.token list) * (Huitr_error.huitr_error option) =
@@ -154,8 +194,8 @@ let rec tokenize
             done;
 
             if !seen_e || !seen_dot
-                then new_token lexer Float_token ?token_value:(Some (F (float_of_string !number))) ?start_index:(Some (Some start_pos))
-                else new_token lexer Int_token ?token_value:(Some (I (int_of_string !number))) ?start_index:(Some (Some start_pos))
+                then new_token lexer Float ?token_value:(Some (F (float_of_string !number))) ?start_index:(Some (Some start_pos))
+                else new_token lexer Int ?token_value:(Some (I (int_of_string !number))) ?start_index:(Some (Some start_pos))
 
         (* Identifier (no reserved keywords in this language) *)
         else if Utils.is_char_identifier current_c
@@ -200,3 +240,4 @@ let rec tokenize
         | None -> tokenize lexer
         | Some(_) -> [], !tokenize_error
     end
+*)

@@ -15,6 +15,8 @@ type huitr_error = {
     end_pos : Position.position;
 }
 
+type t = huitr_error
+
 let create_error
     (_error_type : string)
     (_error_message : string)

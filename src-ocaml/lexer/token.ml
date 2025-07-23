@@ -11,15 +11,15 @@ type token_type =
     | Rparen (* ) *)
     | Lsquare (* [ *)
     | Rsquare (* ] *)
-    | Chainop (*  *)
+    | Chainop (* > *)
     | Comma (* , *)
     | Semicolon (* ; *)
-    | String_token
-    | Int_token
-    | Float_token
+    | String
+    | Int
+    | Float
     | Identifier
     | Namesp (* :: *)
-    | Eof
+    | EOF
 
 
 type huitr_value =
@@ -49,6 +49,9 @@ type token = {
     end_pos : Position.position;
 }
 
+type t = token
+
+(* Returns true if t has a type of tt and a value of v *)
 let matches
     (t : token)
     (tt : token_type)
@@ -67,12 +70,12 @@ let print_token
         | Chainop -> "CHAINOP"
         | Comma -> "COMMA"
         | Semicolon -> "SEMICOLON"
-        | String_token -> "STRING"
-        | Int_token -> "INT"
-        | Float_token -> "FLOAT"
+        | String -> "STRING"
+        | Int -> "INT"
+        | Float -> "FLOAT"
         | Identifier -> "IDENTIFIER"
         | Namesp -> "NAMESP"
-        | Eof -> "EOF");
+        | EOF -> "EOF");
     match t.value with
     | S(s) -> print_string (":" ^ s)
     | I(i) -> print_string ":"; print_int i

@@ -15,6 +15,8 @@ type position = {
     mutable index : int;
 }
 
+type t = position
+
 let create_position
     (_filename : string option)
     (_file_source : string)
@@ -31,6 +33,7 @@ let create_position
         column_number = _column_number;
         index = _index;
     }
+
 
 let get_line
     (pos : position)
