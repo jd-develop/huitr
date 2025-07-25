@@ -8,22 +8,37 @@
 
 (*
  * Cette fonction transforme une chaîne de caractères en liste de caractères.
- * Elle provient de
- * <https://caml.inria.fr/pub/old_caml_site/FAQ/FAQ_EXPERT-eng.html#strings>
+ * C’est l’exact opposé de `implode`.
  *)
 let explode (s: string) : char list =
-  let rec exp i l =
-    if i < 0 then l else exp (i-1) (s.[i]::l) in
-  exp (String.length s - 1) []
+  List.of_seq (String.to_seq s)
 
 
 (*
  * Cette fonction transforme une liste de caractères en chaîne de caractères.
  * C’est l’exact opposé de `explode`.
- * Elle ne vient pas du site de l’INRIA
  *)
 let implode (l: char list) =
   String.of_seq (List.to_seq l)
+
+
+type unfinished_or_finished_token =
+  | Unfinished of char list
+  | Finished of Token.t
+
+
+(* Continue de traiter un lexème en cours de traitement.
+ * Traite le caractère `current_char` sachant que le lexème courant est
+ * de type `current_tok_type` et que pour l’instant, le lexème est
+ * `current_tok` (dans l’ordre inverse) *)
+let continue_token
+    (current_char: char)
+    (current_tok_type: Token.token_type)
+    (current_tok: char list)
+    : (unfinished_or_finished_token) =
+  match current_tok_type with
+  (* TODO *)
+  | _ -> Unfinished (current_char::current_tok)
 
 
 (* Créée une liste de lexèmes à partir d’une liste de caractères d’entrée.
@@ -31,11 +46,15 @@ let implode (l: char list) =
  *   élément à chaque appel récursif au fur et à mesure de l’analyse lexicale
  * * `source_string` est l’entrée sous forme de chaîne de caractères. C’est une
  *   constante utilisée pour construire des Position.t
+ * * `already_tokenize` est la liste des lexèmes créés. Note : cette liste est
+ *   dans l’ordre inverse
  * * `currently_registering` est à true si l’état de l’analyseur est « en train
  *   d’analyser un lexème » et à false dans l’état « attente de nouveau lexème »
  * * `current_tok_type` est le type du lexème courant (si
  *   `currently_registering` est à true)
+ *   note : EOF signifie qu’on est en train de lire une espace insécable
  * * `current_tok` est le lexème courant (si `currently_registering` est à true)
+ *   Note : cette liste est dans l’ordre inverse
  *
  * Notes : dans le doute pour `current_tok_type`, on choisira le type le + large
  * (int au lieu de float, identifier au lieu de keyword), et on ajuste dès
@@ -52,6 +71,44 @@ let rec tokenize_aux
   match source with
   | [] -> Ok(already_tokenized)
   | x::q ->
+      if currently_registering then
+        begin
+        match current_tok_type with
+        | Some tt ->
+            begin match continue_token x tt current_tok with
+            | Finished   t -> tokenize_aux q source_string (t::already_tokenized) false None []
+            | Unfinished l -> tokenize_aux q source_string already_tokenized true current_tok_type l
+            end
+        | None -> failwith "Tokenize : erreur : currently_registering est à true mais current_tok_type est à None"
+        end
+      (* else if x = ' ' || x = '\n' || x = '\t' then
+        tokenize_aux q source_string already_tokenized false None []
+      else if x = '\194' then (* nbsp *)
+        tokenize_aux q source_string already_tokenized true (Some EOF) ['\194']
+      else if (
+        x = '\160' &&
+        currently_registering = true &&
+        current_tok_type = Some EOF &&
+        current_tok = ['\194']
+      ) then (* nbsp second char *)
+        tokenize_aux q source_string already_tokenized false None []
+      else if x = '\226' then (* nnbsp *)
+        tokenize_aux q source_string already_tokenized true (Some EOF) ['\226']
+      else if (
+        x = '\128' &&
+        currently_registering = true &&
+        current_tok_type = Some EOF &&
+        current_tok = ['\226']
+      ) then (* nnbsp second char *)
+        tokenize_aux q source_string already_tokenized true (Some EOF) ['\226'; '\128']
+      else if (
+        x = '\175' &&
+        currently_registering = true &&
+        current_tok_type = Some EOF &&
+        current_tok = ['\226'; '\128']
+      ) then (* nnbsp third char *)
+        tokenize_aux q source_string already_tokenized false None [] *)
+      else
       let new_tok: Token.t = {
         own_type = Identifier;
         value = S (String.make 1 x);
