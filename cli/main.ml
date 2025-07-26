@@ -13,36 +13,36 @@ open Cmdliner
 
 
 let filename =
-    Arg.(
-        required &
-        pos 0 (some string) None &
-        info []
-        ~doc:"File where the Huitr program is"
-        ~docv:"FILENAME"
-    )
+  Arg.(
+    required &
+    pos 0 (some string) None &
+    info []
+    ~doc:"File where the Huitr program is"
+    ~docv:"FILENAME"
+  )
 
 let debug =
-    Arg.(
-        value &
-        flag &
-        info ["d"; "debug"]
-        ~doc:"print tokens structure"
-    )
+  Arg.(
+    value &
+    flag &
+    info ["d"; "debug"]
+    ~doc:"print tokens structure"
+  )
 
 let command =
-    let version = "0.1.0" in
-    let doc = "Huitr file interpreter" in
-    let man = [
-        `S Manpage.s_description;
-        `P "Execute a Huitr program written in a file";
-        `S Manpage.s_see_also;
-        `P "Huitr – a purely functional programming language.";
-        `P "“Huitr” stands for “Huitr is tough to read”."
-    ] in
+  let version = "0.1.0" in
+  let doc = "Huitr file interpreter" in
+  let man = [
+    `S Manpage.s_description;
+    `P "Execute a Huitr program written in a file";
+    `S Manpage.s_see_also;
+    `P "Huitr – a purely functional programming language.";
+    `P "“Huitr” stands for “Huitr is tough to read”."
+  ] in
 
-    Cmd.v
-        (Cmd.info "huitr" ~version ~doc ~man)
-        Term.(const Execute.execute_file $ filename $ debug)
+  Cmd.v
+    (Cmd.info "huitr" ~version ~doc ~man)
+    Term.(const Execute.execute_file $ filename $ debug)
 
 let main () = Cmd.eval command
 let () = if !Sys.interactive then () else exit (main ())

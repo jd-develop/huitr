@@ -9,13 +9,13 @@
 (* FIXME : change file name *)
 
 let is_digit (c : char) : bool =
-    let int_c : int = int_of_char c in
-    int_c >= 0x30 (* = '0' *)
-    && int_c <= 0x39 (* = '9' *)
+  let int_c = int_of_char c in
+  int_c >= 0x30    (* = '0' *)
+  && int_c <= 0x39 (* = '9' *)
 
 
-let is_char_identifier (c : char) : bool =
-    let int_c : int = int_of_char c in
+let is_identifier_char (c : char) : bool =
+    let int_c = int_of_char c in
     (
         int_c >= 65 (* = 'A' *)
         && int_c <= 90 (* = 'Z' *)

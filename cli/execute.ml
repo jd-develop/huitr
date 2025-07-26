@@ -7,5 +7,5 @@
  *)
 
 let execute_file (filename: string) (debug: bool) =
-    print_endline (if debug then "true" else "false");
-    print_endline filename
+  print_endline (if debug then "true" else "false");
+  print_endline filename

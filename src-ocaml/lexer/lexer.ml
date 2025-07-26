@@ -71,16 +71,22 @@ let rec tokenize_aux
   match source with
   | [] -> Ok(already_tokenized)
   | x::q ->
-      if currently_registering then
-        begin
-        match current_tok_type with
-        | Some tt ->
-            begin match continue_token x tt current_tok with
-            | Finished   t -> tokenize_aux q source_string (t::already_tokenized) false None []
-            | Unfinished l -> tokenize_aux q source_string already_tokenized true current_tok_type l
-            end
-        | None -> failwith "Tokenize : erreur : currently_registering est à true mais current_tok_type est à None"
+    if currently_registering then
+      match current_tok_type with
+      | Some tt ->
+        begin match continue_token x tt current_tok with
+        | Finished   t -> tokenize_aux q source_string (t::already_tokenized) false None []
+        | Unfinished l -> tokenize_aux q source_string already_tokenized true current_tok_type l
         end
+      | None -> failwith "Tokenize : erreur : currently_registering est à true mais current_tok_type est à None"
+    else
+      let new_tok: Token.t = {
+        own_type = Identifier;
+        value = S (String.make 1 x);
+        start_pos = Position.create_position None source_string 0 0 0;
+        end_pos = Position.create_position None source_string 0 0 0
+      }
+      in tokenize_aux q source_string (new_tok::already_tokenized) false None []
       (* else if x = ' ' || x = '\n' || x = '\t' then
         tokenize_aux q source_string already_tokenized false None []
       else if x = '\194' then (* nbsp *)
@@ -108,14 +114,6 @@ let rec tokenize_aux
         current_tok = ['\226'; '\128']
       ) then (* nnbsp third char *)
         tokenize_aux q source_string already_tokenized false None [] *)
-      else
-      let new_tok: Token.t = {
-        own_type = Identifier;
-        value = S (String.make 1 x);
-        start_pos = Position.create_position None source_string 0 0 0;
-        end_pos = Position.create_position None source_string 0 0 0
-      }
-      in tokenize_aux q source_string (new_tok::already_tokenized) false None []
 
 
 let tokenize (source : string) : (Token.token list, Huitr_error.t) Result.t =

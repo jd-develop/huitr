@@ -7,46 +7,46 @@
  *)
 
 type token_type =
-    | Lparen (* ( *)
-    | Rparen (* ) *)
-    | Lsquare (* [ *)
-    | Rsquare (* ] *)
-    | Chainop (* > *)
-    | Comma (* , *)
-    | Semicolon (* ; *)
-    | String
-    | Int
-    | Float
-    | Identifier
-    | Namesp (* :: *)
-    | EOF
+  | Lparen (* ( *)
+  | Rparen (* ) *)
+  | Lsquare (* [ *)
+  | Rsquare (* ] *)
+  | Chainop (* > *)
+  | Comma (* , *)
+  | Semicolon (* ; *)
+  | String
+  | Int
+  | Float
+  | Identifier
+  | Namesp (* :: *)
+  | EOF
 
 
 type huitr_value =
-    | S of string
-    | I of int
-    | F of float
-    | None
+  | S of string
+  | I of int
+  | F of float
+  | None
 
 (*
 let (=)
     (val1 : huitr_value)
     (val2 : huitr_value)
     : bool =
-    match (val1, val2) with
-    | S(str1), S(str2) -> str1 = str2
-    | I(int1), I(int2) -> int1 = int2
-    | F(float1), F(float2) -> float1 = float2
-    | None, None -> true
-    | _ -> false;;
+  match (val1, val2) with
+  | S(str1), S(str2) -> str1 = str2
+  | I(int1), I(int2) -> int1 = int2
+  | F(float1), F(float2) -> float1 = float2
+  | None, None -> true
+  | _ -> false;;
 *)
 
 
 type token = {
-    own_type : token_type;
-    value : huitr_value;
-    start_pos : Position.position;
-    end_pos : Position.position;
+  own_type : token_type;
+  value : huitr_value;
+  start_pos : Position.position;
+  end_pos : Position.position;
 }
 
 type t = token
@@ -57,26 +57,26 @@ let matches
     (tt : token_type)
     (v : huitr_value)
     : bool =
-    t.own_type = tt && t.value = v
+  t.own_type = tt && t.value = v
 
 let print_token
     (t : token)
     : unit =
-    print_string (match t.own_type with
-        | Lparen -> "LPAREN"
-        | Rparen -> "RPAREN"
-        | Lsquare -> "LSQUARE"
-        | Rsquare -> "RSQUARE"
-        | Chainop -> "CHAINOP"
-        | Comma -> "COMMA"
-        | Semicolon -> "SEMICOLON"
-        | String -> "STRING"
-        | Int -> "INT"
-        | Float -> "FLOAT"
-        | Identifier -> "IDENTIFIER"
-        | Namesp -> "NAMESP"
-        | EOF -> "EOF");
-    match t.value with
+  print_string (match t.own_type with
+    | Lparen -> "LPAREN"
+    | Rparen -> "RPAREN"
+    | Lsquare -> "LSQUARE"
+    | Rsquare -> "RSQUARE"
+    | Chainop -> "CHAINOP"
+    | Comma -> "COMMA"
+    | Semicolon -> "SEMICOLON"
+    | String -> "STRING"
+    | Int -> "INT"
+    | Float -> "FLOAT"
+    | Identifier -> "IDENTIFIER"
+    | Namesp -> "NAMESP"
+    | EOF -> "EOF");
+  match t.value with
     | S(s) -> print_string (":" ^ s)
     | I(i) -> print_string ":"; print_int i
     | F(f) -> print_string ":"; print_float f
