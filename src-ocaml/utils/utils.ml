@@ -10,8 +10,9 @@
 
 let is_digit (c : char) : bool =
     let int_c : int = int_of_char c in
-    int_c >= 48 (* = '0' *)
-    && int_c <= 57 (* = '9' *)
+    int_c >= 0x30 (* = '0' *)
+    && int_c <= 0x39 (* = '9' *)
+
 
 let is_char_identifier (c : char) : bool =
     let int_c : int = int_of_char c in

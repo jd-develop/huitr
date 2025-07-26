@@ -10,12 +10,13 @@
 type position = {
     filename : string;
     file_source : string;
-    mutable line_number : int;
-    mutable column_number : int;
-    mutable index : int;
+    line_number : int;
+    column_number : int;
+    index : int;
 }
 
 type t = position
+
 
 let create_position
     (_filename : string option)
@@ -43,6 +44,7 @@ let get_line
         then None
         else Some((Array.of_list lines).(pos.line_number) ^ "\n")
 
+
 let get_char
     (pos : position)
     : char option =
@@ -53,6 +55,7 @@ let get_char
         then None
         else Some l.[pos.column_number]
 
+
 let end_of_line
     (* true if pos points at the end of a line and false else *)
     (pos : position)
@@ -61,32 +64,34 @@ let end_of_line
     | None -> false
     | Some(c) -> c = '\n'
 
-let advance
-    (* Advances the position by n character, return the character it landed at or None if impossible *)
+
+let rec advance
+    (* Advances the position by n characters, returns the new position *)
     (pos : position)
     (n : int)
-    : unit =
-    for _ = 1 to n do
-        pos.column_number <- pos.column_number + 1;
-        pos.index <- pos.index + 1;
-
-        if end_of_line(pos)
-            then begin
-                pos.line_number <- pos.line_number + 1;
-                pos.column_number <- 0;
-            end
-    done
-
-let copy_position
-    (pos : position)
     : position =
-    {
+  if n = 0 then
+    pos
+  else
+    let new_pos_1 = {
         filename = pos.filename;
         file_source = pos.file_source;
         line_number = pos.line_number;
-        column_number = pos.column_number;
-        index = pos.index;
-    }
+        column_number = pos.column_number + 1;
+        index = pos.index + 1;
+    } in
+    if end_of_line(new_pos_1) then
+      let new_pos = {
+        filename = pos.filename;
+        file_source = pos.file_source;
+        line_number = pos.line_number + 1;
+        column_number = pos.column_number + 1;
+        index = pos.index + 1;
+      } in
+      advance new_pos (n-1)
+    else
+      advance new_pos_1 (n-1)
+
 
 (*
 let (=)
@@ -99,6 +104,7 @@ let (=)
     pos1.filename = pos2.filename &&
     pos1.file_source = pos2.file_source;;
 *)
+
 
 let print_position
     (pos : position)
