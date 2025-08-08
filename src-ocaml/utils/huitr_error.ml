@@ -60,8 +60,14 @@ let print_error
     in
 
     print_string ("  " ^ line);
-    print_string (repeat_string " " (e.start_pos.column_number + start_offset + 2) );
-    print_string (repeat_string "^" (e.end_pos.column_number - e.start_pos.column_number + 1 + end_offset) );
+    print_string (
+      repeat_string " " (e.start_pos.column_number + start_offset + 2)
+    );
+    print_string (
+      repeat_string "^" (
+        e.end_pos.column_number - e.start_pos.column_number + 1 + end_offset
+      )
+    );
 
     print_endline (e.error_type ^ ":" ^e.error_message)
 
@@ -92,5 +98,6 @@ let huitr_unimplemented_error
     (_error_message : string)
     (_start_pos : Position.position)
     : huitr_error =
-  create_error "UnimplementedError" (_error_message ^" is not implemented yet") _start_pos _end_pos
+  create_error "UnimplementedError" (_error_message ^" is not implemented yet")
+      _start_pos _end_pos
 *)

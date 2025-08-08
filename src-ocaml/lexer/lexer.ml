@@ -83,22 +83,39 @@ let rec tokenize_aux
     (current_tok_start_pos_option: Position.t option)
     (current_pos: Position.t)
     : (Token.t list, Huitr_error.t) Result.t =
+
   match source with
   | [] -> Ok(already_tokenized)
   | x::q ->
+
     if currently_registering then
+
       match current_tok_type with
       | Some tt ->
-        let current_tok_start_pos = (match current_tok_start_pos_option with
+        let current_tok_start_pos = (
+          match current_tok_start_pos_option with
           | Some pos -> pos
-          | None -> failwith "Tokenize: erreur : currently_registering est à true mais current_tok_start_pos_option est à None"
+          | None -> failwith (
+              "Tokenize: erreur : currently_registering est à true mais " ^
+              "current_tok_start_pos_option est à None"
+            )
         ) in
-        let tok_result, new_pos = continue_token x tt current_tok current_tok_start_pos current_pos in
+        let tok_result, new_pos =
+          continue_token x tt current_tok current_tok_start_pos current_pos
+        in
         begin match tok_result with
-        | Finished   t -> tokenize_aux q source_string (t::already_tokenized) false None [] None new_pos
-        | Unfinished l -> tokenize_aux q source_string already_tokenized true current_tok_type l (Some current_tok_start_pos) new_pos
+        | Finished t ->
+            tokenize_aux q source_string (t::already_tokenized) false None []
+                         None new_pos
+        | Unfinished l ->
+            tokenize_aux q source_string already_tokenized true current_tok_type
+                         l (Some current_tok_start_pos) new_pos
         end
-      | None -> failwith "Tokenize : erreur : currently_registering est à true mais current_tok_type est à None"
+      | None -> failwith (
+          "Tokenize : erreur : currently_registering est à true mais " ^
+          "current_tok_type est à None"
+        )
+
     else
       (* TODO *)
       failwith "not implemented"
