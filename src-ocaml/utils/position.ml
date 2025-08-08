@@ -7,6 +7,7 @@
  *)
 
 (* Type position for reading a file *)
+(* line_number et column_number commencent à 0 *)
 type position = {
   filename : string;
   file_source : string;

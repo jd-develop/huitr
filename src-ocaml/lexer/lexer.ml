@@ -30,15 +30,28 @@ type unfinished_or_finished_token =
 (* Continue de traiter un lexème en cours de traitement.
  * Traite le caractère `current_char` sachant que le lexème courant est
  * de type `current_tok_type` et que pour l’instant, le lexème est
- * `current_tok` (dans l’ordre inverse) *)
+ * `current_tok` (dans l’ordre inverse)
+ * Renvoie un token (fini ou non) et la nouvelle position courante.
+ *)
 let continue_token
     (current_char: char)
     (current_tok_type: Token.token_type)
     (current_tok: char list)
-    : (unfinished_or_finished_token) =
+    (start_pos: Position.t)
+    (current_pos: Position.t)
+    : (unfinished_or_finished_token * Position.t) =
   match current_tok_type with
-  (* TODO *)
-  | _ -> Unfinished (current_char::current_tok)
+  | String (* TODO *)
+  | Int (* TODO *)
+  | Float (* TODO *)
+  | Identifier (* TODO *)
+  | Namesp (* TODO *)
+  | _ -> Finished {
+           own_type = current_tok_type;
+           value = None;
+           start_pos = start_pos;
+           end_pos = current_pos;
+         }, current_pos
 
 
 (* Créée une liste de lexèmes à partir d’une liste de caractères d’entrée.
@@ -67,6 +80,8 @@ let rec tokenize_aux
     (currently_registering: bool)
     (current_tok_type: Token.token_type option)
     (current_tok: char list)
+    (current_tok_start_pos_option: Position.t option)
+    (current_pos: Position.t)
     : (Token.t list, Huitr_error.t) Result.t =
   match source with
   | [] -> Ok(already_tokenized)
@@ -74,19 +89,28 @@ let rec tokenize_aux
     if currently_registering then
       match current_tok_type with
       | Some tt ->
-        begin match continue_token x tt current_tok with
-        | Finished   t -> tokenize_aux q source_string (t::already_tokenized) false None []
-        | Unfinished l -> tokenize_aux q source_string already_tokenized true current_tok_type l
+        let current_tok_start_pos = (match current_tok_start_pos_option with
+          | Some pos -> pos
+          | None -> failwith "Tokenize: erreur : currently_registering est à true mais current_tok_start_pos_option est à None"
+        ) in
+        let tok_result, new_pos = continue_token x tt current_tok current_tok_start_pos current_pos in
+        begin match tok_result with
+        | Finished   t -> tokenize_aux q source_string (t::already_tokenized) false None [] None new_pos
+        | Unfinished l -> tokenize_aux q source_string already_tokenized true current_tok_type l (Some current_tok_start_pos) new_pos
         end
       | None -> failwith "Tokenize : erreur : currently_registering est à true mais current_tok_type est à None"
     else
+      (* TODO *)
+      failwith "not implemented"
+      (*
       let new_tok: Token.t = {
         own_type = Identifier;
         value = S (String.make 1 x);
         start_pos = Position.create_position None source_string 0 0 0;
         end_pos = Position.create_position None source_string 0 0 0
       }
-      in tokenize_aux q source_string (new_tok::already_tokenized) false None []
+      in tokenize_aux q source_string (new_tok::already_tokenized) false None [] None current_pos
+      *)
       (* else if x = ' ' || x = '\n' || x = '\t' then
         tokenize_aux q source_string already_tokenized false None []
       else if x = '\194' then (* nbsp *)
@@ -117,7 +141,8 @@ let rec tokenize_aux
 
 
 let tokenize (source : string) : (Token.token list, Huitr_error.t) Result.t =
-  match tokenize_aux (explode source) source [] false None [] with
+  let pos = Position.create_position (Some "TODO filename") source 0 0 0 in
+  match tokenize_aux (explode source) source [] false None [] None pos with
   | Ok(l) -> Ok(List.rev l)
   | Error(e) -> Error(e)
 
