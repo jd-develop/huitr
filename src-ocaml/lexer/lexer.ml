@@ -31,7 +31,13 @@ type unfinished_or_finished_token =
  * Traite le caractère `current_char` sachant que le lexème courant est
  * de type `current_tok_type` et que pour l’instant, le lexème est
  * `current_tok` (dans l’ordre inverse)
- * Renvoie un token (fini ou non) et la nouvelle position courante.
+ * `string_is_escape` est à false si on n’est pas dans un string ou qu’on est
+ * dans un string et que le dernier caractère n’était pas \, et à true
+ * si on est dans un string et que le dernier caractère était \.
+ * Renvoie un token (fini ou non), la nouvelle position courante, l’état
+ * du string courant (false si on n’est pas dans un string ou si le caractère
+ * précédent n’était pas \, true si le caractère précédent était \) et
+ * le nouveau type de lexème.
  *)
 let continue_token
     (current_char: char)
@@ -39,10 +45,49 @@ let continue_token
     (current_tok: char list)
     (start_pos: Position.t)
     (current_pos: Position.t)
-    : (unfinished_or_finished_token * Position.t) =
+    (string_is_escape: bool)
+    : (unfinished_or_finished_token * Position.t * bool *
+       Token.token_type option) =
   match current_tok_type with
-  | String (* TODO *)
-  | Int (* TODO *)
+  | String ->
+    if string_is_escape then
+      let char_to_append =
+        if current_char = 'n' then '\n'
+        else if current_char = 't' then '\t'
+        else if current_char = '\\' then '\\'
+        else current_char
+      in
+      Unfinished (char_to_append::current_tok),
+      (Position.advance current_pos 1), false, Some String
+    else if current_char = '\\' then
+      Unfinished current_tok, (Position.advance current_pos 1), true,
+      Some String
+    else if current_char = '"' then
+      Finished {
+        own_type = current_tok_type;
+        value = S (String.of_seq (List.to_seq (List.rev current_tok)));
+        start_pos = start_pos;
+        end_pos = current_pos;
+      }, current_pos, false, None
+    else
+      Unfinished (current_char::current_tok), (Position.advance current_pos 1),
+      false, Some String
+  | Int ->
+      if 0x30 <= int_of_char current_char && int_of_char current_char <= 0x39 then
+        Unfinished (current_char::current_tok),
+        (Position.advance current_pos 1), false, Some Int
+      else if current_char = '.' then (* float! *)
+        Unfinished (current_char::current_tok),
+        (Position.advance current_pos 1), false, Some Float
+      else
+        Finished {
+          own_type = current_tok_type;
+          value = I (int_of_string
+            (String.of_seq (List.to_seq (List.rev current_tok)))
+          );
+          start_pos = start_pos;
+          end_pos = current_pos;
+        }, (Position.advance current_pos 1), false, None
   | Float (* TODO *)
   | Identifier (* TODO *)
   | Namesp (* TODO *)
@@ -51,7 +96,7 @@ let continue_token
            value = None;
            start_pos = start_pos;
            end_pos = current_pos;
-         }, current_pos
+         }, (Position.advance current_pos 1), false, None
 
 
 (* Créée une liste de lexèmes à partir d’une liste de caractères d’entrée.
@@ -68,6 +113,13 @@ let continue_token
  *   note : EOF signifie qu’on est en train de lire une espace insécable
  * * `current_tok` est le lexème courant (si `currently_registering` est à true)
  *   Note : cette liste est dans l’ordre inverse
+ * * `current_tok_start_pos_option` est égale à la position du lexème courant
+ *   si `currently_registering` est à true et None sinon
+ * * `current_pos` est la position actuelle à laquelle on lit
+ * * `string_is_escape` est égale à false si `currently_registering` est à
+ *    false. Dans le cas contraire, c’est à true si le lexème courant est un
+ *    string et que le dernier caractère était \, et à false dans les autres
+ *    cas.
  *
  * Notes : dans le doute pour `current_tok_type`, on choisira le type le + large
  * (int au lieu de float, identifier au lieu de keyword), et on ajuste dès
@@ -82,6 +134,7 @@ let rec tokenize_aux
     (current_tok: char list)
     (current_tok_start_pos_option: Position.t option)
     (current_pos: Position.t)
+    (string_is_escape: bool)
     : (Token.t list, Huitr_error.t) Result.t =
 
   match source with
@@ -100,16 +153,18 @@ let rec tokenize_aux
               "current_tok_start_pos_option est à None"
             )
         ) in
-        let tok_result, new_pos =
+        let tok_result, new_pos, new_string_is_escape, new_tok_type =
           continue_token x tt current_tok current_tok_start_pos current_pos
+                         string_is_escape
         in
         begin match tok_result with
         | Finished t ->
             tokenize_aux q source_string (t::already_tokenized) false None []
-                         None new_pos
+                         None new_pos new_string_is_escape
         | Unfinished l ->
-            tokenize_aux q source_string already_tokenized true current_tok_type
+            tokenize_aux q source_string already_tokenized true new_tok_type
                          l (Some current_tok_start_pos) new_pos
+                         new_string_is_escape
         end
       | None -> failwith (
           "Tokenize : erreur : currently_registering est à true mais " ^
@@ -159,7 +214,8 @@ let rec tokenize_aux
 
 let tokenize (source : string) : (Token.token list, Huitr_error.t) Result.t =
   let pos = Position.create_position (Some "TODO filename") source 0 0 0 in
-  match tokenize_aux (explode source) source [] false None [] None pos with
+  match tokenize_aux (explode source) source [] false None [] None pos false
+  with
   | Ok(l) -> Ok(List.rev l)
   | Error(e) -> Error(e)
 
