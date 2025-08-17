@@ -68,7 +68,7 @@ let continue_token
         value = S (String.of_seq (List.to_seq (List.rev current_tok)));
         start_pos = start_pos;
         end_pos = current_pos;
-      }, current_pos, false, None
+      }, (Position.advance current_pos 1), false, None
     else
       Unfinished (current_char::current_tok), (Position.advance current_pos 1),
       false, Some String
@@ -87,16 +87,54 @@ let continue_token
           );
           start_pos = start_pos;
           end_pos = current_pos;
+        }, current_pos, false, None
+  | Float ->
+      if 0x30 <= int_of_char current_char && int_of_char current_char <= 0x39 then
+        Unfinished (current_char::current_tok),
+        (Position.advance current_pos 1), false, Some Float
+      else if current_char = '.' then (* erreur! *)
+        (* TODO erreur *)
+        failwith "Cette erreur n’est pas encore proprement implémentée (TODO)"
+      else
+        Finished {
+          own_type = current_tok_type;
+          value = F (float_of_string
+            (String.of_seq (List.to_seq (List.rev current_tok)))
+          );
+          start_pos = start_pos;
+          end_pos = current_pos;
+        }, current_pos, false, None
+  | Identifier ->
+      if ('A' <= current_char && current_char <= 'Z') ||
+         ('a' <= current_char && current_char <= 'z') ||
+         current_char = '_'
+      then
+        Unfinished (current_char::current_tok),
+        (Position.advance current_pos 1), false, Some Identifier
+      else
+        Finished {
+          own_type = current_tok_type;
+          value = S (String.of_seq (List.to_seq (List.rev current_tok)));
+          start_pos = start_pos;
+          end_pos = current_pos;
+        }, current_pos, false, None
+  | Namesp -> (* :: *)
+      if current_char <> ':' then
+        (* TODO erreur *)
+        failwith "Cette erreur n’est pas encore proprement implémentée (TODO)"
+      else
+        Finished {
+          own_type = current_tok_type;
+          value = None;
+          start_pos = start_pos;
+          end_pos = current_pos;
         }, (Position.advance current_pos 1), false, None
-  | Float (* TODO *)
-  | Identifier (* TODO *)
-  | Namesp (* TODO *)
   | _ -> Finished {
            own_type = current_tok_type;
            value = None;
            start_pos = start_pos;
            end_pos = current_pos;
-         }, (Position.advance current_pos 1), false, None
+         }, (Position.advance current_pos 1), false, None (* FIXME à voir s’il faut vraiment avancer la position ou pas *)
 
 
 (* Créée une liste de lexèmes à partir d’une liste de caractères d’entrée.
