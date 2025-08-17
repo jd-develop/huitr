@@ -159,9 +159,12 @@ let continue_token
  *    string et que le dernier caractère était \, et à false dans les autres
  *    cas.
  *
- * Notes : dans le doute pour `current_tok_type`, on choisira le type le + large
+ * Note 1 : dans le doute pour `current_tok_type`, on choisira le type le + large
  * (int au lieu de float, identifier au lieu de keyword), et on ajuste dès
  * qu’on a assez d’information pour déterminer dans quel cas on se situe.
+ *
+ * Note 2 :  NBSP = \194\160
+ *          NNBSP = \226\128\175
  *)
 let rec tokenize_aux
     (source: char list)
@@ -182,6 +185,22 @@ let rec tokenize_aux
     if currently_registering then
 
       match current_tok_type with
+      | Some EOF ->
+        if (x = '\160' && current_tok = ['\194']) then
+          (* nbsp second char *)
+          tokenize_aux q source_string already_tokenized false None [] None
+                       (Position.advance current_pos 1) false
+        else if x = '\128' && current_tok = ['\226'] then
+          (* nnbsp second char *)
+          tokenize_aux q source_string already_tokenized true (Some EOF)
+                       ['\226'; '\128'] current_tok_start_pos_option
+                       (Position.advance current_pos 1) false
+        else if x = '\175' && current_tok = ['\226'; '\128'] then
+          (* nnbsp third char *)
+          tokenize_aux q source_string already_tokenized false None [] None
+                       (Position.advance current_pos 1) false
+        else
+          Error (Huitr_error.create_error "SyntaxError" "Invalid character" current_pos None)
       | Some tt ->
         let current_tok_start_pos = (
           match current_tok_start_pos_option with
