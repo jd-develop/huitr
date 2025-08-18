@@ -93,8 +93,7 @@ let continue_token
         Ok (Unfinished (current_char::current_tok),
             (Position.advance current_pos 1), false, Some Float)
       else if current_char = '.' then (* erreur! *)
-        (* TODO erreur *)
-        failwith "Cette erreur n’est pas encore proprement implémentée (TODO)"
+        Error (Huitr_error.create_error "SyntaxError" "Un flottant ne peut avoir qu’un seul point." current_pos None)
       else
         Ok (Finished {
           own_type = current_tok_type;
@@ -120,8 +119,7 @@ let continue_token
         }, current_pos, false, None)
   | Namesp -> (* :: *)
       if current_char <> ':' then
-        (* TODO erreur *)
-        failwith "Cette erreur n’est pas encore proprement implémentée (TODO)"
+        Error (Huitr_error.create_error "SyntaxError" "':' attendu." current_pos None)
       else
         Ok (Finished {
           own_type = current_tok_type;
@@ -200,7 +198,7 @@ let rec tokenize_aux
           tokenize_aux q source_string already_tokenized false None [] None
                        (Position.advance current_pos 1) false
         else
-          Error (Huitr_error.create_error "SyntaxError" "Invalid character" current_pos None)
+          Error (Huitr_error.create_error "SyntaxError" "Caractère invalide" current_pos None)
       | Some tt ->
         let current_tok_start_pos = (
           match current_tok_start_pos_option with
