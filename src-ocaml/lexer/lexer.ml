@@ -70,10 +70,10 @@ let continue_token
         end_pos = current_pos;
       }, (Position.advance current_pos 1), false, None)
     else
-      Ok (Unfinished (current_char::current_tok), (Position.advance current_pos 1),
-          false, Some String)
+      Ok (Unfinished (current_char::current_tok),
+          (Position.advance current_pos 1), false, Some String)
   | Int ->
-      if 0x30 <= int_of_char current_char && int_of_char current_char <= 0x39 then
+      if '0' <= current_char && current_char <= '9' then
         Ok (Unfinished (current_char::current_tok),
             (Position.advance current_pos 1), false, Some Int)
       else if current_char = '.' then (* float! *)
@@ -89,11 +89,14 @@ let continue_token
           end_pos = current_pos;
         }, current_pos, false, None)
   | Float ->
-      if 0x30 <= int_of_char current_char && int_of_char current_char <= 0x39 then
+      if '0' <= current_char && current_char <= '9' then
         Ok (Unfinished (current_char::current_tok),
             (Position.advance current_pos 1), false, Some Float)
       else if current_char = '.' then (* erreur! *)
-        Error (Huitr_error.create_error "SyntaxError" "Un flottant ne peut avoir qu’un seul point." current_pos None)
+        Error (
+          Huitr_error.create_error "SyntaxError"
+          "Un flottant ne peut avoir qu’un seul point." current_pos None
+        )
       else
         Ok (Finished {
           own_type = current_tok_type;
@@ -119,7 +122,10 @@ let continue_token
         }, current_pos, false, None)
   | Namesp -> (* :: *)
       if current_char <> ':' then
-        Error (Huitr_error.create_error "SyntaxError" "':' attendu." current_pos None)
+        Error (
+          Huitr_error.create_error "SyntaxError" "':' attendu." current_pos
+          None
+        )
       else
         Ok (Finished {
           own_type = current_tok_type;
@@ -177,7 +183,7 @@ let rec tokenize_aux
     : (Token.t list, Huitr_error.t) Result.t =
 
   match source with
-  | [] -> Ok(already_tokenized)
+  | [] -> Ok (already_tokenized)
   | x::q ->
 
     if currently_registering then
@@ -198,7 +204,10 @@ let rec tokenize_aux
           tokenize_aux q source_string already_tokenized false None [] None
                        (Position.advance current_pos 1) false
         else
-          Error (Huitr_error.create_error "SyntaxError" "Caractère invalide" current_pos None)
+          Error (
+            Huitr_error.create_error "SyntaxError" "Caractère invalide"
+            current_pos None
+          )
       | Some tt ->
         let current_tok_start_pos = (
           match current_tok_start_pos_option with
@@ -246,29 +255,9 @@ let rec tokenize_aux
         tokenize_aux q source_string already_tokenized false None []
       else if x = '\194' then (* nbsp *)
         tokenize_aux q source_string already_tokenized true (Some EOF) ['\194']
-      else if (
-        x = '\160' &&
-        currently_registering = true &&
-        current_tok_type = Some EOF &&
-        current_tok = ['\194']
-      ) then (* nbsp second char *)
-        tokenize_aux q source_string already_tokenized false None []
       else if x = '\226' then (* nnbsp *)
         tokenize_aux q source_string already_tokenized true (Some EOF) ['\226']
-      else if (
-        x = '\128' &&
-        currently_registering = true &&
-        current_tok_type = Some EOF &&
-        current_tok = ['\226']
-      ) then (* nnbsp second char *)
-        tokenize_aux q source_string already_tokenized true (Some EOF) ['\226'; '\128']
-      else if (
-        x = '\175' &&
-        currently_registering = true &&
-        current_tok_type = Some EOF &&
-        current_tok = ['\226'; '\128']
-      ) then (* nnbsp third char *)
-        tokenize_aux q source_string already_tokenized false None [] *)
+*)
 
 
 let tokenize (source : string) : (Token.token list, Huitr_error.t) Result.t =
