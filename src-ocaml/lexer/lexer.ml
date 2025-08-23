@@ -18,7 +18,7 @@ let explode (s: string) : char list =
  * Cette fonction transforme une liste de caractères en chaîne de caractères.
  * C’est l’exact opposé de `explode`.
  *)
-let implode (l: char list) =
+let implode (l: char list) : string =
   String.of_seq (List.to_seq l)
 
 
@@ -65,7 +65,7 @@ let continue_token
     else if current_char = '"' then
       Ok (Finished {
         own_type = current_tok_type;
-        value = S (String.of_seq (List.to_seq (List.rev current_tok)));
+        value = S (implode (List.rev current_tok));
         start_pos = start_pos;
         end_pos = current_pos;
       }, (Position.advance current_pos 1), false, None)
@@ -82,9 +82,7 @@ let continue_token
       else
         Ok (Finished {
           own_type = current_tok_type;
-          value = I (int_of_string
-            (String.of_seq (List.to_seq (List.rev current_tok)))
-          );
+          value = I (int_of_string (implode (List.rev current_tok)));
           start_pos = start_pos;
           end_pos = current_pos;
         }, current_pos, false, None)
@@ -100,9 +98,7 @@ let continue_token
       else
         Ok (Finished {
           own_type = current_tok_type;
-          value = F (float_of_string
-            (String.of_seq (List.to_seq (List.rev current_tok)))
-          );
+          value = F (float_of_string (implode (List.rev current_tok)));
           start_pos = start_pos;
           end_pos = current_pos;
         }, current_pos, false, None)
@@ -116,7 +112,7 @@ let continue_token
       else
         Ok (Finished {
           own_type = current_tok_type;
-          value = S (String.of_seq (List.to_seq (List.rev current_tok)));
+          value = S (implode (List.rev current_tok));
           start_pos = start_pos;
           end_pos = current_pos;
         }, current_pos, false, None)
