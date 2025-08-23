@@ -42,7 +42,7 @@ let get_line
     : string option =
   let lines = String.split_on_char '\n' pos.file_source in
   if pos.line_number >= List.length lines then None
-  else Some((Array.of_list lines).(pos.line_number) ^ "\n")
+  else Some (List.nth lines pos.line_number ^ "\n")
 
 
 let get_char
