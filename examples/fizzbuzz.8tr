@@ -1,0 +1,25 @@
+..
+Huitr - a purely functional programming language.
+Copyright (C) 2025  jd-develop
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+..
+
+. A simple fizzbuzz
+
+[
+  0 > getarg > n  . stores the current value into n
+
+  . trivial and self-explanatory /s
+  n, 15 > std::math::mod, 0 > std::comp::eq,
+    ["fizzbuzz" > std::out::print_string],
+    [n, 5 > std::math::mod, 0 > std::comp::eq,
+      ["buzz" > std::out::print_string],
+      [n, 3 > std::math::mod, 0 > std::comp::eq,
+        ["fizz" > std::out::print_string],
+        [n > std::out::print_int] > if] > if] > if
+
+  n, 100 > std::comp::eq, [()], [n, 1 > std::math::add > rec] > if
+] > fizzbuzz
+
