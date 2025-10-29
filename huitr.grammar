@@ -10,6 +10,9 @@ string_literal := "([ !$-~]|(\\"))*"
 
 whitespace := ( |\t)+
 
+simple_comment_start := .
+multi_comment_start := ..
+
 newline := ;|\n
 comma := ,
 lparen := \(
@@ -57,3 +60,4 @@ FUNCTION -> lsquare STATEMENTS rsquare
 
 UNIT -> lparen rparen
 
+unrecognizable := [ -~]

@@ -23,3 +23,5 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
   n, 100 > std::comp::eq, [()], [n, 1 > std::math::add > rec] > if
 ] > fizzbuzz
 
+0 > fizzbuzz
+
