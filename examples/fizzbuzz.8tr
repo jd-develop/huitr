@@ -20,7 +20,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
         ["fizz" > std::out::print_string],
         [n > std::out::print_int] > if] > if] > if
 
-  n, 100 > std::comp::eq, [()], [n, 1 > std::math::add > rec] > if
+  n, 100 > std::comp::eq, [()], [n, 1 > std::math::add > fizzbuzz] > if
 ] > fizzbuzz
 
 0 > fizzbuzz
