@@ -1,0 +1,4 @@
+(executable
+ (name sketch)
+ (public_name huitr)
+ (libraries huitr_interpreter cmdliner tipe))

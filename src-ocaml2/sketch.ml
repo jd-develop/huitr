@@ -1,3 +1,7 @@
+open Tipe.Grammar_grammar
+open Tipe.Parser
+open Tipe.Lexer
+
 let grammar_fp = open_in "/home/jddev/Documents/GitHub/huitr/huitr.grammar"
 
 let test_grammar = really_input_string grammar_fp (in_channel_length grammar_fp)
@@ -31,3 +35,6 @@ let rec filter_tokens l (in_simple_comment: bool) (in_multi_comment: bool) accu 
 let tokens = filter_tokens tokens_with_comments false false []
 
 let result = parse automaton "EOF" tokens "STATEMENTS"
+
+(* Suppress unused variable warning *)
+let _ = result
