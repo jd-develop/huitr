@@ -1,4 +1,9 @@
 (executable
- (name sketch)
+ (name parse_huitr)
  (public_name huitr)
  (libraries huitr_interpreter cmdliner tipe))
+
+(env
+ (dev
+  (flags
+   (:standard -w -9-27-33-39-32))))
