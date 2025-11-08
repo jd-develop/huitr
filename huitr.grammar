@@ -1,0 +1,65 @@
+# Même format de fichier que https://github.com/MP2I-Fermat/tipe-spe-jd-mylo/
+# L’axiome de cette grammaire est STATEMENTS
+
+ident := [A-Za-z][A-Za-z0-9_]*
+
+integer_literal := -?([0-9]+|(0[xX][0-9A-Fa-f]+)|(0[oO][0-7]+)|(0[bB][0-1]+))
+float_literal := -?[0-9]+(.[0-9]*)?([eE][\+-]?[0-9]+)?
+
+string_literal := "([ !$-~]|(\\"))*"
+
+whitespace := ( |\t)+
+
+simple_comment_start := .
+multi_comment_start := ..
+
+newline := ;|\n
+comma := ,
+lparen := \(
+rparen := \)
+lsquare := \[
+rsquare := \]
+chainop := >
+namesp := ::
+
+STATEMENTS -> newline
+STATEMENTS -> newline STATEMENTS
+STATEMENTS -> CHAIN newline STATEMENTS
+STATEMENTS -> CHAIN newline
+STATEMENTS -> CHAIN
+
+LIST -> CHAIN comma ATOM
+LIST -> LIST comma ATOM
+LIST -> CHAIN comma newline ATOM
+LIST -> LIST comma newline ATOM
+
+CHAINOPATOM -> chainop ATOM
+CHAINOPATOM -> chainop ATOM CHAINOPATOM
+
+CHAIN -> CHAINOPATOM
+CHAIN -> LIST CHAINOPATOM
+CHAIN -> ATOM CHAINOPATOM
+CHAIN -> ATOM
+
+ATOM -> string_literal
+ATOM -> integer_literal
+ATOM -> float_literal
+ATOM -> IDENTIFIER
+ATOM -> FUNCTION
+ATOM -> lparen CHAIN rparen
+ATOM -> UNIT
+
+NAMESPIDENT -> namesp ident
+NAMESPIDENT -> namesp ident NAMESPIDENT
+
+IDENTIFIER -> ident
+# je crois que la ligne suivante est incorrecte, dans le doute je ne fais que
+# la commenter
+# IDENTIFIER -> NAMESPIDENT
+IDENTIFIER -> ident NAMESPIDENT
+
+FUNCTION -> lsquare STATEMENTS rsquare
+
+UNIT -> lparen rparen
+
+unrecognizable := [ -~]

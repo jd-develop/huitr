@@ -1,0 +1,23 @@
+..
+Huitr - a purely functional programming language.
+Copyright (C) 2025  jd-develop
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+..
+
+[
+  0 > getarg > n
+
+  1, n > std::comp::le,
+    [1],
+    [n, 1 > std::math::minus > fibonacci,
+     (n, 2 > std::math::minus > fibonacci) > std::math::plus] > if
+] > fibonacci
+
+0 > fibonacci > std::out::print_int
+1 > fibonacci > std::out::print_int
+2 > fibonacci > std::out::print_int
+3 > fibonacci > std::out::print_int
+4 > fibonacci > std::out::print_int
+

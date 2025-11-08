@@ -1,0 +1,6 @@
+
+
+
+    "hello" > std :: out :: print_string 
+  [ 0 > getarg ] > id             ;      
+
