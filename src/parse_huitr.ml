@@ -58,7 +58,9 @@ NAMESPIDENT -> namesp ident
 NAMESPIDENT -> namesp ident NAMESPIDENT
 
 IDENTIFIER -> ident
-IDENTIFIER -> NAMESPIDENT
+# je crois que la ligne suivante est incorrecte, dans le doute je ne fais que
+# la commenter
+# IDENTIFIER -> NAMESPIDENT
 IDENTIFIER -> ident NAMESPIDENT
 
 FUNCTION -> lsquare STATEMENTS rsquare

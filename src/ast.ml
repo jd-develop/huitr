@@ -7,7 +7,7 @@ type ast =
   | List of ast list
   | Chain of ast list
   | Function of ast list
-  | ModuleIdentifier of string list
+  | ModuleIdentifier of string list * string
   | Identifier of string
   | Integer of int
   | Float of float
@@ -83,15 +83,16 @@ and atom (t: (string, string) syntax_tree) : ast =
   | _ -> failwith "Pas un nœud ATOM"
 
 
-and namespident (t: (string, string) syntax_tree) : string list =
+and namespident (t: (string, string) syntax_tree) : string list * string =
   match t with
   | Node("NAMESPIDENT", [Leaf {token_type = "namesp"};
                          Leaf {token_type = "ident"; value}]) ->
-      [value]
+      [], value
   | Node("NAMESPIDENT", [Leaf {token_type = "namesp"};
                          Leaf {token_type = "ident"; value};
                          Node("NAMESPIDENT", _) as suite]) ->
-      value::(namespident suite)
+      let l, s = namespident suite in
+      value::l, s
   | _ -> failwith "Pas un nœud NAMESPIDENT"
 
 and identifier (t: (string, string) syntax_tree) : ast =
@@ -100,7 +101,8 @@ and identifier (t: (string, string) syntax_tree) : ast =
       Identifier value
   | Node("IDENTIFIER", [Leaf {token_type = "ident"; value};
                         Node("NAMESPIDENT", _) as namespident_suite]) ->
-      ModuleIdentifier (value::(namespident namespident_suite))
+      let l, s = namespident namespident_suite in
+      ModuleIdentifier (value::l, s)
   | _ -> failwith "Pas un nœud IDENTIFIER"
 
 
