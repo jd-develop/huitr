@@ -1,7 +1,7 @@
-(executable
- (name parse_huitr)
- (public_name huitr)
- (libraries huitr_interpreter cmdliner tipe))
+(library
+ (name huitr_interpreter)
+ (libraries tipe)
+ (modules huitr_utils ast parse_huitr))
 
 (env
  (dev

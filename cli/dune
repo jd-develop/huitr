@@ -1,3 +1,4 @@
 (executable
- (name main)
- (libraries huitr_interpreter cmdliner))
+  (name main)
+  (public_name huitr)
+  (libraries huitr_interpreter cmdliner))

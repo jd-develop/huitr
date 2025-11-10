@@ -44,11 +44,12 @@ and list (t: (string, string) syntax_tree) : ast list =
 
 and chainopatom (t: (string, string) syntax_tree) : ast list =
   match t with
-  | Node("CHAINOPATOM", [Leaf {token_type = "chainopatom"}; at]) ->
+  | Node("CHAINOPATOM", [Leaf {token_type = "chainop"}; at]) ->
       [ast_of_syntax_tree at]
-  | Node("CHAINOPATOM", [Leaf {token_type = "chainopatom"}; at;
+  | Node("CHAINOPATOM", [Leaf {token_type = "chainop"}; at;
                          Node("CHAINOPATOM", _) as chopat]) ->
       ast_of_syntax_tree at :: (chainopatom chopat)
+  | Node("CHAINOPATOM", _) -> failwith "Meh"
   | _ -> failwith "Pas un nœud CHAINOPATOM"
 
 and chain (t: (string, string) syntax_tree) : ast =
