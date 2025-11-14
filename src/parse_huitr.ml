@@ -89,7 +89,7 @@ let parse_huitr (code: string): (string, string) syntax_tree =
     | t::q when t.token_type = "simple_comment_start" && not in_comment ->
         filter_tokens q true false accu
     | t::q when t.token_type = "newline" && in_simple_comment ->
-        filter_tokens q false false accu
+        filter_tokens q false false (t::accu)
     | t::q when t.token_type = "multi_comment_start" && not in_comment ->
         filter_tokens q false true accu
     | t::q when t.token_type = "multi_comment_start" && in_multi_comment ->

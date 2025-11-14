@@ -1,4 +1,5 @@
 open Ast
+open Huitr_utils
 
 
 type value =
@@ -8,7 +9,7 @@ type value =
   | List of value list
   | Function of ast list
   | BuiltinFunction of (value list -> value)
-  | Module of scope
+  | Module of string * scope
   | Unit
 and scope = {
   parent: scope option;
@@ -49,7 +50,7 @@ let rec find_module_identifier
   | x::q ->
       begin match scope_lookup variables x with
       | None -> raise (Undefined (current_module_expression^s))
-      | Some (Module x) ->
+      | Some (Module (_, x)) ->
           find_module_identifier q s x (current_module_expression^s^"::")
       | Some _ -> raise (IsNotModule (current_module_expression^s))
       end
@@ -127,7 +128,20 @@ and apply_function_aux
 
 exception InvalidArgument
 
-let print_hstring (l: value list) : value =
+
+let rec print (l: value list) : value =
   match l with
-  | [String s] -> print_endline s; Unit
-  | _ -> raise InvalidArgument
+  | [] -> Unit
+  | [value] ->
+      begin
+      match value with
+      | Integer i -> print_int i; print_newline (); Unit
+      | Float f -> print_float f; print_newline (); Unit
+      | String s -> print_endline s; Unit
+      | List l -> print_list l (fun x -> let _ = print [x] in ()); Unit
+      | Function _ -> print_endline "(function)"; Unit
+      | BuiltinFunction _ -> print_endline "(built-in function)"; Unit
+      | Module (s, _) -> print_endline ("(module "^s^")"); Unit
+      | Unit -> print_endline "()"; Unit
+      end
+  | l -> print [List l]
