@@ -55,7 +55,7 @@ and chainopatom (t: (string, string) syntax_tree) : ast list =
 and chain (t: (string, string) syntax_tree) : ast =
   match t with
   | Node("CHAIN", [Node("CHAINOPATOM", _) as chopat]) ->
-      Chain (chainopatom chopat)
+      Chain (Unit :: chainopatom chopat)
   | Node("CHAIN", [Node("LIST", _) as f; Node("CHAINOPATOM", _) as chopat])
   | Node("CHAIN", [Node("ATOM", _) as f; Node("CHAINOPATOM", _) as chopat]) ->
       Chain ((ast_of_syntax_tree f)::(chainopatom chopat))

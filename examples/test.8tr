@@ -7,4 +7,5 @@ m > print
 "test" > print > print   . "test" puis ()
 0 > print  . 0
 [()] > print  . (function)
-() > [()] > print  . ()
+> [()] > print  . ()
+> print  . ()
