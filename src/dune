@@ -1,7 +1,7 @@
 (library
  (name huitr_interpreter)
  (libraries tipe)
- (modules huitr_utils ast parse_huitr))
+ (modules huitr_utils ast parse_huitr interpreter))
 
 (env
  (dev

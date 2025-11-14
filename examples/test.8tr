@@ -1,1 +1,7 @@
-::test
+"Hello," > n
+"world!" > m
+n
+m
+n > print
+m > print
+"test" > print > print
