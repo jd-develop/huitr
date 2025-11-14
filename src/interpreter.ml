@@ -145,3 +145,22 @@ let rec print (l: value list) : value =
       | Unit -> print_endline "()"; Unit
       end
   | l -> print [List l]
+
+
+let nth (l: value list) : value =
+  match l with
+  | [List l'; Integer i] ->
+      begin
+      match List.nth_opt l' i with
+      | None -> raise InvalidArgument
+      | Some x -> x
+      end
+  | _ -> raise InvalidArgument
+
+
+let wrapper (t: ast) : value =
+  let variables : scope = {parent = None; variables = Hashtbl.create 8} in
+  Hashtbl.add variables.variables "print" (BuiltinFunction print);
+  Hashtbl.add variables.variables "nth" (BuiltinFunction nth);
+  interpreter t variables
+

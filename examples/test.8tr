@@ -9,3 +9,13 @@ m > print
 [()] > print  . (function)
 > [()] > print  . ()
 > print  . ()
+
+2, 3, 4 > [args, 1 > nth] > print  . 3
+
+"test", ["hello" > print] > [args, 0 > nth > mavariable ; > (args, 1 > nth) ; mavariable] > print  . hello puis test
+
+. mavariable  . uncomment to crash
+
+["boucle infinie" > print; >rec] > rec
+
+> rec
