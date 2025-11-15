@@ -18,4 +18,4 @@ m > print
 
 ["boucle infinie" > print; >rec] > rec
 
-> rec
+. > rec

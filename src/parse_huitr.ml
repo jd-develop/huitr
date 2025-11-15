@@ -74,10 +74,6 @@ let token_rules, rules = parse_grammar huitr_grammar
 
 let automaton = construit_automate_LR1 rules "STATEMENTS" "EOF"
 
-let code_fp = open_in "/home/jddev/Documents/GitHub/huitr/examples/test.8tr"
-
-let code = really_input_string code_fp (in_channel_length code_fp)
-
 let parse_huitr (code: string): (string, string) syntax_tree =
   let tokens_with_comments =
     tokenize token_rules "EOF" code
