@@ -1,21 +1,44 @@
+std::bool::true
+std::bool::false
 "Hello," > n
 "world!" > m
 n
 m
-n > print
-m > print
-"test" > print > print   . "test" puis ()
-0 > print  . 0
-[()] > print  . (function)
-> [()] > print  . ()
-> print  . ()
+n > std::io::print
+m > std::io::print
+"test" > std::io::print > std::io::print   . "test" puis "test"
+0 > std::io::print  . 0
+[()] > std::io::print  . (function)
+> [()] > std::io::print  . ()
+> std::io::print  . ()
 
-2, 3, 4 > [args, 1 > nth] > print  . 3
+2, 3, 4 > [args, 1 > nth] > std::io::print  . 3
 
-"test", ["hello" > print] > [args, 0 > nth > mavariable ; > (args, 1 > nth) ; mavariable] > print  . hello puis test
+"test", ["hello" > std::io::print] > [args, 0 > nth > mavariable ; > (args, 1 > nth) ; mavariable] > std::io::print  . hello puis test
 
 . mavariable  . uncomment to crash
 
-["boucle infinie" > print; >rec] > rec
+["boucle infinie" > std::io::print; >rec] > rec
 
 . > rec
+
+std::math > std::io::print
+
+> std::math::add > std::io::print  . 0
+1 > std::math::add > std::io::print  . 1
+1.2 > std::math::add > std::io::print  . 1.2
+0, -1, 3, 2 > std::math::add > std::io::print  . 4
+3, 3.14, 2 > std::math::add > std::io::print  . 8.14
+
+std::bool::true > std::io::print
+std::bool::false > std::io::print > std::bool::not > std::io::print
+
+std::bool::false, std::bool::false > std::comp::eq > std::io::print
+
+"" > std::io::print
+
+0, 1 > std::comp::le > std::io::print
+0, 1 > std::comp::lt > std::io::print
+0, 1 > std::comp::ge > std::io::print
+0, 1 > std::comp::gt > std::io::print
+

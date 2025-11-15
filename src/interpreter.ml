@@ -1,36 +1,11 @@
 open Ast
 open Huitr_utils
-
-
-type value =
-  | Integer of int
-  | Float of float
-  | String of string
-  | List of value list
-  | Function of ast list
-  | BuiltinFunction of (value list -> value)
-  | Module of string * scope
-  | Unit
-and scope = {
-  parent: scope option;
-  variables: (string, value) Hashtbl.t
-}
-
-exception Undefined of string
-exception IsNotModule of string
-exception NotCallable
-
-
-(* Regarde récursivement dans variables et dans ses parents. *)
-let rec scope_lookup (variables: scope) (s: string) : value option =
-  match Hashtbl.find_opt variables.variables s with
-  | None ->
-      begin match variables.parent with
-      | None -> None
-      | Some parent -> scope_lookup parent s
-      end
-  | Some x -> Some x
-
+open Value_and_errors
+open Math
+open Comp
+open Bool
+open Tests_
+open Io
 
 (* Renvoie la valeur l1::l2::…::ln::s, ou lève IsNotModule si l’un des li
  * n’est pas un module. Lève Undefined si s n’est pas définie dans ln.
@@ -41,7 +16,6 @@ let rec find_module_identifier
     (l: string list) (s: string) (variables: scope)
     (current_module_expression: string):
     value =
-  print_endline (current_module_expression^s);
   match l with
   | [] -> (* On a déjà regardé tous les modules *)
       begin match scope_lookup variables s with
@@ -50,17 +24,18 @@ let rec find_module_identifier
       end
   | x::q ->
       begin match scope_lookup variables x with
-      | None -> raise (Undefined (current_module_expression^s))
-      | Some (Module (_, x)) ->
-          print_endline current_module_expression ;
-          find_module_identifier q s x (current_module_expression^s^"::")
-      | Some _ -> raise (IsNotModule (current_module_expression^s))
+      | None -> raise (Undefined (current_module_expression^x))
+      | Some (Module (_, v)) ->
+          let new_scope = {parent = None; variables = v} in
+          let new_module_expr = current_module_expression^x^"::" in
+          find_module_identifier q s new_scope new_module_expr
+      | Some _ -> raise (IsNotModule (current_module_expression^x))
       end
 
 
 (* Renvoie la valeur de s. Lève une excecption Undefined si s n’est pas définie
  *)
-let find_valiable (s: string) (variables: scope) : value =
+let find_variable (s: string) (variables: scope) : value =
   find_module_identifier [] s variables ""
 
 
@@ -70,15 +45,10 @@ let rec interpreter (input_ast: ast) (variables: scope) : value =
   | Integer i -> Integer i
   | Float f -> Float f
   | String s -> String s
-  | Function f -> Function f
-  | Identifier s -> find_valiable s variables
+  | Function f -> Function (f, variables)
+  | Identifier s -> find_variable s variables
   | ModuleIdentifier (l, s) ->
-      begin
-      match l with
-      | [] -> find_valiable s variables (* pas censé arriver mais on sait
-                                           jamais *)
-      | x::q -> find_module_identifier q x variables ""
-      end
+      find_module_identifier l s variables ""
   | Statements l -> interprete_statements l variables
   | List l -> interprete_list l variables
   | Chain l -> interprete_chain l variables
@@ -111,9 +81,9 @@ and interprete_chain (l: ast list) (variables: scope) : value =
 (* Cette fonction s’occupe de créer un nouveau scope *)
 and apply_function (fv: value) (x: value) (variables: scope) : value =
   match fv with
-  | Function f -> begin
+  | Function (f, outer_scope) -> begin
       let new_scope = {
-        parent = Some variables;
+        parent = Some outer_scope;
         variables = Hashtbl.create 8
       } in
       match x with
@@ -125,7 +95,7 @@ and apply_function (fv: value) (x: value) (variables: scope) : value =
       | List l -> f l
       | _ -> f [x]
     end
-  | _ -> raise NotCallable
+  | _ -> raise (NotCallable(fv))
 
 (* Le scope est supposé vide, avec le scope parent en parent *)
 and apply_function_aux
@@ -134,41 +104,30 @@ and apply_function_aux
   interpreter (Statements f) variables
 
 
-exception InvalidArgument
-
-
-let rec print (l: value list) : value =
-  match l with
-  | [] -> Unit
-  | [value] ->
-      begin
-      match value with
-      | Integer i -> print_int i; print_newline (); Unit
-      | Float f -> print_float f; print_newline (); Unit
-      | String s -> print_endline s; Unit
-      | List l -> print_list l (fun x -> let _ = print [x] in ()); Unit
-      | Function _ -> print_endline "(function)"; Unit
-      | BuiltinFunction _ -> print_endline "(built-in function)"; Unit
-      | Module (s, _) -> print_endline ("(module "^s^")"); Unit
-      | Unit -> print_endline "()"; Unit
-      end
-  | l -> print [List l]
-
-
 let nth (l: value list) : value =
   match l with
   | [List l'; Integer i] ->
       begin
       match List.nth_opt l' i with
-      | None -> raise InvalidArgument
+      | None -> raise (InvalidArgument("nth", Some (Integer i), "invalid index"))
       | Some x -> x
       end
-  | _ -> raise InvalidArgument
+  | _ -> raise (InvalidArgument("nth", Some (List l), "not a list"))
 
 
 let wrapper (t: ast) : value =
   let variables : scope = {parent = None; variables = Hashtbl.create 8} in
-  Hashtbl.add variables.variables "print" (BuiltinFunction print);
+  (*Hashtbl.add variables.variables "print" (BuiltinFunction print);*)
   Hashtbl.add variables.variables "nth" (BuiltinFunction nth);
+  let std = Hashtbl.create 8 in
+  Hashtbl.add std "math" (create_module_math ());
+  Hashtbl.add std "comp" (create_module_comp ());
+  Hashtbl.add std "bool" (create_module_bool ());
+  Hashtbl.add std "tests" (create_module_tests ());
+  Hashtbl.add std "io" (create_module_io ());
+  Hashtbl.add variables.variables "std" (Module ("std", std));
+  try
   interpreter t variables
+  with
+  | NotCallable(f) -> print_string "not callable : "; print [f]
 
