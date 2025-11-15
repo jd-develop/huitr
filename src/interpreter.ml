@@ -41,6 +41,7 @@ let rec find_module_identifier
     (l: string list) (s: string) (variables: scope)
     (current_module_expression: string):
     value =
+  print_endline (current_module_expression^s);
   match l with
   | [] -> (* On a déjà regardé tous les modules *)
       begin match scope_lookup variables s with
@@ -51,6 +52,7 @@ let rec find_module_identifier
       begin match scope_lookup variables x with
       | None -> raise (Undefined (current_module_expression^s))
       | Some (Module (_, x)) ->
+          print_endline current_module_expression ;
           find_module_identifier q s x (current_module_expression^s^"::")
       | Some _ -> raise (IsNotModule (current_module_expression^s))
       end
@@ -70,7 +72,13 @@ let rec interpreter (input_ast: ast) (variables: scope) : value =
   | String s -> String s
   | Function f -> Function f
   | Identifier s -> find_valiable s variables
-  | ModuleIdentifier (l, s) -> find_module_identifier l s variables ""
+  | ModuleIdentifier (l, s) ->
+      begin
+      match l with
+      | [] -> find_valiable s variables (* pas censé arriver mais on sait
+                                           jamais *)
+      | x::q -> find_module_identifier q x variables ""
+      end
   | Statements l -> interprete_statements l variables
   | List l -> interprete_list l variables
   | Chain l -> interprete_chain l variables
