@@ -9,7 +9,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 . A simple fizzbuzz
 
 [
-  args, 0 > nth > n  . stores the current value into n
+  args, 0 > std::list::nth > n  . stores the current value into n
 
   . trivial and self-explanatory /s
   > (n, 15 > std::math::mod, 0 > std::comp::eq,

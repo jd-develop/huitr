@@ -3,7 +3,7 @@
  (libraries tipe)
  (modules huitr_utils ast parse_huitr interpreter value_and_errors
           ; stdlib
-          math comp bool tests_ io))
+          math comp bool tests_ io list_))
 
 (include_subdirs unqualified) ; unqualified = open Math, qualified = open Std.Math
 

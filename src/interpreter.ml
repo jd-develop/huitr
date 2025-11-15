@@ -6,6 +6,7 @@ open Comp
 open Bool
 open Tests_
 open Io
+open List_
 
 (* Renvoie la valeur l1::l2::…::ln::s, ou lève IsNotModule si l’un des li
  * n’est pas un module. Lève Undefined si s n’est pas définie dans ln.
@@ -104,30 +105,21 @@ and apply_function_aux
   interpreter (Statements f) variables
 
 
-let nth (l: value list) : value =
-  match l with
-  | [List l'; Integer i] ->
-      begin
-      match List.nth_opt l' i with
-      | None -> raise (InvalidArgument("nth", Some (Integer i), "invalid index"))
-      | Some x -> x
-      end
-  | _ -> raise (InvalidArgument("nth", Some (List l), "not a list"))
-
-
 let wrapper (t: ast) : value =
   let variables : scope = {parent = None; variables = Hashtbl.create 8} in
-  (*Hashtbl.add variables.variables "print" (BuiltinFunction print);*)
-  Hashtbl.add variables.variables "nth" (BuiltinFunction nth);
   let std = Hashtbl.create 8 in
   Hashtbl.add std "math" (create_module_math ());
   Hashtbl.add std "comp" (create_module_comp ());
   Hashtbl.add std "bool" (create_module_bool ());
   Hashtbl.add std "tests" (create_module_tests ());
   Hashtbl.add std "io" (create_module_io ());
+  Hashtbl.add std "list" (create_module_list ());
   Hashtbl.add variables.variables "std" (Module ("std", std));
   try
   interpreter t variables
   with
   | NotCallable(f) -> print_string "not callable : "; print [f]
+  | InvalidArgument(func, value, errmsg) ->
+      print_endline ("invalid argument in function "^func^", with message "^errmsg);
+      Unit
 
