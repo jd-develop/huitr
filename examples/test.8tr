@@ -12,9 +12,9 @@ m > std::io::print
 > [()] > std::io::print  . ()
 > std::io::print  . ()
 
-2, 3, 4 > [args, 1 > nth] > std::io::print  . 3
+2, 3, 4 > [args, 1 > std::list::nth] > std::io::print  . 3
 
-"test", ["hello" > std::io::print] > [args, 0 > nth > mavariable ; > (args, 1 > nth) ; mavariable] > std::io::print  . hello puis test
+"test", ["hello" > std::io::print] > [args, 0 > std::list::nth > mavariable ; > (args, 1 > std::list::nth) ; mavariable] > std::io::print  . hello puis test
 
 . mavariable  . uncomment to crash
 
@@ -41,4 +41,3 @@ std::bool::false, std::bool::false > std::comp::eq > std::io::print
 0, 1 > std::comp::lt > std::io::print
 0, 1 > std::comp::ge > std::io::print
 0, 1 > std::comp::gt > std::io::print
-
