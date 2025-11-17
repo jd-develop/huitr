@@ -32,6 +32,9 @@ STATEMENTS -> newline STATEMENTS
 STATEMENTS -> CHAIN newline STATEMENTS
 STATEMENTS -> CHAIN newline
 STATEMENTS -> CHAIN
+STATEMENTS -> LIST newline STATEMENTS
+STATEMENTS -> LIST newline
+STATEMENTS -> LIST
 
 LIST -> CHAIN comma ATOM
 LIST -> LIST comma ATOM
@@ -52,6 +55,7 @@ ATOM -> float_literal
 ATOM -> IDENTIFIER
 ATOM -> FUNCTION
 ATOM -> lparen CHAIN rparen
+ATOM -> lparen LIST rparen
 ATOM -> UNIT
 
 NAMESPIDENT -> namesp ident

@@ -22,10 +22,10 @@ let rec statements (t: (string, string) syntax_tree)
   | Node("STATEMENTS", [Leaf {token_type = "newline"}]) -> []
   | Node("STATEMENTS", [Leaf {token_type = "newline"}; st]) ->
       statements st
-  | Node("STATEMENTS", [ch; Leaf {token_type = "newline"}; st]) ->
-      ast_of_syntax_tree ch :: (statements st)
-  | Node("STATEMENTS", chain::_) ->
-      [ast_of_syntax_tree chain]
+  | Node("STATEMENTS", [ch_or_list; Leaf {token_type = "newline"}; st]) ->
+      ast_of_syntax_tree ch_or_list :: (statements st)
+  | Node("STATEMENTS", ch_or_list::_) ->
+      [ast_of_syntax_tree ch_or_list]
   | _ -> failwith "Pas un nœud STATEMENTS"
 
 
@@ -76,9 +76,9 @@ and atom (t: (string, string) syntax_tree) : ast =
   | Node("ATOM", [Node("FUNCTION", _) as f]) ->
       function_ f
   | Node("ATOM", [Leaf {token_type = "lparen"};
-                  Node("CHAIN", _) as ch;
+                  ch_or_list;
                   Leaf {token_type = "rparen"}]) ->
-      ast_of_syntax_tree ch
+      ast_of_syntax_tree ch_or_list
   | Node("ATOM", [Node("UNIT", _)]) -> Unit
   | _ -> failwith "Pas un nœud ATOM"
 
