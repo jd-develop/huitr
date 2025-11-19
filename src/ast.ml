@@ -33,11 +33,11 @@ and list (t: (string, string) syntax_tree) : ast list =
   match t with
   | Node("LIST", [Node ("CHAIN", _) as ch; Leaf {token_type = "comma"}; at])
   | Node("LIST", [Node ("CHAIN", _) as ch; Leaf {token_type = "comma"};
-                  Leaf {token_type = "newline"}; at]) ->
+                  Node ("ANY_AMOUNT_OF_NEWLINE", _); at]) ->
       [ast_of_syntax_tree ch; ast_of_syntax_tree at]
   | Node("LIST", [Node ("LIST", _) as l; Leaf {token_type = "comma"}; at])
   | Node("LIST", [Node ("LIST", _) as l; Leaf {token_type = "comma"};
-                  Leaf {token_type = "newline"}; at]) ->
+                  Node ("ANY_AMOUNT_OF_NEWLINE", _); at]) ->
       (list l)@[ast_of_syntax_tree at]
   | _ -> failwith "Pas un nœud LIST"
 
