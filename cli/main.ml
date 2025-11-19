@@ -17,7 +17,7 @@ let filename =
     required &
     pos 0 (some string) None &
     info []
-    ~doc:"File where the Huitr program is"
+    ~doc:"File where the Huitr program is (stdin for standard input)"
     ~docv:"FILENAME"
   )
 

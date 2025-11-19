@@ -105,7 +105,18 @@ and apply_function_aux
   interpreter (Statements f) variables
 
 
-let wrapper (t: ast) : value =
+let wrapper_for_console (variables: scope) (t: ast) : value =
+  try
+  interpreter t variables
+  with
+  | NotCallable(f) -> print_string "Not callable: "; print [f]
+  | InvalidArgument(func, value, errmsg) ->
+      print_endline ("Invalid argument in function "^func^", with message “"^errmsg^"”");
+      Unit
+  | Undefined(name) -> print_endline ("Undefined name: "^name); Unit
+  | IsNotModule(name) -> print_endline ("Undefined module: "^name); Unit
+
+let create_scope () : scope =
   let variables : scope = {parent = None; variables = Hashtbl.create 8} in
   let std = Hashtbl.create 8 in
   Hashtbl.add std "math" (create_module_math ());
@@ -115,11 +126,7 @@ let wrapper (t: ast) : value =
   Hashtbl.add std "io" (create_module_io ());
   Hashtbl.add std "list" (create_module_list ());
   Hashtbl.add variables.variables "std" (Module ("std", std));
-  try
-  interpreter t variables
-  with
-  | NotCallable(f) -> print_string "not callable : "; print [f]
-  | InvalidArgument(func, value, errmsg) ->
-      print_endline ("invalid argument in function "^func^", with message "^errmsg);
-      Unit
+  variables
 
+
+let wrapper : ast -> value = wrapper_for_console (create_scope ())

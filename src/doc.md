@@ -151,6 +151,8 @@ Ce module contient les fonctions suivantes&nbsp;:
 * `std::math::prod` prenant un nombre arbitraire de nombres (ou une liste de
   nombres) et renvoyant le produit des nombres. Le produit d’une liste vide est
   1.
+* `std::math::minus` prenant *exactement* deux nombres `a` et `b` en entrée
+  et renvoyant `a-b`.
 * `std::math::mod` prenant deux entiers `a` et `b` en entrée et renvoyant
   le reste de la division euclidienne de `a` par `b`. La sortie est toujours
   positive.
