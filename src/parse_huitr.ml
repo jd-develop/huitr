@@ -68,6 +68,7 @@ IDENTIFIER -> ident
 IDENTIFIER -> ident NAMESPIDENT
 
 FUNCTION -> lsquare STATEMENTS rsquare
+FUNCTION -> lsquare rsquare
 
 UNIT -> lparen rparen
 

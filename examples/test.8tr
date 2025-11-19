@@ -41,3 +41,5 @@ std::bool::false, std::bool::false > std::comp::eq > std::io::print
 0, 1 > std::comp::lt > std::io::print
 0, 1 > std::comp::ge > std::io::print
 0, 1 > std::comp::gt > std::io::print
+
+> [] > std::io::print

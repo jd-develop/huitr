@@ -112,6 +112,9 @@ and function_ (t: (string, string) syntax_tree) : ast =
                       Node("STATEMENTS", _) as st;
                       Leaf {token_type = "rsquare"}]) ->
       Function (statements st)
+  | Node("FUNCTION", [Leaf {token_type = "lsquare"};
+                      Leaf {token_type = "rsquare"}]) ->
+      Function []
   | _ -> failwith "Pas un nœud FUNCTION"
 
 and ast_of_syntax_tree (t: (string, string) syntax_tree) : ast =
