@@ -3,7 +3,8 @@ open Io
 
 let nth (l: value list) : value =
   match l with
-  | [List l'; Integer i] ->
+  | [List l'; Integer i]
+  | [Integer i; List l'] ->
       begin
       match List.nth_opt l' i with
       | None -> raise (InvalidArgument("nth", Some (Integer i), "invalid index"))

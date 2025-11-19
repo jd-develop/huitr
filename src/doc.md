@@ -1,0 +1,159 @@
+# Documentation Huitr
+
+## Présentation générale
+
+Huitr est un langage fonctionnel *extrémiste*. Il y a en gros 2 syntaxes en
+dehors des littéraux&nbsp;:
+* Définir une fonction&nbsp;;
+* Appeler une fonction.
+
+En outre, il n’y a aucune opération relevant du sucre syntaxique, tel que `+` ou
+encore `&&`, il faudra donc utiliser des fonctions bien choisies de la STD
+(~~sexually transmitted disease~~ bibliothèque standard).
+
+Huitr signifie HUitr Is Tough to Read.
+
+Cette documentation présente tout d’abord les éléments de syntaxes basiques,
+puis liste les fonctions disponibles dans la STD.
+
+## Syntaxe
+
+Un programme Huitr est constitué de plusieurs lignes, séparées par des
+retour-lignes ou des point-virgules (en particulier, **les retour-lignes sont
+significatifs**).
+
+### Littéraux
+Ci-après la liste des littéraux de Huitr.
+* Littéral d’entier. Exemples&nbsp;: `0`, `3`, `-1`, `0x3D`, `0B01001`, `0o14`.
+* Littéral de flottant. Exemples&nbsp;: `0.0`, `3.1415`, `-6e12`, `4e-3`.
+* Littéral de chaîne de caractères. Exemples&nbsp; : `""`, `"Hello, world!"`.
+* Littéral «&nbsp;unit&nbsp;»&nbsp;: `()`. Correspond au `None` en Python.
+
+### Constantes
+En Huitr, il n’y a pas de variables mais uniquement des constantes.
+Pour déclarer une constante, il suffit d’utiliser la syntaxe
+`(...) > nom_de_la_constante`. Le nom est constitué de caractères ASCII
+alphanumériques et de tirets du bas (le premier caractère du nom doit être
+alphabétique).
+
+Une expression d’assignation renvoie la valeur de la constante.
+
+### Liste
+Il est possible de définir une liste en juxtaposant plusieurs valeurs séparées
+par des virgules. Par exemple, `1, "chocolatine", 3.14` est une liste contenant
+l’entier 1.0, la chaîne `"chocolatine"` et le flottant `3.14`. Pour les listes
+vides ou ne contenant qu’un seul élément, voir plus bas (`std::list`).
+À noter&nbsp;: **on peut insérer un retour-ligne après une virgule**.
+
+### Déclaration de fonction
+Pour déclarer une fonction, il suffit de mettre du code entre crochets. La
+valeur renvoyée est celle renvoyée par la dernière ligne. S’il n’y a rien
+entre les crochets, la fonction renverra unit.
+Il n’est pas nécessaire de préciser les paramètres de la fonction. Pour
+récupérer les arguments, voir sous-section suivante.
+
+Exemple&nbsp;: `[3 > n; n]` est une fonction renvoyant `3`.
+
+### Appels de fonctions et chaînes
+Pour appeler une fonction, on peut utiliser la même syntaxe que pour déclarer
+une variable&nbsp;: `arg1, arg2, …, argn > fonction`. Cela appelle la fonction
+`fonction` avec les arguments `arg1, …, argn`. Une fonction peut être appelée
+sur 0 arguments&nbsp;: cela équivaut à l’appeler sur un seul argument de type
+unit (i.e. `()`).
+
+À noter&nbsp;: le paranthésage se fait de la gauche vers la droite. Par exemple,
+`arg1, arg2 > fonction1, arg3, arg4 > fonction2, arg5 > fonction3` sera
+paranthésé comme suit&nbsp;:
+`((arg1, arg2 > fonction1), arg3, arg4 > fonction2), arg5 > fonction3`.
+
+À noter&nbsp;: l’usage des parenthèses est possible pour modifier la priorité.
+
+Lors de l’appel d’une fonction, une liste `args` est définie dans le *scope* de
+la fonction&nbsp;: elle contient la liste des arguments. Si aucun argument n’est
+donné, la liste `args` contient un unique élément de type `unit` (i.e. `()`).
+On pourra utiliser les fonctions de `std::list` dessus (cf. plus loin). 
+
+## Bibliothèque standard
+
+Voici la liste des modules et de leurs fonctions et constantes.
+
+### `std::bool`
+Ce module contient les constantes suivantes&nbsp;:
+* `std::bool::true`&nbsp;: le booléen Vrai
+* `std::bool::false`&nbsp;: le booléen Faux
+
+Ce module contient les fonctions suivantes&nbsp;:
+* `std::bool::and` prenant deux booléens `b1` et `b2` en entrée, et renvoyant
+  `b1 && b2` en sortie.
+* `std::bool::not` prenant un booléen `b` en entrée, et renvoyant `!b` en
+  sortie.
+* `std::bool::or` prenant deux booléens `b1` et `b2` en entrée, et renvoyant
+  `b1 || b2` en sortie
+
+### `std::comp`
+Ce module contient les fonctions suivantes&nbsp;:
+* `std::comp::eq` prenant deux valeurs en entrée et renvoyant un booléen
+  indiquant si elles sont égales (en valeur, et non en mémoire). Les flottants
+  et les entiers peuvent être comparés. Deux fonctions sont égales si elles
+  contiennent les mêmes instructions (caractère pour caractère).
+* `std::comp::ne` prenant deux valeurs en entrée et renvoyant un booléen
+  indiquant si elles sont différentes. Note&nbsp;: `v1, v2 > std::comp::ne` est
+  équivalent à `v1, v2 > std::comp::eq > std::bool::not`.
+* `std::comp::le` prenant deux nombres (entiers ou flottants) `a` et `b` en
+  entrée et renvoyant Vrai si `a <= b` et Faux sinon.
+* `std::comp::lt`&nbsp;: idem avec `<`.
+* `std::comp::ge`&nbsp;: idem avec `>=`.
+* `std::comp::gt`&nbsp;: idem avec `>`.
+
+### `std::io`
+Ce module contient les fonctions suivantes&nbsp;:
+* `std::io::print` prenant une valeur en entrée et l’affichant **avec retour
+  ligne**
+* `std::io::print_no_newline` faisant la même chose mais **sans retour ligne**.
+
+### `std::list`
+Ce module contient la constante suivante&nbsp;:
+* `std::list::empty`&nbsp;: la liste vide.
+
+Ce module contient les fonctions suivantes&nbsp;:
+* `std::list::nth` prenant une liste `l` et un entier `n` en entrée et renvoyant
+  le `n`-ième élément de `l` (en commençant à 0).
+  (*note&nbsp;: cette fonction est utile pour récupérer les arguments dans les
+  fonctions&nbsp;: le premier argument pouvant être récupéré avec
+  `args, 0 > std::list::nth`.*)
+* `std::list::len` prend une liste `l` en entrée et renvoie sa longueur.
+* `std::list::is_empty` prend une liste `l` en entrée et renvoie Vrai si elle
+  est vide et Faux sinon (raccourci de `l > std::list::len, 0 > std::comp::eq`
+  avec une meilleure complexité).
+* `std::list::cons` (*cons*truire) prend un élément `x` en entrée et une liste
+  `l` et renvoie une liste ayant comme premier élément `x` puis les éléments de
+  la liste `l`. Par exemple, `3, (4, 2, 9.2, "chocolatine") > std::list::cons`
+  vaut `3, 4, 2, 9.2, "chocolatine"`.
+* `std::list::head` prend une liste en entrée et renvoie son premier élément.
+  Plante si la liste est vide.
+* `std::list::tail` prend une liste en entrée et renvoie une liste contenant
+  tous ses éléments sauf le premier. Plante si la liste est vide.
+
+Note&nbsp;: pour faire une liste à un élément `x`, il suffit de faire
+`x, std::list::empty > std::list::cons`.
+
+### `std::math`
+Ce module contient les fonctions suivantes&nbsp;:
+* `std::math::add` prenant un nombre arbitraire de nombres (ou une liste de
+  nombres) et renvoyant la somme des nombres. La somme d’une liste vide est 0.
+* `std::math::prod` prenant un nombre arbitraire de nombres (ou une liste de
+  nombres) et renvoyant le produit des nombres. Le produit d’une liste vide est
+  1.
+* `std::math::mod` prenant deux entiers `a` et `b` en entrée et renvoyant
+  le reste de la division euclidienne de `a` par `b`. La sortie est toujours
+  positive.
+
+### `std::tests`
+Ce module contient la fonction suivante&nbsp;:
+* `std::tests::if` prenant en argument un booléen, une valeur `v1` et une
+  valeur `v2`. Si le booléen est vrai, renvoie `v1`, s’il est faux, renvoie
+  `v2`. **Attention**&nbsp;: `v1` et `v2` sont évalués AVANT l’exécution du
+  `if`. Pour contrer cela, `v1` et `v2` peuvent être des fonctions, et le
+  résultat est donc appelé en-dehors du `if`. Par exemple&nbsp;:
+  `> (condition, [3 > appel_tres_long], [4 > appel_tres_long] > std::tests::if)`.
+
