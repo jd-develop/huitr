@@ -41,7 +41,7 @@ Une expression d’assignation renvoie la valeur de la constante.
 ### Liste
 Il est possible de définir une liste en juxtaposant plusieurs valeurs séparées
 par des virgules. Par exemple, `1, "chocolatine", 3.14` est une liste contenant
-l’entier 1.0, la chaîne `"chocolatine"` et le flottant `3.14`. Pour les listes
+l’entier `1`, la chaîne `"chocolatine"` et le flottant `3.14`. Pour les listes
 vides ou ne contenant qu’un seul élément, voir plus bas (`std::list`).
 À noter&nbsp;: **on peut insérer un retour-ligne après une virgule**.
 
@@ -61,12 +61,19 @@ une variable&nbsp;: `arg1, arg2, …, argn > fonction`. Cela appelle la fonction
 sur 0 arguments&nbsp;: cela équivaut à l’appeler sur un seul argument de type
 unit (i.e. `()`).
 
-À noter&nbsp;: le paranthésage se fait de la gauche vers la droite. Par exemple,
+À noter&nbsp;: le parenthésage se fait de la gauche vers la droite. Par exemple,
 `arg1, arg2 > fonction1, arg3, arg4 > fonction2, arg5 > fonction3` sera
-paranthésé comme suit&nbsp;:
+parenthésé comme suit&nbsp;:
 `((arg1, arg2 > fonction1), arg3, arg4 > fonction2), arg5 > fonction3`.
 
 À noter&nbsp;: l’usage des parenthèses est possible pour modifier la priorité.
+
+Les constantes définies dans le corps d’une fonction ne sont plus accessibles
+en-dehors de la fonction. À l’inverse, les constantes défénies en-dehors du
+corps d’une fonction sont accessibles par cette fonction (y compris celles
+définies après la fonction). En outre, il est possible de faire des fonctions
+récursives (`[arg > a] > a`) et mutuellement récursives
+(`[arg > b] > a ; [arg > a] > b`).
 
 Lors de l’appel d’une fonction, une liste `args` est définie dans le *scope* de
 la fonction&nbsp;: elle contient la liste des arguments. Si aucun argument n’est
@@ -94,8 +101,8 @@ Ce module contient les fonctions suivantes&nbsp;:
 Ce module contient les fonctions suivantes&nbsp;:
 * `std::comp::eq` prenant deux valeurs en entrée et renvoyant un booléen
   indiquant si elles sont égales (en valeur, et non en mémoire). Les flottants
-  et les entiers peuvent être comparés. Deux fonctions sont égales si elles
-  contiennent les mêmes instructions (caractère pour caractère).
+  et les entiers peuvent être comparés entre eux. Deux fonctions sont égales si
+  elles contiennent les mêmes instructions (caractère pour caractère).
 * `std::comp::ne` prenant deux valeurs en entrée et renvoyant un booléen
   indiquant si elles sont différentes. Note&nbsp;: `v1, v2 > std::comp::ne` est
   équivalent à `v1, v2 > std::comp::eq > std::bool::not`.
@@ -134,8 +141,8 @@ Ce module contient les fonctions suivantes&nbsp;:
 * `std::list::tail` prend une liste en entrée et renvoie une liste contenant
   tous ses éléments sauf le premier. Plante si la liste est vide.
 
-Note&nbsp;: pour faire une liste à un élément `x`, il suffit de faire
-`x, std::list::empty > std::list::cons`.
+Note&nbsp;: pour faire une liste contenant un seul élément `x`, il suffit de
+faire `x, std::list::empty > std::list::cons`.
 
 ### `std::math`
 Ce module contient les fonctions suivantes&nbsp;:
