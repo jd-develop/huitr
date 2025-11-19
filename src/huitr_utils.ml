@@ -17,4 +17,4 @@ let print_list (l: 'a list) (print_'a: 'a -> unit) =
     | x::q -> print_'a x; print_string ", "; print_list_aux q
   in
   print_list_aux l;
-  print_endline "]"
+  print_string "]"

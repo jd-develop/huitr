@@ -1,0 +1,53 @@
+std::list > L
+
+[
+    args, 0 > L::nth > l1
+    args, 1 > L::nth > l2
+
+    > (l1 > L::is_empty,
+       [l2],
+       [>(l2 > L::is_empty,
+          [l1],
+          [
+              . les deux listes sont non vides
+              l1 > L::head > x
+              l2 > L::head > y
+              > (x, y > std::comp::le,
+                 [x, ((l1 > L::tail), l2 > merge) > L::cons],
+                 [y, (l1, (l2 > L::tail) > merge) > L::cons] > std::tests::if)
+          ] > std::tests::if)] > std::tests::if)
+] > merge
+
+[
+    args> l
+    > (l > L::is_empty,
+       [L::empty, L::empty],
+       [l > L::head > x
+        l > L::tail > q
+        > (q > L::is_empty,
+           [x, L::empty > L::cons, L::empty],
+           [q > L::head > y
+            q > L::tail > qp
+            qp > separe > res
+            res, 0 > L::nth > l1p
+            res, 1 > L::nth > l2p
+            (x, l1p > L::cons, (y, l2p > L::cons))] > std::tests::if)] > std::tests::if)
+] > separe
+
+[
+    args > l
+    > (l > L::is_empty,
+       [L::empty],
+       [
+           > (l > L::tail > L::is_empty,
+              [l],
+              [
+                  l > separe > res
+                  res, 0 > L::nth > l1
+                  res, 1 > L::nth > l2
+                  l1 > mergesort, (l2 > mergesort) > merge
+              ] > std::tests::if)
+       ] > std::tests::if)
+] > mergesort
+
+(1, 6, 5.14, 58.237, 69, 7, 17) > mergesort > std::io::print
