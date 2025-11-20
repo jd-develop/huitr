@@ -27,9 +27,16 @@ let print (l: value list) : value =
   value
 
 
+let input (l: value list) : value =
+  let _ = print_no_newline l in
+  let str = read_line () in
+  String str
+
+
 let create_module_io () : value =
   let io = Hashtbl.create 8 in
   Hashtbl.add io "print" (BuiltinFunction print);
   Hashtbl.add io "print_no_newline" (BuiltinFunction print_no_newline);
+  Hashtbl.add io "input" (BuiltinFunction input);
   Module("io", io)
 

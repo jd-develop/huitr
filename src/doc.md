@@ -117,6 +117,8 @@ Ce module contient les fonctions suivantes&nbsp;:
 * `std::io::print` prenant une valeur en entrée et l’affichant **avec retour
   ligne**
 * `std::io::print_no_newline` faisant la même chose mais **sans retour ligne**.
+* `std::io::input` affichant son entrée sans retour ligne et renvoyant une ligne
+  lue dans l’entrée standard.
 
 ### `std::list`
 Ce module contient la constante suivante&nbsp;:
