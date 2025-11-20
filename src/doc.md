@@ -86,8 +86,8 @@ Voici la liste des modules et de leurs fonctions et constantes.
 
 ### `std::bool`
 Ce module contient les constantes suivantes&nbsp;:
-* `std::bool::true`&nbsp;: le booléen Vrai
-* `std::bool::false`&nbsp;: le booléen Faux
+* `std::bool::true` : le booléen Vrai
+* `std::bool::false` : le booléen Faux
 
 Ce module contient les fonctions suivantes&nbsp;:
 * `std::bool::and` prenant deux booléens `b1` et `b2` en entrée, et renvoyant
@@ -108,9 +108,9 @@ Ce module contient les fonctions suivantes&nbsp;:
   équivalent à `v1, v2 > std::comp::eq > std::bool::not`.
 * `std::comp::le` prenant deux nombres (entiers ou flottants) `a` et `b` en
   entrée et renvoyant Vrai si `a <= b` et Faux sinon.
-* `std::comp::lt`&nbsp;: idem avec `<`.
-* `std::comp::ge`&nbsp;: idem avec `>=`.
-* `std::comp::gt`&nbsp;: idem avec `>`.
+* `std::comp::lt` : idem avec `<`.
+* `std::comp::ge` : idem avec `>=`.
+* `std::comp::gt` : idem avec `>`.
 
 ### `std::io`
 Ce module contient les fonctions suivantes&nbsp;:
@@ -120,7 +120,7 @@ Ce module contient les fonctions suivantes&nbsp;:
 
 ### `std::list`
 Ce module contient la constante suivante&nbsp;:
-* `std::list::empty`&nbsp;: la liste vide.
+* `std::list::empty` : la liste vide.
 
 Ce module contient les fonctions suivantes&nbsp;:
 * `std::list::nth` prenant une liste `l` et un entier `n` en entrée et renvoyant
