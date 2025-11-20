@@ -77,6 +77,19 @@ and atom (t: (string, string) syntax_tree) : ast =
       function_ f
   | Node("ATOM", [Leaf {token_type = "lparen"};
                   ch_or_list;
+                  Leaf {token_type = "rparen"}])
+  | Node("ATOM", [Leaf {token_type = "lparen"};
+                  Node ("ANY_AMOUNT_OF_NEWLINE", _);
+                  ch_or_list;
+                  Leaf {token_type = "rparen"}])
+  | Node("ATOM", [Leaf {token_type = "lparen"};
+                  ch_or_list;
+                  Node ("ANY_AMOUNT_OF_NEWLINE", _);
+                  Leaf {token_type = "rparen"}])
+  | Node("ATOM", [Leaf {token_type = "lparen"};
+                  Node ("ANY_AMOUNT_OF_NEWLINE", _);
+                  ch_or_list;
+                  Node ("ANY_AMOUNT_OF_NEWLINE", _);
                   Leaf {token_type = "rparen"}]) ->
       ast_of_syntax_tree ch_or_list
   | Node("ATOM", [Node("UNIT", _)]) -> Unit

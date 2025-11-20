@@ -59,15 +59,18 @@ ATOM -> IDENTIFIER
 ATOM -> FUNCTION
 ATOM -> lparen CHAIN rparen
 ATOM -> lparen LIST rparen
+ATOM -> lparen ANY_AMOUNT_OF_NEWLINE CHAIN rparen
+ATOM -> lparen ANY_AMOUNT_OF_NEWLINE LIST rparen
+ATOM -> lparen CHAIN ANY_AMOUNT_OF_NEWLINE rparen
+ATOM -> lparen LIST ANY_AMOUNT_OF_NEWLINE rparen
+ATOM -> lparen ANY_AMOUNT_OF_NEWLINE CHAIN ANY_AMOUNT_OF_NEWLINE rparen
+ATOM -> lparen ANY_AMOUNT_OF_NEWLINE LIST ANY_AMOUNT_OF_NEWLINE rparen
 ATOM -> UNIT
 
 NAMESPIDENT -> namesp ident
 NAMESPIDENT -> namesp ident NAMESPIDENT
 
 IDENTIFIER -> ident
-# je crois que la ligne suivante est incorrecte, dans le doute je ne fais que
-# la commenter
-# IDENTIFIER -> NAMESPIDENT
 IDENTIFIER -> ident NAMESPIDENT
 
 FUNCTION -> lsquare STATEMENTS rsquare
