@@ -29,7 +29,7 @@ let console (debug: bool) =
 
 
 let execute_file (filename: string) (debug: bool) =
-  if filename = "stdin" then
+  if filename = "-" then
     console debug
   else
     let code_fp = open_in filename in
