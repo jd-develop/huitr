@@ -89,7 +89,12 @@ let parse_huitr (code: string): (string, string) syntax_tree =
   let rec filter_tokens l (in_simple_comment: bool) (in_multi_comment: bool) accu =
     let in_comment = in_simple_comment || in_multi_comment in
     match l with
-    | [] -> List.rev accu
+    | [] ->
+        begin match accu with
+        | t::q when t.token_type <> "EOF" ->
+            List.rev ({token_type="EOF"; value=""; start=t.start+1}::accu)
+        | _ -> List.rev accu
+        end
     | t::q when t.token_type = "simple_comment_start" && not in_comment ->
         filter_tokens q true false accu
     | t::q when t.token_type = "newline" && in_simple_comment ->
