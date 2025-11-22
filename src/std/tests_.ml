@@ -6,7 +6,7 @@ let if_ (l: value list) (pos: int) : value =
   | [Boolean false, _; _; v] -> v
   | _ -> raise (InvalidArgument(
       "std::tests::if", Some (List l),
-      "structure attendue : condition, valeur_vrai, valeur_faux", pos
+      "paramètres attendus : condition, valeur_vrai, valeur_faux", pos
     ))
 
 let create_module_tests () : value =
