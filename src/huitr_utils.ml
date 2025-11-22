@@ -7,14 +7,12 @@ let remove_first_and_last_char (s: string) : string =
   else
     String.sub s 1 (n-2)
 
-
-let print_list (l: 'a list) (print_'a: 'a -> unit) =
-  print_string "[";
+let string_of_list (l: 'a list) (string_of_'a: 'a -> string) =
   let rec print_list_aux (l': 'a list) =
     match l' with
-    | [] -> ()
-    | x::[] -> print_'a x
-    | x::q -> print_'a x; print_string ", "; print_list_aux q
+    | [] -> ""
+    | x::[] -> string_of_'a x
+    | x::q -> (string_of_'a x^", "^(print_list_aux q))
   in
-  print_list_aux l;
-  print_string "]"
+  ("["^(print_list_aux l)^"]")
+

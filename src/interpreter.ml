@@ -30,7 +30,7 @@ let rec find_module_identifier
           let new_scope = {parent = None; variables = v} in
           let new_module_expr = current_module_expression^x^"::" in
           find_module_identifier q s new_scope new_module_expr pos
-      | Some _ -> raise (IsNotModule (current_module_expression^x, pos))
+      | Some v -> raise (IsNotModule (current_module_expression^x, v, pos))
       end
 
 
@@ -109,13 +109,6 @@ and apply_function_aux
   Hashtbl.add variables.variables "args" (List x, args_pos);
   interpreter (Statements(f, fun_pos)) variables
 
-
-  (*| NotCallable(f) -> print_string "Not callable: "; print [f]
-  | InvalidArgument(func, value, errmsg) ->
-      print_endline ("Invalid argument in function "^func^", with message “"^errmsg^"”");
-      Unit
-  | Undefined(name) -> print_endline ("Undefined name: "^name); Unit
-  | IsNotModule(name) -> print_endline ("Undefined module: "^name); Unit*)
 
 let create_scope () : scope =
   let variables : scope = {parent = None; variables = Hashtbl.create 8} in

@@ -6,16 +6,7 @@ let rec print_no_newline (l: value list) (pos: int) : value =
   match l with
   | [] -> Unit, pos
   | [value] -> begin
-      let () = (match fst value with
-        | Integer i -> print_int i
-        | Float f -> print_float f
-        | String s -> print_string s
-        | Boolean b -> print_string (if b then "true" else "false")
-        | List l -> print_list l (fun x -> let _ = print_no_newline [x] pos in ())
-        | Function _ -> print_string "(function)"
-        | BuiltinFunction _ -> print_string "(built-in function)"
-        | Module (s, _) -> print_string ("(module "^s^")")
-        | Unit -> print_string "()") in
+      let () = print_string (string_of_value value) in
       value
       end
   | (_, list_pos)::_ -> print_no_newline [List l, list_pos] pos
