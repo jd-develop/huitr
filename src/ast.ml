@@ -3,105 +3,141 @@ open Tipe.Lexer
 open Huitr_utils
 
 type ast =
-  | Statements of ast list
-  | List of ast list
-  | Chain of ast list
-  | Function of ast list
-  | ModuleIdentifier of string list * string
-  | Identifier of string
-  | Integer of int
-  | Float of float
-  | String of string
-  | Unit
-  | Vide
+  | Statements of ast list * int
+  | List of ast list * int
+  | Chain of ast list * int
+  | Function of ast list * int
+  | ModuleIdentifier of string list * string * int
+  | Identifier of string * int
+  | Integer of int * int
+  | Float of float * int
+  | String of string * int
+  | Unit of int
+  | Vide of int
+
+
+let rec pos_start (t: ast) : int =
+  match t with
+  | Statements(_, i)
+  | List(_, i)
+  | Chain(_, i)
+  | Function(_, i)
+  | ModuleIdentifier(_, _, i)
+  | Identifier(_, i)
+  | Integer(_, i)
+  | Float(_, i)
+  | String(_, i)
+  | Unit i
+  | Vide i -> i
+
+
+let rec new_pos_start (t: ast) (pos: int) : ast =
+  match t with
+  | Statements(s, _) -> Statements(s, pos)
+  | List(l, _) -> List(l, pos)
+  | Chain(c, _) -> Chain(c, pos)
+  | Function(f, _) -> Function(f, pos)
+  | ModuleIdentifier(l, s, _) -> ModuleIdentifier(l, s, pos)
+  | Identifier(i, _) -> Identifier(i, pos)
+  | Integer(i, _) -> Integer(i, pos)
+  | Float(f, _) -> Float(f, pos)
+  | String(s, _) -> String(s, pos)
+  | Unit _ -> Unit pos
+  | Vide _ -> Vide pos
 
 
 let rec statements (t: (string, string) syntax_tree)
-    : ast list =
+    : ast list * int =
   match t with
-  | Node("STATEMENTS", [Leaf {token_type = "newline"}]) -> []
+  | Node("STATEMENTS", [Leaf {token_type = "newline"; start}]) -> [], start
   | Node("STATEMENTS", [Leaf {token_type = "newline"}; st]) ->
       statements st
   | Node("STATEMENTS", [ch_or_list; Leaf {token_type = "newline"}; st]) ->
-      ast_of_syntax_tree ch_or_list :: (statements st)
+      let ast_of_ch_or_list = ast_of_syntax_tree ch_or_list in
+      ast_of_ch_or_list :: (fst (statements st)),
+      pos_start ast_of_ch_or_list
   | Node("STATEMENTS", ch_or_list::_) ->
-      [ast_of_syntax_tree ch_or_list]
+      let ast_of_ch_or_list = ast_of_syntax_tree ch_or_list in
+      [ast_of_ch_or_list], pos_start ast_of_ch_or_list
   | _ -> failwith "Pas un nœud STATEMENTS"
 
 
-and list (t: (string, string) syntax_tree) : ast list =
+and list (t: (string, string) syntax_tree) : ast list * int =
   match t with
   | Node("LIST", [Node ("CHAIN", _) as ch; Leaf {token_type = "comma"}; at])
   | Node("LIST", [Node ("CHAIN", _) as ch; Leaf {token_type = "comma"};
                   Node ("ANY_AMOUNT_OF_NEWLINE", _); at]) ->
-      [ast_of_syntax_tree ch; ast_of_syntax_tree at]
+      let ast_ch = ast_of_syntax_tree ch in
+      [ast_ch; ast_of_syntax_tree at], pos_start ast_ch
   | Node("LIST", [Node ("LIST", _) as l; Leaf {token_type = "comma"}; at])
   | Node("LIST", [Node ("LIST", _) as l; Leaf {token_type = "comma"};
                   Node ("ANY_AMOUNT_OF_NEWLINE", _); at]) ->
-      (list l)@[ast_of_syntax_tree at]
+      let ast_l, p = list l in
+      (ast_l)@[ast_of_syntax_tree at], p
   | _ -> failwith "Pas un nœud LIST"
 
 
-and chainopatom (t: (string, string) syntax_tree) : ast list =
+and chainopatom (t: (string, string) syntax_tree) : ast list * int =
   match t with
-  | Node("CHAINOPATOM", [Leaf {token_type = "chainop"}; at]) ->
-      [ast_of_syntax_tree at]
-  | Node("CHAINOPATOM", [Leaf {token_type = "chainop"}; at;
+  | Node("CHAINOPATOM", [Leaf {token_type = "chainop"; start}; at]) ->
+      [ast_of_syntax_tree at], start
+  | Node("CHAINOPATOM", [Leaf {token_type = "chainop"; start}; at;
                          Node("CHAINOPATOM", _) as chopat]) ->
-      ast_of_syntax_tree at :: (chainopatom chopat)
-  | Node("CHAINOPATOM", _) -> failwith "Meh"
+      ast_of_syntax_tree at :: (fst (chainopatom chopat)), start
   | _ -> failwith "Pas un nœud CHAINOPATOM"
 
 and chain (t: (string, string) syntax_tree) : ast =
   match t with
   | Node("CHAIN", [Node("CHAINOPATOM", _) as chopat]) ->
-      Chain (Unit :: chainopatom chopat)
+      let ast_chopat, pos = chainopatom chopat in
+      Chain (Unit(pos) :: ast_chopat, pos)
   | Node("CHAIN", [Node("LIST", _) as f; Node("CHAINOPATOM", _) as chopat])
   | Node("CHAIN", [Node("ATOM", _) as f; Node("CHAINOPATOM", _) as chopat]) ->
-      Chain ((ast_of_syntax_tree f)::(chainopatom chopat))
+      let ast_f = ast_of_syntax_tree f in
+      Chain (ast_f::(fst (chainopatom chopat)), pos_start ast_f)
   | Node("CHAIN", [Node("ATOM", _) as a]) -> ast_of_syntax_tree a
   | _ -> failwith "Pas un nœud CHAIN"
 
 
 and atom (t: (string, string) syntax_tree) : ast =
   match t with
-  | Node("ATOM", [Leaf {token_type = "string_literal"; value}]) ->
-      String (remove_first_and_last_char value)
-  | Node("ATOM", [Leaf {token_type = "integer_literal"; value}]) ->
-      Integer (int_of_string value)
-  | Node("ATOM", [Leaf {token_type = "float_literal"; value}]) ->
-      Float (float_of_string value)
+  | Node("ATOM", [Leaf {token_type = "string_literal"; value; start}]) ->
+      String (remove_first_and_last_char value, start)
+  | Node("ATOM", [Leaf {token_type = "integer_literal"; value; start}]) ->
+      Integer (int_of_string value, start)
+  | Node("ATOM", [Leaf {token_type = "float_literal"; value; start}]) ->
+      Float (float_of_string value, start)
   | Node("ATOM", [Node("IDENTIFIER", _) as id]) ->
       identifier id
   | Node("ATOM", [Node("FUNCTION", _) as f]) ->
       function_ f
-  | Node("ATOM", [Leaf {token_type = "lparen"};
+  | Node("ATOM", [Leaf {token_type = "lparen"; start};
                   ch_or_list;
                   Leaf {token_type = "rparen"}])
-  | Node("ATOM", [Leaf {token_type = "lparen"};
+  | Node("ATOM", [Leaf {token_type = "lparen"; start};
                   Node ("ANY_AMOUNT_OF_NEWLINE", _);
                   ch_or_list;
                   Leaf {token_type = "rparen"}])
-  | Node("ATOM", [Leaf {token_type = "lparen"};
+  | Node("ATOM", [Leaf {token_type = "lparen"; start};
                   ch_or_list;
                   Node ("ANY_AMOUNT_OF_NEWLINE", _);
                   Leaf {token_type = "rparen"}])
-  | Node("ATOM", [Leaf {token_type = "lparen"};
+  | Node("ATOM", [Leaf {token_type = "lparen"; start};
                   Node ("ANY_AMOUNT_OF_NEWLINE", _);
                   ch_or_list;
                   Node ("ANY_AMOUNT_OF_NEWLINE", _);
                   Leaf {token_type = "rparen"}]) ->
-      ast_of_syntax_tree ch_or_list
-  | Node("ATOM", [Node("UNIT", _)]) -> Unit
+      new_pos_start (ast_of_syntax_tree ch_or_list) start
+  | Node("ATOM", [Node("UNIT", Leaf {start} :: _)]) -> Unit(start)
   | _ -> failwith "Pas un nœud ATOM"
 
 
 and namespident (t: (string, string) syntax_tree) : string list * string =
   match t with
-  | Node("NAMESPIDENT", [Leaf {token_type = "namesp"};
+  | Node("NAMESPIDENT", [Leaf {token_type = "namesp"; start};
                          Leaf {token_type = "ident"; value}]) ->
       [], value
-  | Node("NAMESPIDENT", [Leaf {token_type = "namesp"};
+  | Node("NAMESPIDENT", [Leaf {token_type = "namesp"; start};
                          Leaf {token_type = "ident"; value};
                          Node("NAMESPIDENT", _) as suite]) ->
       let l, s = namespident suite in
@@ -110,41 +146,43 @@ and namespident (t: (string, string) syntax_tree) : string list * string =
 
 and identifier (t: (string, string) syntax_tree) : ast =
   match t with
-  | Node("IDENTIFIER", [Leaf {token_type = "ident"; value}]) ->
-      Identifier value
-  | Node("IDENTIFIER", [Leaf {token_type = "ident"; value};
+  | Node("IDENTIFIER", [Leaf {token_type = "ident"; value; start}]) ->
+      Identifier(value, start)
+  | Node("IDENTIFIER", [Leaf {token_type = "ident"; value; start};
                         Node("NAMESPIDENT", _) as namespident_suite]) ->
       let l, s = namespident namespident_suite in
-      ModuleIdentifier (value::l, s)
+      ModuleIdentifier (value::l, s, start)
   | _ -> failwith "Pas un nœud IDENTIFIER"
 
 
 and function_ (t: (string, string) syntax_tree) : ast =
   match t with
-  | Node("FUNCTION", [Leaf {token_type = "lsquare"};
+  | Node("FUNCTION", [Leaf {token_type = "lsquare"; start};
                       Node("STATEMENTS", _) as st;
                       Leaf {token_type = "rsquare"}]) ->
-      Function (statements st)
-  | Node("FUNCTION", [Leaf {token_type = "lsquare"};
+      Function (fst (statements st), start)
+  | Node("FUNCTION", [Leaf {token_type = "lsquare"; start};
                       Leaf {token_type = "rsquare"}]) ->
-      Function []
+      Function ([], start)
   | _ -> failwith "Pas un nœud FUNCTION"
 
 and ast_of_syntax_tree (t: (string, string) syntax_tree) : ast =
   match t with
   | Leaf t ->
       begin match t.token_type with
-      | "ident" -> Identifier t.value
-      | "integer_literal" -> Integer (int_of_string t.value)
-      | "float_literal" -> Float (float_of_string t.value)
-      | "string_literal" -> String (remove_first_and_last_char t.value)
-      | "newline" -> Vide
+      | "ident" -> Identifier (t.value, t.start)
+      | "integer_literal" -> Integer (int_of_string t.value, t.start)
+      | "float_literal" -> Float (float_of_string t.value, t.start)
+      | "string_literal" -> String (remove_first_and_last_char t.value, t.start)
+      | "newline" -> Vide t.start
       | _ -> failwith "Invalid token"
       end
   | Node("STATEMENTS", _) ->
-      Statements (statements t)
+      let l, p = statements t in
+      Statements(l, p)
   | Node("LIST", _) ->
-      List (list t)
+      let l, p = list t in
+      List(l, p)
   | Node("CHAIN", _) ->
       chain t
   | Node("ATOM", _) ->
@@ -153,6 +191,6 @@ and ast_of_syntax_tree (t: (string, string) syntax_tree) : ast =
       identifier t
   | Node("FUNCTION", _) ->
       function_ t
-  | Node("UNIT", _) ->
-      Unit
+  | Node("UNIT", Leaf {start} :: _) ->
+      Unit(start)
   | Node(_, _) -> failwith "Unimplemented"

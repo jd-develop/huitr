@@ -1,56 +1,64 @@
 open Value_and_errors
 
-let add (l: value list) : value =
-  let rec add_accu (l': value list) (accu: value) : value =
+let add (l: value list) (pos: int) : value =
+  let rec add_accu (l': value list) (accu: value_without_pos) : value =
     match l', accu with
-    | [Unit], _
-    | [], _ -> accu
-    | (Integer x)::q, (Integer y) -> add_accu q (Integer (x+y))
-    | (Integer x)::q, (Float y)
-    | (Float y)::q, (Integer x) -> add_accu q (Float ((float_of_int x) +. y))
-    | (Float x)::q, (Float y) -> add_accu q (Float (x+.y))
-    | x::_, _ -> raise (InvalidArgument("std::math::add", Some x, "entier ou flottant attendu"))
+    | [(Unit, _)], _
+    | [], _ -> accu, pos
+    | (Integer x, _)::q, (Integer y) -> add_accu q (Integer (x+y))
+    | (Integer x, _)::q, (Float y)
+    | (Float y, _)::q, (Integer x) -> add_accu q (Float ((float_of_int x) +. y))
+    | (Float x, _)::q, (Float y) -> add_accu q (Float (x+.y))
+    | x::_, _ -> raise (InvalidArgument(
+        "std::math::add", Some (fst x), "entier ou flottant attendu", snd x
+      ))
   in
   add_accu l (Integer 0)
 
 
-let prod (l: value list) : value =
-  let rec prod_accu (l': value list) (accu: value) : value =
+let prod (l: value list) (pos: int) : value =
+  let rec prod_accu (l': value list) (accu: value_without_pos) : value =
     match l', accu with
-    | [Unit], _
-    | [], _ -> accu
-    | (Integer x)::q, (Integer y) -> prod_accu q (Integer (x*y))
-    | (Integer x)::q, (Float y)
-    | (Float y)::q, (Integer x) -> prod_accu q (Float ((float_of_int x) *. y))
-    | (Float x)::q, (Float y) -> prod_accu q (Float (x*.y))
-    | x::_, _ -> raise (InvalidArgument("std::math::prod", Some x, "entier ou flottant attendu"))
+    | [(Unit, _)], _
+    | [], _ -> accu, pos
+    | (Integer x, _)::q, (Integer y) -> prod_accu q (Integer (x*y))
+    | (Integer x, _)::q, (Float y)
+    | (Float y, _)::q, (Integer x) -> prod_accu q (Float ((float_of_int x) *. y))
+    | (Float x, _)::q, (Float y) -> prod_accu q (Float (x*.y))
+    | x::_, _ -> raise (InvalidArgument(
+        "std::math::prod", Some (fst x), "entier ou flottant attendu", snd x
+      ))
   in
   prod_accu l (Integer 1)
 
 
-let minus (l: value list) : value =
-  match l with
-  | [Integer i; Integer j] -> Integer (i-j)
-  | [Integer i; Float j] -> Float ((float_of_int i) -. j)
-  | [Float i; Integer j] -> Float (i -. (float_of_int) j)
-  | [Float i; Float j] -> Float (i -. j)
-  | _ -> raise (InvalidArgument("std::math::minus", Some (List l), "deux nombres attendus"))
+let minus (l: value list) (pos: int) : value =
+  match List.map fst l with
+  | [Integer i; Integer j] -> Integer (i-j), pos
+  | [Integer i; Float j] -> Float ((float_of_int i) -. j), pos
+  | [Float i; Integer j] -> Float (i -. (float_of_int) j), pos
+  | [Float i; Float j] -> Float (i -. j), pos
+  | _ -> raise (InvalidArgument(
+      "std::math::minus", Some (List l), "deux nombres attendus", pos
+    ))
 
 (* modulo mathématique (toujours positif) *)
 let (%) a b = ((a mod b) + b) mod b
 
 
-let mod_ (l: value list) : value =
+let mod_ (l: value list) (pos: int) : value =
   match l with
-  | (Integer a)::(Integer b)::[] -> Integer (a % b)
-  | _ -> raise (InvalidArgument("std::math::mod", None, ""))
+  | (Integer a, _)::(Integer b, _)::[] -> Integer (a % b), pos
+  | _ -> raise (InvalidArgument(
+      "std::math::mod", None, "deux nombres entiers attendus", pos
+    ))
 
 
 let create_module_math () : value =
   let math = Hashtbl.create 8 in
-  Hashtbl.add math "add" (BuiltinFunction add);
-  Hashtbl.add math "prod" (BuiltinFunction prod);
-  Hashtbl.add math "minus" (BuiltinFunction minus);
-  Hashtbl.add math "mod" (BuiltinFunction mod_);
-  Module("math", math)
+  Hashtbl.add math "add" (BuiltinFunction add, 0);
+  Hashtbl.add math "prod" (BuiltinFunction prod, 0);
+  Hashtbl.add math "minus" (BuiltinFunction minus, 0);
+  Hashtbl.add math "mod" (BuiltinFunction mod_, 0);
+  Module("math", math), 0
 

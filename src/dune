@@ -1,7 +1,7 @@
 (library
  (name huitr_interpreter)
  (libraries tipe)
- (modules huitr_utils ast parse_huitr interpreter value_and_errors
+ (modules huitr_utils ast parse_huitr interpreter value_and_errors huitr
           ; stdlib
           math comp bool tests_ io list_))
 
