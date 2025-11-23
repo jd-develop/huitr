@@ -32,9 +32,9 @@ Ci-après la liste des littéraux de Huitr.
 ### Constantes
 En Huitr, il n’y a pas de variables mais uniquement des constantes.
 Pour déclarer une constante, il suffit d’utiliser la syntaxe
-`(...) > nom_de_la_constante`. Le nom est constitué de caractères ASCII
-alphanumériques et de tirets du bas (le premier caractère du nom doit être
-alphabétique).
+`... > nom_de_la_constante`. Le nom est constitué de caractères ASCII
+alphanumériques et de tirets du bas (le premier caractère du nom ne doit pas
+être un nombre).
 
 Une expression d’assignation renvoie la valeur de la constante.
 
