@@ -1,35 +1,41 @@
 # Huitr
 
->[!Warning]
-> This is a WIP.
-
 Huitr – a purely functional programming language.
 
 “Huitr” stands for “Huitr is tough to read”.
 
-### Execute
+## AOC
+Huitr était le langage de la finale de l’AOC 2025-2026 dans la classe de MP2I
+du lycée Pierre de Fermat à Toulouse (31).
+[Huitr en ligne](https://aoc.mylo.moe/).
 
-```bash
-./main.py path_to_your_file
-```
+Autres années&nbsp;:
+* 2023-2024&nbsp;: [SECS](https://secs.ca.lixte.org/)
+* 2024-2025&nbsp;: [COCS](https://github.com/Yann-Miquel-Erdmann/Finale-AOC-Fermat-2025) ([en ligne](https://yann-me.com/Finale-AOC/))
+* **2025-2026&nbsp;: Huitr**
 
-### Grammar
-
-[Here](src-ocaml/grammar.txt)
-
-### OCaml
-
-This branch aims to translate the Python code into OCaml.
+## Execute
 
 To build:
 ```bash
 dune build
 ```
 
-To run:
 ```bash
-dune exec -- huitr [OPTION]… FILENAME
+dune exec huitr path_to_your_file
 ```
+
+### REPL
+```bash
+dune exec huitr -
+```
+
+### Debian-based distros
 
 To see specific information for Debian-based distros, read
 [debian.md](debian.md).
+
+## Grammar
+
+[Here](huitr.grammar)
+

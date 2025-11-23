@@ -1,2 +1,2 @@
 #!/usr/bin/bash
-ledit dune exec -- huitr -
+ledit dune exec huitr -
