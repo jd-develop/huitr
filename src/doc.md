@@ -115,8 +115,9 @@ Ce module contient les fonctions suivantes&nbsp;:
 ### `std::io`
 Ce module contient les fonctions suivantes&nbsp;:
 * `std::io::print` prenant une valeur en entrée et l’affichant **avec retour
-  ligne**
+  ligne**. Renvoie la valeur donnée en entrée.
 * `std::io::print_no_newline` faisant la même chose mais **sans retour ligne**.
+  Renvoie également la valeur donnée en entrée.
 * `std::io::input` affichant son entrée sans retour ligne et renvoyant une ligne
   lue dans l’entrée standard.
 
