@@ -54,6 +54,7 @@ let rec interpreter_was_list (input_ast: ast) (variables: scope) : value * bool 
   | Statements(l, p) -> (interprete_statements l variables p), false
   | List(l, p) -> (interprete_list l variables p), true
   | Chain(l, p) -> (interprete_chain l variables p), false
+  | InsideParenthesis(a, p) -> interpreter a variables, false
 
 
 and interpreter (input_ast: ast) (variables: scope) : value =

@@ -12,6 +12,7 @@ type ast =
   | Integer of int * int
   | Float of float * int
   | String of string * int
+  | InsideParenthesis of ast * int
   | Unit of int
   | Vide of int
 
@@ -27,6 +28,7 @@ let rec pos_start (t: ast) : int =
   | Integer(_, i)
   | Float(_, i)
   | String(_, i)
+  | InsideParenthesis(_, i)
   | Unit i
   | Vide i -> i
 
@@ -42,6 +44,7 @@ let rec new_pos_start (t: ast) (pos: int) : ast =
   | Integer(i, _) -> Integer(i, pos)
   | Float(f, _) -> Float(f, pos)
   | String(s, _) -> String(s, pos)
+  | InsideParenthesis(a, _) -> InsideParenthesis(a, pos)
   | Unit _ -> Unit pos
   | Vide _ -> Vide pos
 
@@ -127,7 +130,7 @@ and atom (t: (string, string) syntax_tree) : ast =
                   ch_or_list;
                   Node ("ANY_AMOUNT_OF_NEWLINE", _);
                   Leaf {token_type = "rparen"}]) ->
-      new_pos_start (ast_of_syntax_tree ch_or_list) start
+      InsideParenthesis(ast_of_syntax_tree ch_or_list, start)
   | Node("ATOM", [Node("UNIT", Leaf {start} :: _)]) -> Unit(start)
   | _ -> failwith "Pas un nœud ATOM"
 
