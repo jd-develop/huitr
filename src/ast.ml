@@ -33,22 +33,6 @@ let rec pos_start (t: ast) : int =
   | Vide i -> i
 
 
-let rec new_pos_start (t: ast) (pos: int) : ast =
-  match t with
-  | Statements(s, _) -> Statements(s, pos)
-  | List(l, _) -> List(l, pos)
-  | Chain(c, _) -> Chain(c, pos)
-  | Function(f, _) -> Function(f, pos)
-  | ModuleIdentifier(l, s, _) -> ModuleIdentifier(l, s, pos)
-  | Identifier(i, _) -> Identifier(i, pos)
-  | Integer(i, _) -> Integer(i, pos)
-  | Float(f, _) -> Float(f, pos)
-  | String(s, _) -> String(s, pos)
-  | InsideParenthesis(a, _) -> InsideParenthesis(a, pos)
-  | Unit _ -> Unit pos
-  | Vide _ -> Vide pos
-
-
 let rec statements (t: (string, string) syntax_tree)
     : ast list * int =
   match t with

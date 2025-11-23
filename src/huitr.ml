@@ -12,8 +12,8 @@ let wrapper (code: string) (variables: scope option) =
     let syntax_tree = parse_huitr code in
     let ast = ast_of_syntax_tree syntax_tree in
     let _ = match variables with
-    | None -> interpreter ast (create_scope ())
-    | Some scope -> interpreter ast scope
+    | None -> interpreter ast (create_scope ()) 0
+    | Some scope -> interpreter ast scope 0
     in
     ()
   with
@@ -27,12 +27,16 @@ let wrapper (code: string) (variables: scope option) =
         ("La valeur "^(string_of_value f)^" n’est pas appelable.")
         pos code
   | Undefined(name, pos) ->
-      print_error "Undefined" ("Le nom "^name^" n’est pas défini") pos code
+      print_error "Undefined" ("Le nom "^name^" n’est pas défini") pos
+      code
   | IsNotModule(name, v, pos) ->
       print_error "IsNotModule"
       ("Le nom "^name^" n’est pas un module (il s’agit de la valeur "^
        (string_of_value v)^").")
       pos code
+  | RecursionDepthExceeded(pos) ->
+      print_error "RecursionDepthExceeded"
+        "trop d’appels récursifs imbriqués (max 1000)" pos code
   | InvalidArgument(func, value, errmsg, pos) ->
       print_error "InvalidArgument"
         begin match value with

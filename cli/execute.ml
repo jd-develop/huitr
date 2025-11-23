@@ -13,8 +13,8 @@ let console (debug: bool) =
   try
     while true do
       print_string "huitr> ";
-      let code = read_line () in
-      Huitr.wrapper code (Some scope)
+      let line = read_line () in
+      Huitr.wrapper line (Some scope)
     done
   with
   | End_of_file -> print_endline "EOF"

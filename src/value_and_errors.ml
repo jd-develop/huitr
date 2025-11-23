@@ -50,6 +50,7 @@ let scope_copy (s: scope) : scope =
 exception Undefined of string * int
 exception IsNotModule of string * value * int
 exception NotCallable of value * int
+exception RecursionDepthExceeded of int
 
 (*
  * Nom de la fonction, valeur renvoyée, message d’erreur, indice dans le texte
