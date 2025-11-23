@@ -14,13 +14,14 @@ Autres années&nbsp;:
 * 2024-2025&nbsp;: [COCS](https://github.com/Yann-Miquel-Erdmann/Finale-AOC-Fermat-2025) ([en ligne](https://yann-me.com/Finale-AOC/))
 * **2025-2026&nbsp;: Huitr**
 
-## Execute
+## Build and execute
 
-To build:
+### Build
 ```bash
 dune build
 ```
 
+### Run a file
 ```bash
 dune exec huitr path_to_your_file
 ```
