@@ -67,18 +67,25 @@ parenthésé comme suit&nbsp;:
 `((arg1, arg2 > fonction1), arg3, arg4 > fonction2), arg5 > fonction3`.
 
 À noter&nbsp;: l’usage des parenthèses est possible pour modifier la priorité.
+Attention cependant, `a, b > fonction` est différent de `(a, b) > fonction`.
+En effet, dans le premier cas, la fonction est appelée avec deux arguments `a`
+et `b`, et dans le deuxième cas elle est appelée avec un seul argument de type
+liste contenant `a` et `b`.
 
 Les constantes définies dans le corps d’une fonction ne sont plus accessibles
 en-dehors de la fonction. À l’inverse, les constantes définies en-dehors du
 corps d’une fonction sont accessibles par cette fonction (y compris celles
 définies après la fonction). En outre, il est possible de faire des fonctions
-récursives (`[arg > a] > a`) et mutuellement récursives
-(`[arg > b] > a ; [arg > a] > b`).
+récursives (`[foo > a] > a`) et mutuellement récursives
+(`[foo > b] > a ; [bar > a] > b`).
+
+**Important**&nbsp;: lisez *attentivement* la documentation de `std::tests::if`
+avant de vous lancer dans l’écriture de fonctions récursives&nbsp;!
 
 Lors de l’appel d’une fonction, une liste `args` est définie dans le *scope* de
 la fonction&nbsp;: elle contient la liste des arguments. Si aucun argument n’est
 donné, la liste `args` contient un unique élément de type `unit` (i.e. `()`).
-On pourra utiliser les fonctions de `std::list` dessus (cf. plus loin). 
+On pourra utiliser les fonctions de `std::list` dessus (cf. plus loin).
 
 ## Bibliothèque standard
 
@@ -176,7 +183,7 @@ Ce module contient la fonction suivante&nbsp;:
   valeur `v2`. Si le booléen est vrai, renvoie `v1`, s’il est faux, renvoie
   `v2`. Par exemple, `true, 1, 0 > std::tests::if` renvoie `1`, mais
   `false, 1, 0 > std::tests::if` renvoie `0`.
-  **Attention**&nbsp;: `v1` et `v2` sont évalués AVANT l’exécution du
+  ***ATTENTION***&nbsp;: `v1` et `v2` sont évalués AVANT l’exécution du
   `if`. Si vous souhaitez les évaluer après (par exemple pour faire un appel
   récursif coûteux), `v1` et `v2` peuvent être des fonctions, et le
   résultat peut être appelé en-dehors du `if`. Par exemple&nbsp;:

@@ -7,5 +7,4 @@
 * [ ] Plus de fonctions sur les listes et les strings
 
 ## Site web
-* [ ] Nombres scroll
 * [ ] Garder l’indentation quand on fait un retour-ligne
