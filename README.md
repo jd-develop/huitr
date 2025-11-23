@@ -7,7 +7,7 @@ Huitr – a purely functional programming language.
 ## AOC
 Huitr était le langage de la finale de l’AOC 2025-2026 dans la classe de MP2I
 du lycée Pierre de Fermat à Toulouse (31).
-[Huitr en ligne](https://aoc.mylo.moe/).
+[Huitr en ligne](https://aoc.mylo.moe/) ([dépôt du site](https://github.com/MP2I-Fermat/AOC-2025)).
 
 Autres années&nbsp;:
 * 2023-2024&nbsp;: [SECS](https://secs.ca.lixte.org/)
