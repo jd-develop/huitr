@@ -61,7 +61,10 @@ let print_error
     (error_message: string)
     (index: int)
     (code: string) : unit =
-  (* TODO avec le code *)
+  let line, idx_in_line, line_number = get_line_from_idx code index in
+  Printf.eprintf "Erreur à la ligne %d :\n" line_number;
+  Printf.eprintf "%s%s\n" (String.make 4 ' ') line;
+  Printf.eprintf "%s%s\n" (String.make (4+idx_in_line) ' ') "^";
   (* Note : %! sert à flush *)
-  Printf.eprintf "Erreur %s : %s (%d)\n%!" error_name error_message index;
+  Printf.eprintf "%s : %s (%d)\n%!" error_name error_message index;
 

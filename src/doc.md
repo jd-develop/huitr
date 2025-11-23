@@ -69,7 +69,7 @@ parenthésé comme suit&nbsp;:
 À noter&nbsp;: l’usage des parenthèses est possible pour modifier la priorité.
 
 Les constantes définies dans le corps d’une fonction ne sont plus accessibles
-en-dehors de la fonction. À l’inverse, les constantes défénies en-dehors du
+en-dehors de la fonction. À l’inverse, les constantes définies en-dehors du
 corps d’une fonction sont accessibles par cette fonction (y compris celles
 définies après la fonction). En outre, il est possible de faire des fonctions
 récursives (`[arg > a] > a`) et mutuellement récursives

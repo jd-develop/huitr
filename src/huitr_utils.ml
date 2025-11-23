@@ -16,3 +16,19 @@ let string_of_list (l: 'a list) (string_of_'a: 'a -> string) =
   in
   ("["^(print_list_aux l)^"]")
 
+(* Étant donné un texte `text`, renvoie la ligne (i.e. la portion du texte
+ * délimitée par \n) et l’indice dans la ligne correspondant au caractère
+ * d’indice `idx` dans `text`, ainsi que le numéro de la ligne renvoyée *)
+let get_line_from_idx (text: string) (idx: int) : string * int * int =
+  let text_split = String.split_on_char '\n' text in
+  let rec get_line_aux (text': string list) (idx': int) (line_nbr: int)
+      : string * int * int =
+    match text' with
+    | [] -> "", 0, line_nbr
+    | x::q -> if String.length x < idx' then
+                get_line_aux q (idx'-(String.length x + 1)) (line_nbr+1)
+              else
+                x, idx', line_nbr
+  in
+  get_line_aux text_split idx 1
+
