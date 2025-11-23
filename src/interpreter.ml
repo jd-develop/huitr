@@ -41,19 +41,23 @@ let find_variable (s: string) (variables: scope) (pos: int) : value =
   find_module_identifier [] s variables "" pos
 
 
-let rec interpreter (input_ast: ast) (variables: scope) : value =
+let rec interpreter_was_list (input_ast: ast) (variables: scope) : value * bool =
   match input_ast with
-  | Vide(p) | Unit(p) -> Unit, p
-  | Integer(i, p) -> Integer i, p
-  | Float(f, p) -> Float f, p
-  | String(s, p) -> String s, p
-  | Function(f, p) -> Function (f, variables), p
-  | Identifier(s, p) -> find_variable s variables p
+  | Vide(p) | Unit(p) -> (Unit, p), false
+  | Integer(i, p) -> (Integer i, p), false
+  | Float(f, p) -> (Float f, p), false
+  | String(s, p) -> (String s, p), false
+  | Function(f, p) -> (Function (f, variables), p), false
+  | Identifier(s, p) -> (find_variable s variables p), false
   | ModuleIdentifier (l, s, p) ->
-      find_module_identifier l s variables "" p
-  | Statements(l, p) -> interprete_statements l variables p
-  | List(l, p) -> interprete_list l variables p
-  | Chain(l, p) -> interprete_chain l variables p
+      (find_module_identifier l s variables "" p), false
+  | Statements(l, p) -> (interprete_statements l variables p), false
+  | List(l, p) -> (interprete_list l variables p), true
+  | Chain(l, p) -> (interprete_chain l variables p), false
+
+
+and interpreter (input_ast: ast) (variables: scope) : value =
+  fst (interpreter_was_list input_ast variables)
 
 and interprete_statements (l: ast list) (variables: scope)
     (pos: int) : value =
@@ -71,21 +75,22 @@ and interprete_chain (l: ast list) (variables: scope) (pos: int) : value =
   match l with
   | [] -> Unit, pos
   | x::[] ->
-      apply_function (interpreter x variables) (List [], pos) variables
+      apply_function (interpreter x variables) (List [], pos) variables true
   | x::(Identifier(s, id_pos))::[] -> begin
-      let v = interpreter x variables in
+      let v, was_list = interpreter_was_list x variables in
       match scope_lookup variables s with
       | None -> Hashtbl.add (variables.variables) s v; v
-      | Some f -> apply_function (fst f, id_pos) v variables
+      | Some f -> apply_function (fst f, id_pos) v variables was_list
     end
   | x::y::[] -> begin
-      let args = interpreter x variables in
+      let args, was_list = interpreter_was_list x variables in
       apply_function (fst (interpreter y variables), pos_start y) args variables
+                     was_list
   end
   | x::y::q -> interprete_chain ((Chain([x; y], pos))::q) variables pos
 
 (* Cette fonction s’occupe de créer un nouveau scope *)
-and apply_function (fv: value) (x: value) (variables: scope) : value =
+and apply_function (fv: value) (x: value) (variables: scope) (was_list: bool) : value =
   match fv with
   | Function (f, outer_scope), f_pos -> begin
       let new_scope = {
@@ -93,12 +98,15 @@ and apply_function (fv: value) (x: value) (variables: scope) : value =
         variables = Hashtbl.create 8
       } in
       match x with
-      | List l, list_pos -> apply_function_aux f l new_scope f_pos list_pos
+      | List l, list_pos ->
+          apply_function_aux
+            f (if was_list then l else [List l, list_pos])
+            new_scope f_pos list_pos
       | _, args_pos -> apply_function_aux f [x] new_scope f_pos args_pos
     end
   | BuiltinFunction f, f_pos -> begin
       match x with
-      | List l, _ -> f l f_pos
+      | List l, list_pos -> f (if was_list then l else [List l, list_pos]) f_pos
       | _ -> f [x] f_pos
     end
   | _, f_pos -> raise (NotCallable(fv, f_pos))

@@ -26,7 +26,7 @@ std::list > L
 ] > merge
 
 [
-    args> l
+    args, 0 > std::list::nth > l
     > (l > L::is_empty,
        [L::empty, L::empty],
        [l > L::head > x
@@ -42,7 +42,7 @@ std::list > L
 ] > separe
 
 [
-    args > l
+    args, 0 > std::list::nth > l
     > (l > L::is_empty,
        [L::empty],
        [
@@ -57,4 +57,4 @@ std::list > L
        ] > std::tests::if)
 ] > mergesort
 
-(1, 6, 5.14, 58.237, 69, 7, 17) > mergesort > std::io::print
+> [1, 6, 5.14, 58.237, 69, 7, 17] > mergesort > std::io::print
