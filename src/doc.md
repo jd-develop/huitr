@@ -174,8 +174,14 @@ Ce module contient les fonctions suivantes&nbsp;:
 Ce module contient la fonction suivante&nbsp;:
 * `std::tests::if` prenant en argument un booléen, une valeur `v1` et une
   valeur `v2`. Si le booléen est vrai, renvoie `v1`, s’il est faux, renvoie
-  `v2`. **Attention**&nbsp;: `v1` et `v2` sont évalués AVANT l’exécution du
-  `if`. Pour contrer cela, `v1` et `v2` peuvent être des fonctions, et le
-  résultat est donc appelé en-dehors du `if`. Par exemple&nbsp;:
+  `v2`. Par exemple, `true, 1, 0 > std::tests::if` renvoie `1`, mais
+  `false, 1, 0 > std::tests::if` renvoie `0`.
+  **Attention**&nbsp;: `v1` et `v2` sont évalués AVANT l’exécution du
+  `if`. Si vous souhaitez les évaluer après (par exemple pour faire un appel
+  récursif coûteux), `v1` et `v2` peuvent être des fonctions, et le
+  résultat peut être appelé en-dehors du `if`. Par exemple&nbsp;:
   `> (condition, [3 > appel_tres_long], [4 > appel_tres_long] > std::tests::if)`.
+  Dans cet exemple, le `if` n’appelle rien&nbsp;: il renvoie une des deux
+  fonctions en fonction de la condition, et la fonction renvoyée est appelée
+  par le `> (...)`.
 
