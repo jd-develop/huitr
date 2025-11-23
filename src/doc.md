@@ -160,6 +160,16 @@ Ce module contient les fonctions suivantes&nbsp;:
   le reste de la division euclidienne de `a` par `b`. La sortie est toujours
   positive.
 
+### `std::string`
+Ce module contient les fonctions suivantes&nbsp;:
+* `std::string::nth` prenant une chaîne de caractères et un nombre `i` en
+  entrée, et renvoyant le i-ième caractère de la chaîne (en commençant à 0).
+* `std::string::len` prenant une chaîne en entrée et renvoyant sa longueur.
+* `std::string::is_empty` renvoyant `true` si la chaîne donnée en entrée est
+  vide, `false` sinon.
+* `std::string::concat_strings` renvoyant la concaténation de toutes les chaînes
+  données en argument.
+
 ### `std::tests`
 Ce module contient la fonction suivante&nbsp;:
 * `std::tests::if` prenant en argument un booléen, une valeur `v1` et une

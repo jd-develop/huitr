@@ -1,4 +1,6 @@
 
+let string_of_char (c : char) : string = String.make 1 c
+
 (* Renvoie une nouvelle chaîne qui ne contient ni le premier ni le dernier
  * caractère. Si la chaîne a 2 caractères ou moins, renvoie une chaîne vide *)
 let remove_first_and_last_char (s: string) : string =
