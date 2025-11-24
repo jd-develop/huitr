@@ -102,7 +102,7 @@ and interprete_chain (l: ast list) (variables: scope) (pos: int)
  * profondeur de *cet appel*. *)
 and apply_function (fv: value) (x: value) (variables: scope) (was_list: bool)
     (recursion_depth: int) : value =
-  if recursion_depth = 1000 then
+  if recursion_depth = 60000 then
     raise(RecursionDepthExceeded (snd fv));
   match fv with
   | Function (f, outer_scope), f_pos -> begin
