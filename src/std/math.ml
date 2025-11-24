@@ -13,7 +13,9 @@ let add (l: value list) (pos: int) : value =
         "std::math::add", Some (fst x), "entier ou flottant attendu", snd x
       ))
   in
-  add_accu l (Integer 0)
+  match l with
+  | [(List l', _)]
+  | l' -> add_accu l' (Integer 0)
 
 
 let prod (l: value list) (pos: int) : value =
@@ -29,7 +31,9 @@ let prod (l: value list) (pos: int) : value =
         "std::math::prod", Some (fst x), "entier ou flottant attendu", snd x
       ))
   in
-  prod_accu l (Integer 1)
+  match l with
+  | [(List l', _)]
+  | l' -> prod_accu l' (Integer 1)
 
 
 let minus (l: value list) (pos: int) : value =
