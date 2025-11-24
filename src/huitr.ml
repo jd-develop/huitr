@@ -36,7 +36,7 @@ let wrapper (code: string) (variables: scope option) =
       pos code
   | RecursionDepthExceeded(pos) ->
       print_error "RecursionDepthExceeded"
-        "trop d’appels récursifs imbriqués (max 60000)" pos code
+        "trop d’appels récursifs (max 60000)" pos code
   | InvalidArgument(func, value, errmsg, pos) ->
       print_error "InvalidArgument"
         begin match value with

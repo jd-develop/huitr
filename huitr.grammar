@@ -76,5 +76,6 @@ FUNCTION -> lsquare STATEMENTS rsquare
 FUNCTION -> lsquare rsquare
 
 UNIT -> lparen rparen
+UNIT -> lparen ANY_AMOUNT_OF_NEWLINE rparen
 
 unrecognizable := [ -~]
