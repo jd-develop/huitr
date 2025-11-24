@@ -18,7 +18,8 @@ whitespace := ( |\t)+
 simple_comment_start := .
 multi_comment_start := ..
 
-newline := ;|\n
+newline := \n
+semicolon := ;
 comma := ,
 lparen := \(
 rparen := \)
@@ -27,17 +28,20 @@ rsquare := \]
 chainop := >
 namesp := ::
 
-STATEMENTS -> newline
-STATEMENTS -> newline STATEMENTS
-STATEMENTS -> CHAIN newline STATEMENTS
-STATEMENTS -> CHAIN newline
+NEWLINE -> newline
+NEWLINE -> semicolon
+
+STATEMENTS -> NEWLINE
+STATEMENTS -> NEWLINE STATEMENTS
+STATEMENTS -> CHAIN NEWLINE STATEMENTS
+STATEMENTS -> CHAIN NEWLINE
 STATEMENTS -> CHAIN
-STATEMENTS -> LIST newline STATEMENTS
-STATEMENTS -> LIST newline
+STATEMENTS -> LIST NEWLINE STATEMENTS
+STATEMENTS -> LIST NEWLINE
 STATEMENTS -> LIST
 
-ANY_AMOUNT_OF_NEWLINE -> newline
-ANY_AMOUNT_OF_NEWLINE -> newline ANY_AMOUNT_OF_NEWLINE
+ANY_AMOUNT_OF_NEWLINE -> NEWLINE
+ANY_AMOUNT_OF_NEWLINE -> NEWLINE ANY_AMOUNT_OF_NEWLINE
 
 LIST -> CHAIN comma ATOM
 LIST -> LIST comma ATOM

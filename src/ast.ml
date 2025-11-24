@@ -36,10 +36,10 @@ let rec pos_start (t: ast) : int =
 let rec statements (t: (string, string) syntax_tree)
     : ast list * int =
   match t with
-  | Node("STATEMENTS", [Leaf {token_type = "newline"; start}]) -> [], start
-  | Node("STATEMENTS", [Leaf {token_type = "newline"}; st]) ->
+  | Node("STATEMENTS", [Node("NEWLINE", [Leaf {start}])]) -> [], start
+  | Node("STATEMENTS", [Node("NEWLINE", _); st]) ->
       statements st
-  | Node("STATEMENTS", [ch_or_list; Leaf {token_type = "newline"}; st]) ->
+  | Node("STATEMENTS", [ch_or_list; Node("NEWLINE", _); st]) ->
       let ast_of_ch_or_list = ast_of_syntax_tree ch_or_list in
       ast_of_ch_or_list :: (fst (statements st)),
       pos_start ast_of_ch_or_list
