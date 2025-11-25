@@ -85,11 +85,33 @@ and chain (t: (string, string) syntax_tree) : ast =
   | Node("CHAIN", [Node("ATOM", _) as a]) -> ast_of_syntax_tree a
   | _ -> failwith "Pas un nœud CHAIN"
 
+and parse_string_literal (literal: string): string =
+    let res_chars = ref [] in
+    let i = ref 0 in
+    while !i < String.length literal do
+        if literal.[!i] <> '\\' then
+            res_chars := literal.[!i] :: !res_chars
+        else (
+            incr i;
+            let new_char = match literal.[!i] with
+            | '\\' -> '\\'
+            | '"' -> '"'
+            | 'n' -> '\n'
+            | 't' -> '\t'
+            | 'b' -> '\b'
+            | 'r' -> '\r'
+            | _ -> failwith "Pas une séquence d'échappement autorisée"
+            in
+            res_chars := new_char :: !res_chars
+        );
+        incr i
+    done;
+    Tipe.Utils.implode (List.rev !res_chars)
 
 and atom (t: (string, string) syntax_tree) : ast =
   match t with
   | Node("ATOM", [Leaf {token_type = "string_literal"; value; start}]) ->
-      String (remove_first_and_last_char value, start)
+      String (parse_string_literal (remove_first_and_last_char value), start)
   | Node("ATOM", [Leaf {token_type = "integer_literal"; value; start}]) ->
       Integer (int_of_string value, start)
   | Node("ATOM", [Leaf {token_type = "float_literal"; value; start}]) ->
@@ -160,7 +182,7 @@ and ast_of_syntax_tree (t: (string, string) syntax_tree) : ast =
       | "ident" -> Identifier (t.value, t.start)
       | "integer_literal" -> Integer (int_of_string t.value, t.start)
       | "float_literal" -> Float (float_of_string t.value, t.start)
-      | "string_literal" -> String (remove_first_and_last_char t.value, t.start)
+      | "string_literal" -> String (parse_string_literal (remove_first_and_last_char t.value), t.start)
       | "newline" -> Vide t.start
       | _ -> failwith "Invalid token"
       end
