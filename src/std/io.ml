@@ -6,7 +6,7 @@ let rec print_no_newline (l: value list) (pos: int) : value =
   match l with
   | [] -> print_no_newline [List [], pos] pos
   | [value] -> begin
-      let () = print_string (string_of_value value) in
+      let () = print_string (string_of_value_for_printing value) in
       value
       end
   | (_, list_pos)::_ -> print_no_newline [List l, list_pos] pos

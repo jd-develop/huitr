@@ -9,6 +9,33 @@ let remove_first_and_last_char (s: string) : string =
   else
     String.sub s 1 (n-2)
 
+
+(* Renvoie la chaîne en remplaçant les séquences d’échappement par les
+ * caractères qu’elles représentent. *)
+let parse_string_literal (literal: string) : string =
+  let n = String.length literal in
+  (* De même, mais à partir de l’indice i et en concaténant l’inverse d’accu
+   * avec le résultat *)
+  let rec parse_string_literal_accu (i: int) (accu: char list) : string =
+    if i >= n then
+      Tipe.Utils.implode (List.rev accu)
+    else if literal.[i] <> '\\' then
+      parse_string_literal_accu (i+1) (literal.[i]::accu)
+    else
+      let new_char = match literal.[i+1] with
+      | '\\' -> '\\'
+      | '"' -> '"'
+      | 'n' -> '\n'
+      | 't' -> '\t'
+      | 'b' -> '\b'
+      | 'r' -> '\r'
+      | _   -> failwith "Pas une séquence d’échappement valide"
+      in
+      parse_string_literal_accu (i+2) (new_char::accu)
+  in
+  parse_string_literal_accu 0 []
+
+
 let string_of_list (l: 'a list) (string_of_'a: 'a -> string) =
   let rec print_list_aux (l': 'a list) =
     match l' with

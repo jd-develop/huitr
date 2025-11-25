@@ -85,29 +85,6 @@ and chain (t: (string, string) syntax_tree) : ast =
   | Node("CHAIN", [Node("ATOM", _) as a]) -> ast_of_syntax_tree a
   | _ -> failwith "Pas un nœud CHAIN"
 
-and parse_string_literal (literal: string): string =
-    let res_chars = ref [] in
-    let i = ref 0 in
-    while !i < String.length literal do
-        if literal.[!i] <> '\\' then
-            res_chars := literal.[!i] :: !res_chars
-        else (
-            incr i;
-            let new_char = match literal.[!i] with
-            | '\\' -> '\\'
-            | '"' -> '"'
-            | 'n' -> '\n'
-            | 't' -> '\t'
-            | 'b' -> '\b'
-            | 'r' -> '\r'
-            | _ -> failwith "Pas une séquence d'échappement autorisée"
-            in
-            res_chars := new_char :: !res_chars
-        );
-        incr i
-    done;
-    Tipe.Utils.implode (List.rev !res_chars)
-
 and atom (t: (string, string) syntax_tree) : ast =
   match t with
   | Node("ATOM", [Leaf {token_type = "string_literal"; value; start}]) ->

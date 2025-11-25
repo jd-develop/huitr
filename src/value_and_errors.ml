@@ -22,13 +22,21 @@ let rec string_of_value (v: value) : string =
   match fst v with
   | Integer i -> string_of_int i
   | Float f -> string_of_float f
-  | String s -> s
+  | String s -> ("\"" ^ (String.escaped s) ^ "\"")
   | Boolean b -> if b then "true" else "false"
   | List l -> string_of_list l string_of_value
   | Function _ -> "(function)"
   | BuiltinFunction _ -> "(built-in function)"
   | Module (s, _) -> "(module "^s^")"
   | Unit -> "()"
+
+
+(* Affiche les str sans guillemets ni escape chars, mais lors d’appels
+ * récursifs (listes, …), affiche et les guillemets et les escape chars *)
+let string_of_value_for_printing (v: value) : string =
+  match fst v with
+  | String s -> s
+  | _ -> string_of_value v
 
 
 (* Regarde récursivement dans variables et dans ses parents. *)
