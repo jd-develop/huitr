@@ -1,6 +1,7 @@
 open Value_and_errors
 
 let add (l: value list) (pos: int) : value =
+  (* TODO: error msg *)
   let rec add_accu (l': value list) (accu: value_without_pos) : value =
     match l', accu with
     | [(Unit, _)], _
@@ -19,6 +20,7 @@ let add (l: value list) (pos: int) : value =
 
 
 let prod (l: value list) (pos: int) : value =
+  (* TODO: error msg *)
   let rec prod_accu (l': value list) (accu: value_without_pos) : value =
     match l', accu with
     | [(Unit, _)], _
@@ -37,6 +39,7 @@ let prod (l: value list) (pos: int) : value =
 
 
 let minus (l: value list) (pos: int) : value =
+  (* TODO: error msg *)
   match List.map fst l with
   | [Integer i; Integer j] -> Integer (i-j), pos
   | [Integer i; Float j] -> Float ((float_of_int i) -. j), pos
@@ -51,6 +54,7 @@ let (%) a b = ((a mod b) + b) mod b
 
 
 let mod_ (l: value list) (pos: int) : value =
+  (* TODO: error msg *)
   match l with
   | (Integer a, _)::(Integer b, _)::[] -> Integer (a % b), pos
   | _ -> raise (InvalidArgument(

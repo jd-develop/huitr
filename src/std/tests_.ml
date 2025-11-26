@@ -1,6 +1,7 @@
 open Value_and_errors
 
 let if_ (l: value list) (pos: int) : value =
+  (* TODO: error msg *)
   match l with
   | [Boolean true, _; v; _]
   | [Boolean false, _; _; v] -> v

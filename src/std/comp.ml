@@ -36,16 +36,16 @@ let comp_nombres
     (comp_float: float -> float -> bool)
     (l: value list)
     (pos: int) : value =
-  match (List.map fst l) with
-  | [Integer i; Integer j] -> Boolean (comp_int i j), pos
-  | [Float i; Float j] -> Boolean (comp_float i j), pos
-  | [Integer i; Float j] -> Boolean (comp_float (float_of_int i) j), pos
-  | [Float i; Integer j] -> Boolean (comp_float i (float_of_int j)), pos
-  | [v; _] -> raise (InvalidArgument(
+  match l with
+  | [Integer i, _; Integer j, _] -> Boolean (comp_int i j), pos
+  | [Float i, _; Float j, _] -> Boolean (comp_float i j), pos
+  | [Integer i, _; Float j, _] -> Boolean (comp_float (float_of_int i) j), pos
+  | [Float i, _; Integer j, _] -> Boolean (comp_float i (float_of_int j)), pos
+  | [v, v_pos; _] -> raise (InvalidArgument(
       "std::comp::"^func_name,
       Some v,
       "merci de donner deux nombres en argument",
-      pos
+      v_pos
     ))
   | _ -> raise (InvalidArgument(
     "std::comp::"^func_name,

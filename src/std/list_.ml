@@ -1,6 +1,7 @@
 open Value_and_errors
 
 let nth (l: value list) (pos: int) : value =
+  (* TODO: error msg *)
   match l with
   | [(List l', _); (Integer i, i_pos)]
   | [(Integer i, i_pos); (List l', _)] ->
@@ -18,6 +19,7 @@ let nth (l: value list) (pos: int) : value =
 
 
 let len (l: value list) (pos: int) : value =
+  (* TODO: error msg *)
   match l with
   | [List l', _] -> Integer (List.length l'), pos
   | _ -> raise (InvalidArgument(
@@ -27,6 +29,7 @@ let len (l: value list) (pos: int) : value =
 
 
 let is_empty (l: value list) (pos: int) : value =
+  (* TODO: error msg *)
   match l with
   | [List l', _] -> begin
     match l' with
@@ -40,6 +43,7 @@ let is_empty (l: value list) (pos: int) : value =
 
 (* construire *)
 let cons (l: value list) (pos: int) : value =
+  (* TODO: error msg *)
   match l with
   | [v; (List l', list_pos)] -> List (v::l'), pos
   | _ -> raise (InvalidArgument(
@@ -48,6 +52,7 @@ let cons (l: value list) (pos: int) : value =
 
 
 let head (l: value list) (pos: int) : value =
+  (* TODO: error msg *)
   match l with
   | [List l', _] -> begin
     match l' with
@@ -62,6 +67,7 @@ let head (l: value list) (pos: int) : value =
 
 
 let tail (l: value list) (pos: int) : value =
+  (* TODO: error msg *)
   match l with
   | [List l', _] -> begin
     match l' with

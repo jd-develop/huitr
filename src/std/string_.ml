@@ -2,6 +2,7 @@ open Value_and_errors
 open Huitr_utils
 
 let nth (l: value list) (pos: int) : value =
+  (* TODO: error msg *)
   match l with
   | [(String s, _); (Integer i, i_pos)]
   | [(Integer i, i_pos); (String s, _)] ->
@@ -20,6 +21,7 @@ let nth (l: value list) (pos: int) : value =
 
 
 let len (l: value list) (pos: int) : value =
+  (* TODO: error msg *)
   match l with
   | [(String s, _)] -> Integer (String.length s), pos
   | _ -> raise (InvalidArgument(
@@ -30,6 +32,7 @@ let len (l: value list) (pos: int) : value =
 
 
 let is_empty (l: value list) (pos: int) : value =
+  (* TODO: error msg *)
   match l with
   | [(String "", _)] -> Boolean true, pos
   | [(String _, _)] -> Boolean false, pos
@@ -41,6 +44,7 @@ let is_empty (l: value list) (pos: int) : value =
 
 
 let concat_strings (l: value list) (pos: int) : value =
+  (* TODO: error msg *)
   let rec concat_strings_accu (l': value list) (accu: string) : value =
     match l' with
     | [] -> String accu, pos
