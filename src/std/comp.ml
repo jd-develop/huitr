@@ -41,8 +41,18 @@ let comp_nombres
   | [Float i; Float j] -> Boolean (comp_float i j), pos
   | [Integer i; Float j] -> Boolean (comp_float (float_of_int i) j), pos
   | [Float i; Integer j] -> Boolean (comp_float i (float_of_int j)), pos
-  | _ -> raise (InvalidArgument("std::comp::"^func_name, None,
-                                "merci de donner deux arguments", pos))
+  | [v; _] -> raise (InvalidArgument(
+      "std::comp::"^func_name,
+      Some v,
+      "merci de donner deux nombres en argument",
+      pos
+    ))
+  | _ -> raise (InvalidArgument(
+    "std::comp::"^func_name,
+    None,
+    "merci de donner deux nombres en argument",
+    pos
+  ))
 
 
 let create_module_comp () : value =
