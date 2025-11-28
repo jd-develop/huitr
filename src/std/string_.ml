@@ -89,6 +89,51 @@ let split_on_char (l: value list) (pos: int) : value =
       ))
 
 
+let sub (l: value list) (pos: int) : value =
+  match l with
+  | [(String s, _); (Integer debut, deb_pos); (Integer len, len_pos)]
+  | [(Integer debut, deb_pos); (Integer len, len_pos); (String s, _)] ->
+      let n = String.length s in
+      if debut < 0 then
+        raise (InvalidArgument (
+          "std::string::sub", Some (Integer debut),
+          "l’indice de début est invalide",
+          deb_pos
+        ));
+      if len < 0 then
+        raise (InvalidArgument (
+          "std::string::sub", Some (Integer len),
+          "la longueur est invalide",
+          len_pos
+        ));
+      if debut+len >= n then
+        raise (InvalidArgument (
+          "std::string::sub", Some (Integer len),
+          ("l’indice de fin (qui vaut " ^
+           (string_of_int (debut+len)) ^
+           ") est invalide. Pour rappel, il faut fourir l’indice de début et " ^
+           "la longueur."),
+          len_pos
+        ));
+      String (String.sub s debut len), pos
+  | [(String _, _); (Integer _, _); (v, bad_pos)]
+  | [(String _, _); (v, bad_pos); _]
+  | [(Integer _, _); (Integer _, _); (v, bad_pos)]
+  | [(Integer _, _); (v, bad_pos); _]
+  | [(v, bad_pos); _; _] ->
+    raise (InvalidArgument (
+      "std::string::sub", Some v,
+      "arguments attendus : chaîne, début, longueur ou début, longueur, chaîne",
+      bad_pos
+    ))
+  | _ ->
+    raise (InvalidArgument (
+      "std::string::sub", None,
+      "trois arguments attendus",
+      pos
+    ))
+
+
 let create_module_string () : value =
   let string = Hashtbl.create 8 in
   Hashtbl.add string "nth" (BuiltinFunction nth, 0);
@@ -96,6 +141,7 @@ let create_module_string () : value =
   Hashtbl.add string "is_empty" (BuiltinFunction is_empty, 0);
   Hashtbl.add string "concat_strings" (BuiltinFunction concat_strings, 0);
   Hashtbl.add string "split_on_char" (BuiltinFunction split_on_char, 0);
+  Hashtbl.add string "sub" (BuiltinFunction sub, 0);
 
   (* CONSTANTES *)
   Hashtbl.add string "empty" (String "", 0);

@@ -182,6 +182,10 @@ Ce module contient les fonctions suivantes&nbsp;:
   renvoie `"hello world", std::list::empty > std::list::cons`.
   `"", "." > std::string::split_on_char` renvoie
   `"", std::list::empty > std::list::cons`.
+* `std::string::sub` prend en argument une chaîne de caractères `s`, un indice
+  de début `i` et une longueur `l` et renvoie le facteur de `s` commençant à
+  l’indice `i` et ayant une longueur `l`. Par exemple
+  `"abcd",1,2>std::string::sub` renvoie `"bc"`.
 
 ### `std::tests`
 Ce module contient la fonction suivante&nbsp;:
