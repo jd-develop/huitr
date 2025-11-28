@@ -176,6 +176,14 @@ Ce module contient les fonctions suivantes&nbsp;:
   vide, `false` sinon.
 * `std::string::concat_strings` renvoyant la concaténation de toutes les chaînes
   données en argument.
+* `std::string::split_on_char` prend en arguments une chaîne de carcatères `s`
+  et un caractère `c` (i.e. une chaîne de caractères de longueur 1) et renvoie
+  une liste contenant les facteurs de `s` délimités par `c`. Par exemple,
+  `"hello world", "o" > std::string::split_on_char` renvoie
+  `"hell", " w", "rld"`. `"hello world", "." > std::string::split_on_char`
+  renvoie `"hello world", std::list::empty > std::list::cons`.
+  `"", "." > std::string::split_on_char` renvoie
+  `"", std::list::empty > std::list::cons`.
 
 ### `std::tests`
 Ce module contient la fonction suivante&nbsp;:

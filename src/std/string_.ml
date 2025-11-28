@@ -50,11 +50,43 @@ let concat_strings (l: value list) (pos: int) : value =
     | [] -> String accu, pos
     | (String s, _)::q -> concat_strings_accu q (accu^s)
     | (v, v_pos)::q -> raise (InvalidArgument(
-        "std::list::concat_strings", Some v,
+        "std::string::concat_strings", Some v,
         "la liste ne doit contenir que des chaînes de caractères", v_pos
       ))
   in
   concat_strings_accu l ""
+
+
+let split_on_char (l: value list) (pos: int) : value =
+  match l with
+  | [(String s, _); (String c, char_pos)] ->
+    if String.length c <> 1 then
+      raise (InvalidArgument(
+        "std::string::split_on_char", Some (String c),
+        "le caractère sur lequel couper doit être une chaîne de longueur 1",
+        char_pos
+      ));
+    let splitted = String.split_on_char c.[0] s in
+    List (List.map (fun s -> String s, pos) splitted), pos
+  | [(String s, _); (v, char_pos)] ->
+      raise (InvalidArgument (
+        "std::string::split_on_char", Some v,
+        ("le second argument doit être un caractère (i.e. une chaîne de "^
+         "longueur 1)"),
+        char_pos
+      ))
+  | [(v, s_pos); _] ->
+      raise (InvalidArgument (
+        "std::string::split_on_char", Some v,
+        "le premier argument doit être une chaîne de caractères",
+        s_pos
+      ))
+  | _ ->
+      raise (InvalidArgument (
+        "std::string::split_on_char", None,
+        "merci de donner deux arguments",
+        pos
+      ))
 
 
 let create_module_string () : value =
@@ -63,6 +95,7 @@ let create_module_string () : value =
   Hashtbl.add string "len" (BuiltinFunction len, 0);
   Hashtbl.add string "is_empty" (BuiltinFunction is_empty, 0);
   Hashtbl.add string "concat_strings" (BuiltinFunction concat_strings, 0);
+  Hashtbl.add string "split_on_char" (BuiltinFunction split_on_char, 0);
 
   (* CONSTANTES *)
   Hashtbl.add string "empty" (String "", 0);

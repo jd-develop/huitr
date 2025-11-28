@@ -4,7 +4,6 @@ let add (l: value list) (pos: int) : value =
   (* TODO: error msg *)
   let rec add_accu (l': value list) (accu: value_without_pos) : value =
     match l', accu with
-    | [(Unit, _)], _
     | [], _ -> accu, pos
     | (Integer x, _)::q, (Integer y) -> add_accu q (Integer (x+y))
     | (Integer x, _)::q, (Float y)
@@ -23,7 +22,6 @@ let prod (l: value list) (pos: int) : value =
   (* TODO: error msg *)
   let rec prod_accu (l': value list) (accu: value_without_pos) : value =
     match l', accu with
-    | [(Unit, _)], _
     | [], _ -> accu, pos
     | (Integer x, _)::q, (Integer y) -> prod_accu q (Integer (x*y))
     | (Integer x, _)::q, (Float y)

@@ -17,6 +17,22 @@ type ast =
   | Vide of int
 
 
+let rec string_of_ast (t: ast) : string =
+  match t with
+  | Statements(l, _) -> "Statements"^(string_of_list l string_of_ast)
+  | List(l, _) -> "List"^(string_of_list l string_of_ast)
+  | Chain(l, _) -> "Chain"^(string_of_list l string_of_ast)
+  | Function(l, _) -> "Function"^(string_of_list l string_of_ast)
+  | ModuleIdentifier(l, s, _) -> "Identifier:"^String.concat "::" (l@[s])
+  | Identifier(s, _) -> "Identifier:"^s
+  | Integer(i, _) -> "Int:"^(string_of_int i)
+  | Float(f, _) -> "Float:"^(string_of_float f)
+  | String(s, _) -> "String:\""^s^"\""
+  | InsideParenthesis(t', _) -> "("^(string_of_ast t')^")"
+  | Unit(_) -> "()"
+  | Vide(_) -> "(arbre vide)"
+
+
 let rec pos_start (t: ast) : int =
   match t with
   | Statements(_, i)
@@ -77,7 +93,7 @@ and chain (t: (string, string) syntax_tree) : ast =
   match t with
   | Node("CHAIN", [Node("CHAINOPATOM", _) as chopat]) ->
       let ast_chopat, pos = chainopatom chopat in
-      Chain (Unit(pos) :: ast_chopat, pos)
+      Chain (Vide(pos) :: ast_chopat, pos)
   | Node("CHAIN", [Node("LIST", _) as f; Node("CHAINOPATOM", _) as chopat])
   | Node("CHAIN", [Node("ATOM", _) as f; Node("CHAINOPATOM", _) as chopat]) ->
       let ast_f = ast_of_syntax_tree f in

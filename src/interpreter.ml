@@ -54,7 +54,7 @@ let rec interpreter_was_list (input_ast: ast) (variables: scope)
       (find_module_identifier l s variables "" p), false
   | Statements(l, p) -> (interprete_statements l variables p recursion_depth), false
   | List(l, p) -> (interprete_list l variables p recursion_depth), true
-  | Chain(l, p) -> (interprete_chain l variables p recursion_depth), false
+  | Chain(l, p) -> interprete_chain l variables p recursion_depth, false
   | InsideParenthesis(a, p) -> interpreter a variables recursion_depth, false
 
 
@@ -76,13 +76,19 @@ and interprete_list (l: ast list) (variables: scope) (pos: int)
   List (List.map (fun t -> interpreter t variables recursion_depth) l), pos
 
 and interprete_chain (l: ast list) (variables: scope) (pos: int)
-    (recursion_depth: int): value =
+    (recursion_depth: int) : value =
   match l with
   | [] -> Unit, pos
   | x::[] ->
       apply_function
         (interpreter x variables recursion_depth) (List [], pos) variables true
         (recursion_depth+1)
+  | Vide(v_pos)::(Identifier(s, id_pos))::[] -> begin
+      match scope_lookup variables s with
+      | None -> raise (Undefined(s, id_pos))
+      | Some f -> apply_function (fst f, id_pos) (List [], v_pos) variables
+                                 true (recursion_depth+1)
+    end
   | x::(Identifier(s, id_pos))::[] -> begin
       let v, was_list = interpreter_was_list x variables recursion_depth in
       match scope_lookup variables s with
@@ -90,6 +96,10 @@ and interprete_chain (l: ast list) (variables: scope) (pos: int)
       | Some f -> apply_function (fst f, id_pos) v variables was_list
                                  (recursion_depth+1)
     end
+  | Vide(v_pos)::y::[] ->
+      apply_function
+        (fst (interpreter y variables recursion_depth), pos_start y)
+        (List [], v_pos) variables true (recursion_depth+1)
   | x::y::[] ->
       let args, was_list = interpreter_was_list x variables recursion_depth in
       apply_function
