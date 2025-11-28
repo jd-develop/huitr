@@ -23,7 +23,6 @@ retour-lignes ou des point-virgules (en particulier, **les retour-lignes sont
 significatifs**).
 
 ### Littéraux
-Ci-après la liste des littéraux de Huitr.
 * Littéral d’entier. Exemples&nbsp;: `0`, `3`, `-1`, `0x3D`, `0B01001`, `0o14`.
 * Littéral de flottant. Exemples&nbsp;: `0.0`, `3.1415`, `-6e12`, `4e-3`.
 * Littéral de chaîne de caractères. Exemples&nbsp; : `""`, `"Hello, world!"`.
@@ -58,8 +57,7 @@ Exemple&nbsp;: `[3 > n; n]` est une fonction renvoyant `3`.
 Pour appeler une fonction, on peut utiliser la même syntaxe que pour déclarer
 une variable&nbsp;: `arg1, arg2, …, argn > fonction`. Cela appelle la fonction
 `fonction` avec les arguments `arg1, …, argn`. Une fonction peut être appelée
-sur 0 arguments&nbsp;: cela équivaut à l’appeler sur un seul argument de type
-unit (i.e. `()`).
+sur 0 arguments. Pour récupérer les arguments, voir plus loin.
 
 À noter&nbsp;: le parenthésage se fait de la gauche vers la droite. Par exemple,
 `arg1, arg2 > fonction1, arg3, arg4 > fonction2, arg5 > fonction3` sera
@@ -84,8 +82,8 @@ avant de vous lancer dans l’écriture de fonctions récursives&nbsp;!
 
 Lors de l’appel d’une fonction, une liste `args` est définie dans le *scope* de
 la fonction&nbsp;: elle contient la liste des arguments. Si aucun argument n’est
-donné, la liste `args` contient un unique élément de type `unit` (i.e. `()`).
-On pourra utiliser les fonctions de `std::list` dessus (cf. plus loin).
+donné, la liste `args` est vide.
+On pourra utiliser les fonctions de `std::list` sur `args` (cf. plus loin).
 
 ## Bibliothèque standard
 
