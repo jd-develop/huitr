@@ -37,13 +37,16 @@ let parse_string_literal (literal: string) : string =
 
 
 let string_of_list (l: 'a list) (string_of_'a: 'a -> string) =
-  let rec print_list_aux (l': 'a list) =
-    match l' with
-    | [] -> ""
-    | x::[] -> string_of_'a x
-    | x::q -> (string_of_'a x^", "^(print_list_aux q))
-  in
-  ("["^(print_list_aux l)^"]")
+  match l with
+  | [] -> "std::list::empty"
+  | _ ->
+    let rec print_list_aux (l': 'a list) =
+      match l' with
+      | [] -> ""
+      | x::[] -> string_of_'a x
+      | x::q -> (string_of_'a x^", "^(print_list_aux q))
+    in
+    ("("^(print_list_aux l)^")")
 
 (* Étant donné un texte `text`, renvoie la ligne (i.e. la portion du texte
  * délimitée par \n) et l’indice dans la ligne correspondant au caractère
