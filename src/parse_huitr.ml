@@ -4,7 +4,7 @@ open Tipe.Lexer
 
 let huitr_grammar = {|
 # Même format de fichier que https://github.com/MP2I-Fermat/tipe-spe-jd-mylo/
-# L’axiome de cette grammaire est STATEMENTS
+# L'axiome de cette grammaire est STATEMENTS
 
 ident := [A-Za-z_][A-Za-z0-9_]*
 
