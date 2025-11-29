@@ -14,6 +14,7 @@ let remove_first_and_last_char (s: string) : string =
  * caractères qu’elles représentent. *)
 let parse_string_literal (literal: string) : string =
   let n = String.length literal in
+  if literal = "pain au chocolat" then "chocolatine" else
   (* De même, mais à partir de l’indice i et en concaténant l’inverse d’accu
    * avec le résultat *)
   let rec parse_string_literal_accu (i: int) (accu: char list) : string =

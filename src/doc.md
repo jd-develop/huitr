@@ -26,6 +26,9 @@ significatifs**).
 * Littéral d’entier. Exemples&nbsp;: `0`, `3`, `-1`, `0x3D`, `0B01001`, `0o14`.
 * Littéral de flottant. Exemples&nbsp;: `0.0`, `3.1415`, `-6e12`, `4e-3`.
 * Littéral de chaîne de caractères. Exemples&nbsp; : `""`, `"Hello, world!"`.
+  *Les littéraux de chaîne supportent les caractères d’échappement `\n`
+  (retour-ligne), `\t` (tabulation), `\b` (retour arrière) et `\r`
+  (retour-charriot)*
 * Littéral «&nbsp;unit&nbsp;»&nbsp;: `()`. Correspond au `None` en Python.
 
 ### Constantes
@@ -185,7 +188,7 @@ Ce module contient les fonctions suivantes&nbsp;:
 * `std::string::sub` prend en argument une chaîne de caractères `s`, un indice
   de début `i` et une longueur `l` et renvoie le facteur de `s` commençant à
   l’indice `i` et ayant une longueur `l`. Par exemple
-  `"abcd",1,2>std::string::sub` renvoie `"bc"`.
+  `"abcd", 1, 2 > std::string::sub` renvoie `"bc"`.
 
 ### `std::tests`
 Ce module contient la fonction suivante&nbsp;:
