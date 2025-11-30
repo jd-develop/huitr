@@ -4,7 +4,7 @@ open Value_and_errors
 open Math
 open Comp
 open Bool
-open Tests_
+open Test_
 open Io
 open List_
 open String_
@@ -150,7 +150,9 @@ let create_scope () : scope =
   Hashtbl.add std "math" (create_module_math ());
   Hashtbl.add std "comp" (create_module_comp ());
   Hashtbl.add std "bool" (create_module_bool ());
-  Hashtbl.add std "tests" (create_module_tests ());
+  let module_test = create_module_test () in
+  Hashtbl.add std "test" module_test;
+  Hashtbl.add std "tests" module_test;
   Hashtbl.add std "io" (create_module_io ());
   Hashtbl.add std "list" (create_module_list ());
   Hashtbl.add std "string" (create_module_string ());

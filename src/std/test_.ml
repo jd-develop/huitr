@@ -10,8 +10,8 @@ let if_ (l: value list) (pos: int) : value =
       "paramètres attendus : condition, valeur_vrai, valeur_faux", pos
     ))
 
-let create_module_tests () : value =
-  let tests = Hashtbl.create 8 in
-  Hashtbl.add tests "if" (BuiltinFunction if_, 0);
-  Module("tests", tests), 0
+let create_module_test () : value =
+  let test = Hashtbl.create 8 in
+  Hashtbl.add test "if" (BuiltinFunction if_, 0);
+  Module("test", test), 0
 

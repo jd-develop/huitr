@@ -18,11 +18,11 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
       ["buzz" > std::io::print],
       [> (n, 3 > std::math::mod, 0 > std::comp::eq,
         ["fizz" > std::io::print],
-        [n > std::io::print] > std::tests::if)
-      ] > std::tests::if)
-    ] > std::tests::if)
+        [n > std::io::print] > std::test::if)
+      ] > std::test::if)
+    ] > std::test::if)
 
-  > (n, 100 > std::comp::eq, [()], [n, 1 > std::math::add > fizzbuzz] > std::tests::if)
+  > (n, 100 > std::comp::eq, [()], [n, 1 > std::math::add > fizzbuzz] > std::test::if)
 ] > fizzbuzz
 
 0 > fizzbuzz

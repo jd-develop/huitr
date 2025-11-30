@@ -87,7 +87,7 @@ définies après la fonction). En outre, il est possible de faire des fonctions
 récursives (`[foo > a] > a`) et mutuellement récursives
 (`[foo > b] > a ; [bar > a] > b`).
 
-**Important**&nbsp;: lisez *attentivement* la documentation de `std::tests::if`
+**Important**&nbsp;: lisez *attentivement* la documentation de `std::test::if`
 avant de vous lancer dans l’écriture de fonctions récursives&nbsp;!
 
 Lors de l’appel d’une fonction, une liste `args` est définie dans le *scope* de
@@ -197,17 +197,17 @@ Ce module contient les fonctions suivantes&nbsp;:
   l’indice `i` et ayant une longueur `l`. Par exemple
   `"abcd", 1, 2 > std::string::sub` renvoie `"bc"`.
 
-### `std::tests`
+### `std::test`
 Ce module contient la fonction suivante&nbsp;:
-* `std::tests::if` prenant en argument un booléen, une valeur `v1` et une
+* `std::test::if` prenant en argument un booléen, une valeur `v1` et une
   valeur `v2`. Si le booléen est vrai, renvoie `v1`, s’il est faux, renvoie
-  `v2`. Par exemple, `true, 1, 0 > std::tests::if` renvoie `1`, mais
-  `false, 1, 0 > std::tests::if` renvoie `0`.
+  `v2`. Par exemple, `true, 1, 0 > std::test::if` renvoie `1`, mais
+  `false, 1, 0 > std::test::if` renvoie `0`.
   ***ATTENTION***&nbsp;: `v1` et `v2` sont évalués AVANT l’exécution du
   `if`. Si vous souhaitez les évaluer après (par exemple pour faire un appel
   récursif coûteux), `v1` et `v2` peuvent être des fonctions, et le
   résultat peut être appelé en-dehors du `if`. Par exemple&nbsp;:
-  `> (condition, [3 > appel_tres_long], [4 > appel_tres_long] > std::tests::if)`.
+  `> (condition, [3 > appel_tres_long], [4 > appel_tres_long] > std::test::if)`.
   Dans cet exemple, le `if` n’appelle rien&nbsp;: il renvoie une des deux
   fonctions en fonction de la condition, et la fonction renvoyée est appelée
   par le `> (...)`.

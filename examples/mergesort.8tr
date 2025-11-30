@@ -21,8 +21,8 @@ std::list > L
               l2 > L::head > y
               > (x, y > std::comp::le,
                  [x, ((l1 > L::tail), l2 > merge) > L::cons],
-                 [y, (l1, (l2 > L::tail) > merge) > L::cons] > std::tests::if)
-          ] > std::tests::if)] > std::tests::if)
+                 [y, (l1, (l2 > L::tail) > merge) > L::cons] > std::test::if)
+          ] > std::test::if)] > std::test::if)
 ] > merge
 
 [
@@ -38,7 +38,7 @@ std::list > L
             qp > separe > res
             res, 0 > L::nth > l1p
             res, 1 > L::nth > l2p
-            (x, l1p > L::cons, (y, l2p > L::cons))] > std::tests::if)] > std::tests::if)
+            (x, l1p > L::cons, (y, l2p > L::cons))] > std::test::if)] > std::test::if)
 ] > separe
 
 [
@@ -53,8 +53,8 @@ std::list > L
                   res, 0 > L::nth > l1
                   res, 1 > L::nth > l2
                   l1 > mergesort, (l2 > mergesort) > merge
-              ] > std::tests::if)
-       ] > std::tests::if)
+              ] > std::test::if)
+       ] > std::test::if)
 ] > mergesort
 
 (1, 6, 5.14, 58.237, 69, 7, 17) > mergesort > std::io::print
