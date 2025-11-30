@@ -135,6 +135,7 @@ Ce module contient les fonctions suivantes&nbsp;:
   Renvoie également la valeur donnée en entrée.
 * `std::io::input` affichant son entrée sans retour ligne et renvoyant une ligne
   lue dans l’entrée standard.
+<!-- non documenté : std::io::read -->
 
 ### `std::list`
 Ce module contient la constante suivante&nbsp;:

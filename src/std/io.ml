@@ -24,10 +24,31 @@ let input (l: value list) (pos: int) : value =
   String str, pos
 
 
+let read (l: value list) (pos: int) : value =
+  match l with
+  | [String file_name, file_name_pos] ->
+      begin try
+        let in_ch = open_in file_name in
+        let result = really_input_string in_ch (in_channel_length in_ch) in
+        close_in in_ch;
+        String result, pos
+      with
+      | Sys_error s -> raise (SysError(s, file_name_pos))
+      end
+  | [v, v_pos] -> raise (InvalidArgument(
+      "std::io::read", Some v,
+      "le premier argument doit être une chaîne (nom de fichier)", v_pos
+    ))
+  | _ -> raise (InvalidArgument(
+      "std::io::read", None, "un argument attendu", pos
+    ))
+
+
 let create_module_io () : value =
   let io = Hashtbl.create 8 in
   Hashtbl.add io "print" (BuiltinFunction print, 0);
   Hashtbl.add io "print_no_newline" (BuiltinFunction print_no_newline, 0);
   Hashtbl.add io "input" (BuiltinFunction input, 0);
+  Hashtbl.add io "read" (BuiltinFunction read, 0);
   Module("io", io), 0
 

@@ -21,6 +21,8 @@ let wrapper (code: string) (variables: scope option) =
       print_error "SyntaxError" "Syntaxe invalide." current_pos code
   | SyntaxError(message, pos) ->
       print_error "SyntaxError" message pos code
+  | SysError(s, pos) ->
+      print_error "SysError" s pos code
   | NotCallable(f, pos) ->
       print_error
         "NotCallable"
