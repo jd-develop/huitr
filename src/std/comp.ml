@@ -41,6 +41,8 @@ let comp_nombres
   | [Float i, _; Float j, _] -> Boolean (comp_float i j), pos
   | [Integer i, _; Float j, _] -> Boolean (comp_float (float_of_int i) j), pos
   | [Float i, _; Integer j, _] -> Boolean (comp_float i (float_of_int j)), pos
+  | [Float _, _; v, v_pos]
+  | [Integer _, _; v, v_pos]
   | [v, v_pos; _] -> raise (InvalidArgument(
       "std::comp::"^func_name,
       Some v,
