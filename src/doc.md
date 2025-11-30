@@ -99,11 +99,11 @@ Ce module contient les constantes suivantes&nbsp;:
 
 Ce module contient les fonctions suivantes&nbsp;:
 * `std::bool::and` prenant deux booléens `b1` et `b2` en entrée, et renvoyant
-  `b1 && b2` en sortie.
-* `std::bool::not` prenant un booléen `b` en entrée, et renvoyant `!b` en
-  sortie.
+  la conjonction de `b1` et `b2`.
+* `std::bool::not` prenant un booléen `b` en entrée, et renvoyant la négation
+  de `b`.
 * `std::bool::or` prenant deux booléens `b1` et `b2` en entrée, et renvoyant
-  `b1 || b2` en sortie
+  la disjoction de `b1` et `b2`.
 
 ### `std::comp`
 Ce module contient les fonctions suivantes&nbsp;:
