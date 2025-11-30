@@ -22,6 +22,13 @@ Un programme Huitr est constitué de plusieurs lignes, séparées par des
 retour-lignes ou des point-virgules (en particulier, **les retour-lignes sont
 significatifs**).
 
+### Commentaires
+* Si un `.` apparaît sur une ligne (en-dehors d’un flottant ou d’une chaîne),
+  le reste de la ligne (i.e. jusqu’au retour-ligne suivant) est ignoré.
+  *Exemple&nbsp;: `code . commentaire`.*
+* Tout ce qui se trouve entre deux `..` est ignoré (y compris les retour-ligne).
+  *Exemple&nbsp;: `code .. commentaire .. code`.*
+
 ### Littéraux
 * Littéral d’entier. Exemples&nbsp;: `0`, `3`, `-1`, `0x3D`, `0B01001`, `0o14`.
 * Littéral de flottant. Exemples&nbsp;: `0.0`, `3.1415`, `-6e12`, `4e-3`.
@@ -40,14 +47,14 @@ alphanumériques et de tirets du bas (le premier caractère du nom ne doit pas
 
 Une expression d’assignation renvoie la valeur de la constante.
 
-### Liste
+### Listes
 Il est possible de définir une liste en juxtaposant plusieurs valeurs séparées
 par des virgules. Par exemple, `1, "chocolatine", 3.14` est une liste contenant
 l’entier `1`, la chaîne `"chocolatine"` et le flottant `3.14`. Pour les listes
 vides ou ne contenant qu’un seul élément, voir plus bas (`std::list`).
 À noter&nbsp;: **on peut insérer un retour-ligne après une virgule**.
 
-### Déclaration de fonction
+### Déclarations de fonctions
 Pour déclarer une fonction, il suffit de mettre du code entre crochets. La
 valeur renvoyée est celle renvoyée par la dernière ligne. S’il n’y a rien
 entre les crochets, la fonction renverra unit.
@@ -205,3 +212,6 @@ Ce module contient la fonction suivante&nbsp;:
   fonctions en fonction de la condition, et la fonction renvoyée est appelée
   par le `> (...)`.
 
+## Exemple
+
+<!-- TODO -->
