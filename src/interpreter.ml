@@ -35,7 +35,7 @@ let rec find_module_identifier
       end
 
 
-(* Renvoie la valeur de s. Lève une excecption Undefined si s n’est pas définie
+(* Renvoie la valeur de s. Lève une exception Undefined si s n’est pas définie
  *)
 let find_variable (s: string) (variables: scope) (pos: int) : value =
   find_module_identifier [] s variables "" pos
@@ -112,9 +112,10 @@ and interprete_chain (l: ast list) (variables: scope) (pos: int)
  * profondeur de *cet appel*. *)
 and apply_function (fv: value) (x: value) (variables: scope) (was_list: bool)
     (recursion_depth: int) : value =
+  add_call (snd x);
   if recursion_depth = 60000 then
     raise(RecursionDepthExceeded (snd fv));
-  match fv with
+  let valeur = match fv with
   | Function (f, outer_scope), f_pos -> begin
       let new_scope = {
         parent = Some outer_scope;
@@ -134,6 +135,9 @@ and apply_function (fv: value) (x: value) (variables: scope) (was_list: bool)
       | _ -> f [x] f_pos
     end
   | _, f_pos -> raise (NotCallable(fv, f_pos))
+  in
+  remove_last_call ();
+  valeur
 
 (* Le scope est supposé vide, avec le scope parent en parent. recursion_depth
  * est la profondeur de *cet appel*. *)

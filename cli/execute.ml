@@ -20,7 +20,8 @@ let console (debug: bool) =
   | End_of_file -> print_endline "EOF"
 
 
-let execute_file (filename: string) (debug: bool) =
+let execute_file (filename: string) (debug: bool) (backtrace: bool)=
+  Value_and_errors.print_backtrace := backtrace;
   if filename = "-" then
     console debug
   else

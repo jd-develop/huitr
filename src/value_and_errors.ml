@@ -66,12 +66,41 @@ exception SysError of string * int
  *)
 exception InvalidArgument of (string * value_without_pos option * string * int)
 
+let print_backtrace = ref false
+
+(* Liste des appels aux fonctions *)
+let call_list = ref []
+
+(* Ajoute un appel à la liste d'appel *)
+let add_call (call : int) : unit =
+  call_list := call :: !call_list
+
+(* Retire la dernière fonction de la liste d'appel*)
+let remove_last_call () : unit =
+  match !call_list with
+  | _::q -> call_list := q
+  | _ -> failwith "Pas d'appel de fonction à enlever"
+
+(* affiche l'entièreté de l'arbre d'appel *)
+let print_call_tree (code : string) : unit =
+  if not !print_backtrace then () else
+  let rec print_call_tree_aux (tree : int list) : unit =
+    match tree with
+    | index::q ->
+      let line, idx_in_line, line_number = get_line_from_idx code index in
+      Printf.eprintf "Dans \"%s\", ligne %d\n" line line_number;
+      print_call_tree_aux q
+    | _ -> ()
+  in
+  print_call_tree_aux (List.rev !call_list)
+
 let print_error
     (error_name: string)
     (error_message: string)
     (index: int)
     (code: string) : unit =
   let line, idx_in_line, line_number = get_line_from_idx code index in
+  print_call_tree code;
   Printf.eprintf "Erreur à la ligne %d :\n" line_number;
   Printf.eprintf "%s%s\n" (String.make 4 ' ') line;
   Printf.eprintf "%s%s\n" (String.make (4+idx_in_line) ' ') "^";
