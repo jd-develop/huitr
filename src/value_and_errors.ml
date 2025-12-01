@@ -83,6 +83,7 @@ type interpretation_error =
 | NotCallable of value * int * interpreter_state
 | RecursionDepthExceeded of int * interpreter_state
 | SysError of string * int * interpreter_state
+| DivisionByZero of int * interpreter_state
 | InvalidArgument of (string * value_without_pos option * string * int * interpreter_state)
 
 exception InterpretationError of interpretation_error
