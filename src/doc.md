@@ -135,7 +135,8 @@ Ce module contient les fonctions suivantes&nbsp;:
   Renvoie également la valeur donnée en entrée.
 * `std::io::input` affichant son entrée sans retour ligne et renvoyant une ligne
   lue dans l’entrée standard.
-<!-- non documenté : std::io::read -->
+* `std::io::read` prend en entrée une chaîne de caractère contenant un nom de
+  fichier, puis renvoie le contenu du fichier en question.
 
 ### `std::list`
 Ce module contient la constante suivante&nbsp;:
@@ -164,6 +165,9 @@ Note&nbsp;: pour faire une liste contenant un seul élément `x`, il suffit de
 faire `x, std::list::empty > std::list::cons`.
 
 ### `std::math`
+Ce module contient les constantes suivantes&nbsp;:
+* `std::math::tau` : `6.283185307179586` (π=τ/2).
+* `std::math::e` : `2.71828182845904509`.
 Ce module contient les fonctions suivantes&nbsp;:
 * `std::math::add` prenant un nombre arbitraire de nombres (ou une liste de
   nombres) et renvoyant la somme des nombres. La somme d’une liste vide est 0.
@@ -172,6 +176,11 @@ Ce module contient les fonctions suivantes&nbsp;:
   1.
 * `std::math::minus` prenant *exactement* deux nombres `a` et `b` en entrée
   et renvoyant `a-b`.
+* `std::math::div` prenant deux nombres `a` et `b` en entrée et renvoyant
+  `a/b`. Renvoie toujours un flottant. En cas de division par 0, renvoie `inf`.
+* `std::math::floordiv` prenant deux entiers `a` et `b` et renvoyant le quotient
+  de la division euclidienne de `a` par `b`. Renvoie un entier. Plante en cas de
+  division par 0.
 * `std::math::mod` prenant deux entiers `a` et `b` en entrée et renvoyant
   le reste de la division euclidienne de `a` par `b`. La sortie est toujours
   positive.

@@ -19,6 +19,8 @@ let wrapper (code: string) (variables: scope option) =
   with
   | Tokenize_failure {current_pos} ->
       print_error "SyntaxError" "Syntaxe invalide." current_pos code
+  | DivisionByZero(pos) ->
+      print_error "DivisionByZero" "division par zéro." pos code
   | SyntaxError(message, pos) ->
       print_error "SyntaxError" message pos code
   | SysError(s, pos) ->
