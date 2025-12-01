@@ -81,7 +81,7 @@ let remove_last_call () : unit =
   | _::q -> call_list := q
   | _ -> failwith "Pas d'appel de fonction à enlever"
 
-(* affiche l'entièreté de l'arbre d'appel *)
+(* affiche l'entièreté de l'arbre d'appel (sauf le dernier pour éviter la redondance) *)
 let print_call_tree (code : string) : unit =
   if not !print_backtrace then () else
   let rec print_call_tree_aux (tree : int list) : unit =
@@ -92,7 +92,9 @@ let print_call_tree (code : string) : unit =
       print_call_tree_aux q
     | _ -> ()
   in
-  print_call_tree_aux (List.rev !call_list)
+  match !call_list with
+  | [] -> ()
+  | _::q -> print_call_tree_aux (List.rev q)
 
 let print_error
     (error_name: string)
