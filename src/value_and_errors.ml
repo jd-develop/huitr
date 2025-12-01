@@ -17,6 +17,16 @@ and scope = {
   variables: (string, value) Hashtbl.t
 }
 
+type interpreter_state = {recursion_depth : int; call_stack : int list}
+
+let create_state () : interpreter_state =
+  {recursion_depth = 0; call_stack = []}
+
+let stack_call (idx' : int) (current_state : interpreter_state) : interpreter_state =
+  {
+    recursion_depth = current_state.recursion_depth + 1;
+    call_stack = idx'::current_state.call_stack
+  }
 
 let rec string_of_value (v: value) : string =
   match fst v with
@@ -67,12 +77,47 @@ exception DivisionByZero of int
  *)
 exception InvalidArgument of (string * value_without_pos option * string * int)
 
+type interpretation_error =
+| Undefined of string * int * interpreter_state
+| IsNotModule of string * value * int * interpreter_state
+| NotCallable of value * int * interpreter_state
+| RecursionDepthExceeded of int * interpreter_state
+| SysError of string * int * interpreter_state
+| InvalidArgument of (string * value_without_pos option * string * int * interpreter_state)
+
+exception InterpretationError of interpretation_error
+
+let print_backtrace = ref false
+
+
+(* affiche l'entièreté de l'arbre d'appel (sauf le dernier pour éviter la redondance) *)
+let print_call_tree (code : string) (error_state: interpreter_state) : unit =
+  if not !print_backtrace then () else
+  let rec print_call_tree_aux (tree : int list) : unit =
+    match tree with
+    | index::q ->
+      let line, idx_in_line, line_number = get_line_from_idx code index in
+      Printf.eprintf "Dans \"%s\", ligne %d\n" line line_number;
+      print_call_tree_aux q
+    | _ -> ()
+  in
+  match error_state.call_stack with
+  | [] -> ()
+  | _::q -> print_call_tree_aux (List.rev q)
+
 let print_error
     (error_name: string)
     (error_message: string)
     (index: int)
-    (code: string) : unit =
+    (code: string)
+    (return_state : interpreter_state option) : unit =
   let line, idx_in_line, line_number = get_line_from_idx code index in
+  let error_state = 
+    match return_state with
+    | None -> create_state ()
+    | Some s -> s
+  in
+  print_call_tree code error_state;
   Printf.eprintf "Erreur à la ligne %d :\n" line_number;
   Printf.eprintf "%s%s\n" (String.make 4 ' ') line;
   Printf.eprintf "%s%s\n" (String.make (4+idx_in_line) ' ') "^";

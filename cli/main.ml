@@ -29,6 +29,14 @@ let debug =
     ~doc:"print tokens structure"
   )
 
+let no_backtrace =
+  Arg.(
+    value &
+    flag &
+    info ["no-backtrace"]
+    ~doc:"prevents backtrace from being shown on error"
+  )
+
 let command =
   let version = "0.1.0" in
   let doc = "Huitr file interpreter" in
@@ -42,7 +50,7 @@ let command =
 
   Cmd.v
     (Cmd.info "huitr" ~version ~doc ~man)
-    Term.(const Execute.execute_file $ filename $ debug)
+    Term.(const Execute.execute_file $ filename $ debug $ no_backtrace)
 
 let main () = Cmd.eval command
 let () = if !Sys.interactive then () else exit (main ())
