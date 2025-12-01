@@ -47,6 +47,37 @@ let minus (l: value list) (pos: int) : value =
       "std::math::minus", Some (List l), "deux nombres attendus", pos
     ))
 
+
+let div (l: value list) (pos: int) : value =
+  (* TODO: error msg *)
+  match List.map fst l with
+  | [Integer i; Integer j] -> Float (float_of_int i /. float_of_int j), pos
+  | [Integer i; Float j] -> Float ((float_of_int i) /. j), pos
+  | [Float i; Integer j] -> Float (i /. (float_of_int) j), pos
+  | [Float i; Float j] -> Float (i /. j), pos
+  | _ -> raise (InvalidArgument(
+      "std::math::div", Some (List l), "deux nombres attendus", pos
+    ))
+
+
+let (//) a b =
+  let res = a/b in
+  if res*b > a then res-1
+  else res
+
+
+let floordiv (l: value list) (pos: int) : value =
+  (* TODO: error msg *)
+  match l with
+  | [Integer i, _; Integer j, j_pos] ->
+      if j = 0 then
+        raise (DivisionByZero j_pos);
+      Integer (i // j), pos
+  | _ -> raise (InvalidArgument(
+      "std::math::floordiv", Some (List l), "deux entiers attendus", pos
+    ))
+
+
 (* modulo mathématique (toujours positif) *)
 let (%) a b = ((a mod b) + b) mod b
 
@@ -65,6 +96,10 @@ let create_module_math () : value =
   Hashtbl.add math "add" (BuiltinFunction add, 0);
   Hashtbl.add math "prod" (BuiltinFunction prod, 0);
   Hashtbl.add math "minus" (BuiltinFunction minus, 0);
+  Hashtbl.add math "div" (BuiltinFunction div, 0);
+  Hashtbl.add math "floordiv" (BuiltinFunction floordiv, 0);
   Hashtbl.add math "mod" (BuiltinFunction mod_, 0);
+  Hashtbl.add math "tau" (Float 6.283185307179586, 0);
+  Hashtbl.add math "e" (Float (exp 1.0), 0);
   Module("math", math), 0
 

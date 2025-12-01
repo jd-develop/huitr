@@ -70,6 +70,7 @@ exception IsNotModule of string * value * int
 exception NotCallable of value * int
 exception RecursionDepthExceeded of int
 exception SysError of string * int
+exception DivisionByZero of int
 
 (*
  * Nom de la fonction, valeur renvoyée, message d’erreur, indice dans le texte
