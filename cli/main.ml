@@ -29,12 +29,12 @@ let debug =
     ~doc:"print tokens structure"
   )
 
-let backtrace =
+let no_backtrace =
   Arg.(
     value &
     flag &
-    info ["b"; "backtrace"]
-    ~doc:"prints backtrace on error"
+    info ["no-backtrace"]
+    ~doc:"prevents backtrace from being shown on error"
   )
 
 let command =
@@ -50,7 +50,7 @@ let command =
 
   Cmd.v
     (Cmd.info "huitr" ~version ~doc ~man)
-    Term.(const Execute.execute_file $ filename $ debug $ backtrace)
+    Term.(const Execute.execute_file $ filename $ debug $ no_backtrace)
 
 let main () = Cmd.eval command
 let () = if !Sys.interactive then () else exit (main ())
