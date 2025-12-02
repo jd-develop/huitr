@@ -48,9 +48,12 @@ let command =
     `P "“Huitr” stands for “Huitr is tough to read”."
   ] in
 
+  let (+) (debug : bool) (backtrace : bool) : Huitr_interpreter.Huitr.interpreter_options =
+    {debug; backtrace}
+  in
+
   Cmd.v
     (Cmd.info "huitr" ~version ~doc ~man)
-    Term.(const Execute.execute_file $ filename $ debug $ no_backtrace)
-
+    Term.(const Execute.execute_file $ filename $ (const (+) $ debug $ (const not $ no_backtrace)))
 let main () = Cmd.eval command
 let () = if !Sys.interactive then () else exit (main ())

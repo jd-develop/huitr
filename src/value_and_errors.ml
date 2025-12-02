@@ -93,12 +93,8 @@ type interpretation_error =
 
 exception InterpretationError of interpretation_error
 
-let print_backtrace = ref false
-
-
 (* affiche l'entièreté de l'arbre d'appel (sauf le dernier pour éviter la redondance) *)
 let print_call_tree (code : string) (error_state: interpreter_state) : unit =
-  if not !print_backtrace then () else
   let rec print_call_tree_aux (tree : (int*int) list) : unit =
     match tree with
     | (index, times_called)::q ->
