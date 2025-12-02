@@ -1,6 +1,6 @@
 (*
  * Huitr - a purely functional programming language.
- * Copyright (C) 2024-2025  3fxcf9, jd-develop, Hugo Vangilluwen
+ * Copyright (C) 2024-2025  3fxcf9, jd-develop, Hugo Vangilluwen, Erwan FB
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
@@ -20,7 +20,8 @@ let console (options: Huitr.interpreter_options) =
   | End_of_file -> print_endline "EOF"
 
 
-let execute_file (filename: string) (options: Huitr.interpreter_options): unit =
+let execute_file (filename: string) (options: Huitr.interpreter_options) :
+    unit =
   if filename = "-" then
     console options
   else

@@ -31,9 +31,11 @@ let wrapper (code: string) (variables: scope option)
   | SyntaxError(message, pos) ->
     print_error "SyntaxError" message pos code None
   | InterpretationError(DivisionByZero(pos, state)) ->
-      print_error "DivisionByZero" "division par zéro." pos code (if options.backtrace then (Some state) else None)
+      print_error "DivisionByZero" "division par zéro." pos code
+        (if options.backtrace then (Some state) else None)
   | InterpretationError(SysError(s, pos, state)) ->
-      print_error "SysError" s pos code (if options.backtrace then (Some state) else None)
+      print_error "SysError" s pos code
+        (if options.backtrace then (Some state) else None)
   | InterpretationError(NotCallable(f, pos, state)) ->
       print_error
         "NotCallable"
@@ -49,7 +51,8 @@ let wrapper (code: string) (variables: scope option)
       pos code (if options.backtrace then (Some state) else None)
   | InterpretationError(RecursionDepthExceeded(pos, state)) ->
       print_error "RecursionDepthExceeded"
-        "trop d’appels récursifs (max 60000)" pos code (if options.backtrace then (Some state) else None)
+        "trop d’appels récursifs (max 60000)" pos code
+        (if options.backtrace then (Some state) else None)
   | InterpretationError(InvalidArgument(func, value, errmsg, pos, state)) ->
       print_error "InvalidArgument"
         begin match value with

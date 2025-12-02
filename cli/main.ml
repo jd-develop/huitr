@@ -1,6 +1,6 @@
 (*
  * Huitr - a purely functional programming language.
- * Copyright (C) 2024-2025  3fxcf9, jd-develop, Hugo Vangilluwen
+ * Copyright (C) 2024-2025  3fxcf9, jd-develop, Hugo Vangilluwen, Erwan FB
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
@@ -48,12 +48,17 @@ let command =
     `P "“Huitr” stands for “Huitr is tough to read”."
   ] in
 
-  let (+) (debug : bool) (backtrace : bool) : Huitr_interpreter.Huitr.interpreter_options =
+  let (+) (debug : bool) (backtrace : bool) :
+      Huitr_interpreter.Huitr.interpreter_options =
     {debug; backtrace}
   in
 
   Cmd.v
     (Cmd.info "huitr" ~version ~doc ~man)
-    Term.(const Execute.execute_file $ filename $ (const (+) $ debug $ (const not $ no_backtrace)))
+    Term.(
+      const Execute.execute_file $ filename $ (
+        const (+) $ debug $ (const not $ no_backtrace)
+      )
+    )
 let main () = Cmd.eval command
 let () = if !Sys.interactive then () else exit (main ())

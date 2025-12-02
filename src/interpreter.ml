@@ -52,23 +52,31 @@ let rec interpreter_was_list (input_ast: ast) (variables: scope)
   | Identifier(s, p) -> (find_variable s variables p), false
   | ModuleIdentifier (l, s, p) ->
       (find_module_identifier l s variables "" p), false
-  | Statements(l, p) -> (interprete_statements l variables p current_state), false
+  | Statements(l, p) ->
+      (interprete_statements l variables p current_state), false
   | List(l, p) -> (interprete_list l variables p current_state), true
   | Chain(l, p) -> interprete_chain l variables p current_state, false
   | InsideParenthesis(a, p) -> interpreter a variables current_state, false
 
-  (*InvalidArgument of (string * value_without_pos option * string * int)*)
-and interpreter (input_ast: ast) (variables: scope) (current_state: interpreter_state)
-    : value =
+and interpreter (input_ast: ast) (variables: scope)
+    (current_state: interpreter_state) : value =
   try
     fst (interpreter_was_list input_ast variables current_state)
   with
-  | Undefined (s, n) -> raise (InterpretationError (Undefined (s, n, current_state)))
-  | IsNotModule (s, v, n) -> raise (InterpretationError (IsNotModule (s, v, n, current_state)))
-  | NotCallable (v, n) -> raise (InterpretationError (NotCallable (v, n, current_state)))
-  | RecursionDepthExceeded n -> raise (InterpretationError (RecursionDepthExceeded (n, current_state)))
-  | SysError (s, n) -> raise (InterpretationError (SysError (s, n, current_state)))
-  | InvalidArgument (s1, val_opt, s2, n) -> raise (InterpretationError(InvalidArgument (s1, val_opt, s2, n, current_state)))
+  | Undefined (s, n) ->
+      raise (InterpretationError (Undefined (s, n, current_state)))
+  | IsNotModule (s, v, n) ->
+      raise (InterpretationError (IsNotModule (s, v, n, current_state)))
+  | NotCallable (v, n) ->
+      raise (InterpretationError (NotCallable (v, n, current_state)))
+  | RecursionDepthExceeded n ->
+      raise (InterpretationError (RecursionDepthExceeded (n, current_state)))
+  | SysError (s, n) ->
+      raise (InterpretationError (SysError (s, n, current_state)))
+  | InvalidArgument (s1, val_opt, s2, n) ->
+      raise (InterpretationError(
+        InvalidArgument (s1, val_opt, s2, n, current_state)
+      ))
 
 and interprete_statements (l: ast list) (variables: scope)
     (pos: int) (current_state: interpreter_state) : value =

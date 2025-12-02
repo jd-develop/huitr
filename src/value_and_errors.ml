@@ -17,15 +17,23 @@ and scope = {
   variables: (string, value) Hashtbl.t
 }
 
-type interpreter_state = {recursion_depth : int; call_stack : (int * int) list;}
+type interpreter_state = {
+  recursion_depth : int;
+  call_stack : (int * int) list
+}
 
 let create_state () : interpreter_state =
   {recursion_depth = 0; call_stack = []}
 
-let stack_call (idx' : int) (current_state : interpreter_state) : interpreter_state =
-  let next_call_stack = 
+let stack_call (idx' : int) (current_state : interpreter_state) :
+    interpreter_state =
+  let next_call_stack =
     match current_state.call_stack with
-    | (x, n)::q -> if x = idx' then (x, n+1)::q else (idx', 1)::current_state.call_stack
+    | (x, n)::q ->
+        if x = idx' then
+          (x, n+1)::q
+        else
+          (idx', 1)::current_state.call_stack
     | [] -> [(idx', 1)]
   in
   {
@@ -89,7 +97,9 @@ type interpretation_error =
 | RecursionDepthExceeded of int * interpreter_state
 | SysError of string * int * interpreter_state
 | DivisionByZero of int * interpreter_state
-| InvalidArgument of (string * value_without_pos option * string * int * interpreter_state)
+| InvalidArgument of (
+  string * value_without_pos option * string * int * interpreter_state
+)
 
 exception InterpretationError of interpretation_error
 
