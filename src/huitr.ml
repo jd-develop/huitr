@@ -12,7 +12,11 @@ type interpreter_options =
   backtrace : bool;
 }
 
-let wrapper (code: string) (variables: scope option) (options : interpreter_options)=
+(* Exécute le code avec l’environnement `variables` (qui est modifié par effet
+ * de bord) sachant les options d’interprétation `options`. Si le code renvoie
+ * une erreur, affiche correctement l’erreur. *)
+let wrapper (code: string) (variables: scope option)
+    (options : interpreter_options) : unit =
   try
     let syntax_tree = parse_huitr code in
     let ast = ast_of_syntax_tree syntax_tree in
