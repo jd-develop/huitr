@@ -17,15 +17,20 @@ and scope = {
   variables: (string, value) Hashtbl.t
 }
 
-type interpreter_state = {recursion_depth : int; call_stack : int list}
+type interpreter_state = {recursion_depth : int; call_stack : (int * int) list;}
 
 let create_state () : interpreter_state =
   {recursion_depth = 0; call_stack = []}
 
 let stack_call (idx' : int) (current_state : interpreter_state) : interpreter_state =
+  let next_call_stack = 
+    match current_state.call_stack with
+    | (x, n)::q -> if x = idx' then (x, n+1)::q else (idx', 1)::current_state.call_stack
+    | [] -> [(idx', 1)]
+  in
   {
     recursion_depth = current_state.recursion_depth + 1;
-    call_stack = idx'::current_state.call_stack
+    call_stack = next_call_stack
   }
 
 let rec string_of_value (v: value) : string =
@@ -94,17 +99,17 @@ let print_backtrace = ref false
 (* affiche l'entièreté de l'arbre d'appel (sauf le dernier pour éviter la redondance) *)
 let print_call_tree (code : string) (error_state: interpreter_state) : unit =
   if not !print_backtrace then () else
-  let rec print_call_tree_aux (tree : int list) : unit =
+  let rec print_call_tree_aux (tree : (int*int) list) : unit =
     match tree with
-    | index::q ->
+    | (index, times_called)::q ->
       let line, idx_in_line, line_number = get_line_from_idx code index in
       Printf.eprintf "Dans \"%s\", ligne %d\n" line line_number;
+      if times_called > 1 then
+        Printf.eprintf "    ... %d fois de plus\n" (times_called-1);
       print_call_tree_aux q
     | _ -> ()
   in
-  match error_state.call_stack with
-  | [] -> ()
-  | _::q -> print_call_tree_aux (List.rev q)
+  print_call_tree_aux (List.rev error_state.call_stack)
 
 let print_error
     (error_name: string)
