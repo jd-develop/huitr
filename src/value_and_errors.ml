@@ -103,7 +103,8 @@ type interpretation_error =
 
 exception InterpretationError of interpretation_error
 
-(* affiche l'entièreté de l'arbre d'appel (sauf le dernier pour éviter la redondance) *)
+(* affiche l'entièreté de l'arbre d'appel (sauf le dernier pour éviter la
+ * redondance) *)
 let print_call_tree (code : string) (error_state: interpreter_state) : unit =
   let rec print_call_tree_aux (tree : (int*int) list) : unit =
     match tree with
