@@ -71,7 +71,7 @@ let floordiv (l: value list) (pos: int) : value =
   match l with
   | [Integer i, _; Integer j, j_pos] ->
       if j = 0 then
-        raise (DivisionByZero j_pos);
+        raise (InterpretationError(DivisionByZero (j_pos, None)));
       Integer (i // j), pos
   | _ -> raise (InvalidArgument(
       "std::math::floordiv", Some (List l), "deux entiers attendus", pos

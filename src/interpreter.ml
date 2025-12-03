@@ -21,17 +21,17 @@ let rec find_module_identifier
   match l with
   | [] -> (* On a déjà regardé tous les modules *)
       begin match scope_lookup variables s with
-      | None -> raise (Undefined (current_module_expression^s, pos))
+      | None -> raise (InterpretationError(Undefined (current_module_expression^s, pos, None)))
       | Some x -> fst x, pos
       end
   | x::q ->
       begin match scope_lookup variables x with
-      | None -> raise (Undefined (current_module_expression^x, pos))
+      | None -> raise (InterpretationError(Undefined (current_module_expression^x, pos, None)))
       | Some (Module (_, v), _) ->
           let new_scope = {parent = None; variables = v} in
           let new_module_expr = current_module_expression^x^"::" in
           find_module_identifier q s new_scope new_module_expr pos
-      | Some v -> raise (IsNotModule (current_module_expression^x, v, pos))
+      | Some v -> raise (InterpretationError(IsNotModule (current_module_expression^x, v, pos, None)))
       end
 
 
@@ -63,19 +63,19 @@ and interpreter (input_ast: ast) (variables: scope)
   try
     fst (interpreter_was_list input_ast variables current_state)
   with
-  | Undefined (s, n) ->
-      raise (InterpretationError (Undefined (s, n, current_state)))
-  | IsNotModule (s, v, n) ->
-      raise (InterpretationError (IsNotModule (s, v, n, current_state)))
-  | NotCallable (v, n) ->
-      raise (InterpretationError (NotCallable (v, n, current_state)))
-  | RecursionDepthExceeded n ->
-      raise (InterpretationError (RecursionDepthExceeded (n, current_state)))
-  | SysError (s, n) ->
-      raise (InterpretationError (SysError (s, n, current_state)))
-  | InvalidArgument (s1, val_opt, s2, n) ->
+  |InterpretationError (Undefined (s, n, None)) ->
+      raise (InterpretationError (Undefined (s, n, Some current_state)))
+  | InterpretationError(IsNotModule (s, v, n, None)) ->
+      raise (InterpretationError (IsNotModule (s, v, n, Some current_state)))
+  | InterpretationError(NotCallable (v, n, None)) ->
+      raise (InterpretationError (NotCallable (v, n, Some current_state)))
+  | InterpretationError(RecursionDepthExceeded (n, None)) ->
+      raise (InterpretationError (RecursionDepthExceeded (n, Some current_state)))
+  | InterpretationError(SysError (s, n, None)) ->
+      raise (InterpretationError (SysError (s, n, Some current_state)))
+  | InterpretationError(InvalidArgument (s1, val_opt, s2, n, None)) ->
       raise (InterpretationError(
-        InvalidArgument (s1, val_opt, s2, n, current_state)
+        InvalidArgument (s1, val_opt, s2, n, Some current_state)
       ))
 
 and interprete_statements (l: ast list) (variables: scope)
@@ -101,7 +101,7 @@ and interprete_chain (l: ast list) (variables: scope) (pos: int)
         current_state
   | Vide(v_pos)::(Identifier(s, id_pos))::[] -> begin
       match scope_lookup variables s with
-      | None -> raise (Undefined(s, id_pos))
+      | None -> raise (InterpretationError(Undefined(s, id_pos, None)))
       | Some f -> apply_function (fst f, id_pos) (List [], v_pos) variables
                                  true current_state
     end
@@ -130,7 +130,7 @@ and apply_function (fv: value) (x: value) (variables: scope) (was_list: bool)
     (current_state: interpreter_state) : value =
   let next_state = stack_call (snd x) current_state in
   if next_state.recursion_depth = 60000 then
-    raise(RecursionDepthExceeded (snd fv));
+    raise(InterpretationError(RecursionDepthExceeded (snd fv, None)));
   match fv with
   | Function (f, outer_scope), f_pos -> begin
       let new_scope = {
@@ -150,7 +150,7 @@ and apply_function (fv: value) (x: value) (variables: scope) (was_list: bool)
       | List l, list_pos -> f (if was_list then l else [List l, list_pos]) f_pos
       | _ -> f [x] f_pos
     end
-  | _, f_pos -> raise (NotCallable(fv, f_pos))
+  | _, f_pos -> raise (InterpretationError(NotCallable(fv, f_pos, None)))
 
 (* Le scope est supposé vide, avec le scope parent en parent. recursion_depth
  * est la profondeur de *cet appel*. *)

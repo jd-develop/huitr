@@ -32,27 +32,27 @@ let wrapper (code: string) (variables: scope option)
     print_error "SyntaxError" message pos code None
   | InterpretationError(DivisionByZero(pos, state)) ->
       print_error "DivisionByZero" "division par zéro." pos code
-        (if options.backtrace then (Some state) else None)
+        (if options.backtrace then state else None)
   | InterpretationError(SysError(s, pos, state)) ->
       print_error "SysError" s pos code
-        (if options.backtrace then (Some state) else None)
+        (if options.backtrace then state else None)
   | InterpretationError(NotCallable(f, pos, state)) ->
       print_error
         "NotCallable"
         ("La valeur "^(string_of_value f)^" n’est pas appelable.")
-        pos code (if options.backtrace then (Some state) else None)
+        pos code (if options.backtrace then state else None)
   | InterpretationError(Undefined(name, pos, state)) ->
       print_error "Undefined" ("Le nom "^name^" n’est pas défini") pos
-      code (if options.backtrace then (Some state) else None)
+      code (if options.backtrace then state else None)
   | InterpretationError(IsNotModule(name, v, pos, state)) ->
       print_error "IsNotModule"
       ("Le nom "^name^" n’est pas un module (il s’agit de la valeur "^
        (string_of_value v)^").")
-      pos code (if options.backtrace then (Some state) else None)
+      pos code (if options.backtrace then state else None)
   | InterpretationError(RecursionDepthExceeded(pos, state)) ->
       print_error "RecursionDepthExceeded"
         "trop d’appels récursifs (max 60000)" pos code
-        (if options.backtrace then (Some state) else None)
+        (if options.backtrace then state else None)
   | InterpretationError(InvalidArgument(func, value, errmsg, pos, state)) ->
       print_error "InvalidArgument"
         begin match value with
@@ -64,5 +64,5 @@ let wrapper (code: string) (variables: scope option)
           ("Argument invalide dans la fonction " ^ func ^ ", avec le message " ^
            " « " ^ errmsg ^ " ».")
         end
-      pos code (if options.backtrace then (Some state) else None)
+      pos code (if options.backtrace then state else None)
 

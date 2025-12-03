@@ -33,7 +33,7 @@ let read (l: value list) (pos: int) : value =
         close_in in_ch;
         String result, pos
       with
-      | Sys_error s -> raise (SysError(s, file_name_pos))
+      | Sys_error s -> raise (InterpretationError(SysError(s, file_name_pos, None)))
       end
   | [v, v_pos] -> raise (InvalidArgument(
       "std::io::read", Some v,
