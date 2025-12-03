@@ -1,12 +1,16 @@
 open Value_and_errors
 
+let true_nth_opt (l: 'a list) (i: int) : 'a option =
+  if i < 0 then None
+  else List.nth_opt l i
+
 let nth (l: value list) (pos: int) : value =
   (* TODO: error msg *)
   match l with
   | [(List l', _); (Integer i, i_pos)]
   | [(Integer i, i_pos); (List l', _)] ->
       begin
-      match List.nth_opt l' i with
+      match true_nth_opt l' i with
       | None -> raise (InvalidArgument(
           "std::list::nth", Some (Integer i), "invalid index", i_pos
         ))
