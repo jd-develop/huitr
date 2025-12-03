@@ -63,7 +63,7 @@ and interpreter (input_ast: ast) (variables: scope)
   try
     fst (interpreter_was_list input_ast variables current_state)
   with
-  |InterpretationError (Undefined (s, n, None)) ->
+  | InterpretationError (Undefined (s, n, None)) ->
       raise (InterpretationError (Undefined (s, n, Some current_state)))
   | InterpretationError(IsNotModule (s, v, n, None)) ->
       raise (InterpretationError (IsNotModule (s, v, n, Some current_state)))
