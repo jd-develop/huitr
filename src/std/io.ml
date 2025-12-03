@@ -33,15 +33,17 @@ let read (l: value list) (pos: int) : value =
         close_in in_ch;
         String result, pos
       with
-      | Sys_error s -> raise (InterpretationError(SysError(s, file_name_pos, None)))
+      | Sys_error s -> raise (InterpretationError(SysError(
+          s, file_name_pos, None
+        )))
       end
-  | [v, v_pos] -> raise (InvalidArgument(
+  | [v, v_pos] -> raise (InterpretationError(InvalidArgument(
       "std::io::read", Some v,
-      "le premier argument doit être une chaîne (nom de fichier)", v_pos
-    ))
-  | _ -> raise (InvalidArgument(
-      "std::io::read", None, "un argument attendu", pos
-    ))
+      "le premier argument doit être une chaîne (nom de fichier)", v_pos, None
+    )))
+  | _ -> raise (InterpretationError(InvalidArgument(
+      "std::io::read", None, "un argument attendu", pos, None
+    )))
 
 
 let create_module_io () : value =

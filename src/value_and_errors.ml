@@ -78,11 +78,6 @@ let scope_copy (s: scope) : scope =
   {parent = s.parent; variables = Hashtbl.copy s.variables}
 
 
-(*
- * Nom de la fonction, valeur renvoyée, message d’erreur, indice dans le texte
- *)
-exception InvalidArgument of (string * value_without_pos option * string * int)
-
 type interpretation_error =
 | Undefined of string * int * interpreter_state option
 | IsNotModule of string * value * int * interpreter_state option
@@ -90,6 +85,9 @@ type interpretation_error =
 | RecursionDepthExceeded of int * interpreter_state option
 | SysError of string * int * interpreter_state option
 | DivisionByZero of int * interpreter_state option
+  (*
+   * Nom de la fonction, valeur renvoyée, message d’erreur, indice dans le texte
+   *)
 | InvalidArgument of (
   string * value_without_pos option * string * int * interpreter_state option
 )

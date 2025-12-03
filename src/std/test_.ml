@@ -5,10 +5,10 @@ let if_ (l: value list) (pos: int) : value =
   match l with
   | [Boolean true, _; v; _]
   | [Boolean false, _; _; v] -> v
-  | _ -> raise (InvalidArgument(
+  | _ -> raise (InterpretationError(InvalidArgument(
       "std::tests::if", Some (List l),
-      "paramètres attendus : condition, valeur_vrai, valeur_faux", pos
-    ))
+      "paramètres attendus : condition, valeur_vrai, valeur_faux", pos, None
+    )))
 
 let create_module_test () : value =
   let test = Hashtbl.create 8 in

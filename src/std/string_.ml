@@ -9,26 +9,26 @@ let nth (l: value list) (pos: int) : value =
       begin try
         String(string_of_char (String.get s i)), pos
       with
-      | Invalid_argument(_) -> raise (InvalidArgument(
-          "std::string::nth", Some (Integer i), "indice invalide", i_pos
-        ))
+      | Invalid_argument(_) -> raise (InterpretationError(InvalidArgument(
+          "std::string::nth", Some (Integer i), "indice invalide", i_pos, None
+        )))
       end
-  | _ -> raise (InvalidArgument(
+  | _ -> raise (InterpretationError(InvalidArgument(
       "std::string::nth", Some (List l),
       "merci de donner une chaîne de caractères en argument",
-      pos
-    ))
+      pos, None
+    )))
 
 
 let len (l: value list) (pos: int) : value =
   (* TODO: error msg *)
   match l with
   | [(String s, _)] -> Integer (String.length s), pos
-  | _ -> raise (InvalidArgument(
+  | _ -> raise (InterpretationError(InvalidArgument(
       "std::string::len", Some (List l),
       "merci de donner une chaîne de caractères en argument",
-      pos
-    ))
+      pos, None
+    )))
 
 
 let is_empty (l: value list) (pos: int) : value =
@@ -36,11 +36,11 @@ let is_empty (l: value list) (pos: int) : value =
   match l with
   | [(String "", _)] -> Boolean true, pos
   | [(String _, _)] -> Boolean false, pos
-  | _ -> raise (InvalidArgument(
+  | _ -> raise (InterpretationError(InvalidArgument(
       "std::string::is_empty", Some (List l),
       "merci de donner une chaîne de caractères en argument",
-      pos
-    ))
+      pos, None
+    )))
 
 
 let concat_strings (l: value list) (pos: int) : value =
@@ -49,10 +49,11 @@ let concat_strings (l: value list) (pos: int) : value =
     match l' with
     | [] -> String accu, pos
     | (String s, _)::q -> concat_strings_accu q (accu^s)
-    | (v, v_pos)::q -> raise (InvalidArgument(
+    | (v, v_pos)::q -> raise (InterpretationError(InvalidArgument(
         "std::string::concat_strings", Some v,
-        "la liste ne doit contenir que des chaînes de caractères", v_pos
-      ))
+        "la liste ne doit contenir que des chaînes de caractères", v_pos,
+        None
+      )))
   in
   concat_strings_accu l ""
 
@@ -61,32 +62,32 @@ let split_on_char (l: value list) (pos: int) : value =
   match l with
   | [(String s, _); (String c, char_pos)] ->
     if String.length c <> 1 then
-      raise (InvalidArgument(
+      raise (InterpretationError(InvalidArgument(
         "std::string::split_on_char", Some (String c),
         "le caractère sur lequel couper doit être une chaîne de longueur 1",
-        char_pos
-      ));
+        char_pos, None
+      )));
     let splitted = String.split_on_char c.[0] s in
     List (List.map (fun s -> String s, pos) splitted), pos
   | [(String s, _); (v, char_pos)] ->
-      raise (InvalidArgument (
+      raise (InterpretationError(InvalidArgument (
         "std::string::split_on_char", Some v,
         ("le second argument doit être un caractère (i.e. une chaîne de "^
          "longueur 1)"),
-        char_pos
-      ))
+        char_pos, None
+      )))
   | [(v, s_pos); _] ->
-      raise (InvalidArgument (
+      raise (InterpretationError(InvalidArgument (
         "std::string::split_on_char", Some v,
         "le premier argument doit être une chaîne de caractères",
-        s_pos
-      ))
+        s_pos, None
+      )))
   | _ ->
-      raise (InvalidArgument (
+      raise (InterpretationError(InvalidArgument (
         "std::string::split_on_char", None,
         "merci de donner deux arguments",
-        pos
-      ))
+        pos, None
+      )))
 
 
 let sub (l: value list) (pos: int) : value =
@@ -95,43 +96,43 @@ let sub (l: value list) (pos: int) : value =
   | [(Integer debut, deb_pos); (Integer len, len_pos); (String s, _)] ->
       let n = String.length s in
       if debut < 0 then
-        raise (InvalidArgument (
+        raise (InterpretationError(InvalidArgument (
           "std::string::sub", Some (Integer debut),
           "l’indice de début est invalide",
-          deb_pos
-        ));
+          deb_pos, None
+        )));
       if len < 0 then
-        raise (InvalidArgument (
+        raise (InterpretationError(InvalidArgument (
           "std::string::sub", Some (Integer len),
           "la longueur est invalide",
-          len_pos
-        ));
+          len_pos, None
+        )));
       if debut+len >= n then
-        raise (InvalidArgument (
+        raise (InterpretationError(InvalidArgument (
           "std::string::sub", Some (Integer len),
           ("l’indice de fin (qui vaut " ^
            (string_of_int (debut+len)) ^
            ") est invalide. Pour rappel, il faut fourir l’indice de début et " ^
            "la longueur."),
-          len_pos
-        ));
+          len_pos, None
+        )));
       String (String.sub s debut len), pos
   | [(String _, _); (Integer _, _); (v, bad_pos)]
   | [(String _, _); (v, bad_pos); _]
   | [(Integer _, _); (Integer _, _); (v, bad_pos)]
   | [(Integer _, _); (v, bad_pos); _]
   | [(v, bad_pos); _; _] ->
-    raise (InvalidArgument (
+    raise (InterpretationError(InvalidArgument (
       "std::string::sub", Some v,
       "arguments attendus : chaîne, début, longueur ou début, longueur, chaîne",
-      bad_pos
-    ))
+      bad_pos, None
+    )))
   | _ ->
-    raise (InvalidArgument (
+    raise (InterpretationError(InvalidArgument (
       "std::string::sub", None,
       "trois arguments attendus",
-      pos
-    ))
+      pos, None
+    )))
 
 
 let create_module_string () : value =

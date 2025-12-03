@@ -4,29 +4,29 @@ let not_ (l: value list) (pos: int) : value =
   match l with
   | [(Boolean b, _)] -> Boolean (not b), pos
   | [(v, v_pos)] ->
-      raise(InvalidArgument(
-        "std::bool::not", Some v, "l’argument doit être booléen", v_pos
-      ))
+      raise(InterpretationError(InvalidArgument(
+        "std::bool::not", Some v, "l’argument doit être booléen", v_pos, None
+      )))
   | _ ->
-      raise(InvalidArgument(
-        "std::bool::not", None, "merci de donner un argument", pos
-      ))
+      raise(InterpretationError(InvalidArgument(
+        "std::bool::not", None, "merci de donner un argument", pos, None
+      )))
 
 let and_ (l: value list) (pos: int) : value =
   match l with
   | [(Boolean b1, _); (Boolean b2, _)] -> Boolean (b1 && b2), pos
   (* TODO: error msg *)
-  | _ -> raise(InvalidArgument(
-      "std::bool::and", None, "please provide 2 booleans", pos
-    ))
+  | _ -> raise(InterpretationError(InvalidArgument(
+      "std::bool::and", None, "please provide 2 booleans", pos, None
+    )))
 
 let or_ (l: value list) (pos: int) : value =
   match l with
   | [(Boolean b1, _); (Boolean b2, _)] -> Boolean (b1 || b2), pos
   (* TODO: error msg *)
-  | _ -> raise(InvalidArgument(
-      "std::bool::or", None, "please provide 2 booleans", pos
-    ))
+  | _ -> raise(InterpretationError(InvalidArgument(
+      "std::bool::or", None, "please provide 2 booleans", pos, None
+    )))
 
 let create_module_bool () : value =
   let bool_ = Hashtbl.create 8 in
