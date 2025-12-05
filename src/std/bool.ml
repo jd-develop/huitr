@@ -15,17 +15,27 @@ let not_ (l: value list) (pos: int) : value =
 let and_ (l: value list) (pos: int) : value =
   match l with
   | [(Boolean b1, _); (Boolean b2, _)] -> Boolean (b1 && b2), pos
-  (* TODO: error msg *)
+  | [(Boolean _, _); (v, v_pos)]
+  | [(v, v_pos); _] ->
+      raise (InterpretationError(InvalidArgument(
+        "std::bool::and", Some v,
+        "les deux arguments doivent être des booléens", v_pos, None
+      )))
   | _ -> raise(InterpretationError(InvalidArgument(
-      "std::bool::and", None, "please provide 2 booleans", pos, None
+      "std::bool::and", None, "2 arguments requis.", pos, None
     )))
 
 let or_ (l: value list) (pos: int) : value =
   match l with
   | [(Boolean b1, _); (Boolean b2, _)] -> Boolean (b1 || b2), pos
-  (* TODO: error msg *)
+  | [(Boolean _, _); (v, v_pos)]
+  | [(v, v_pos); _] ->
+      raise (InterpretationError(InvalidArgument(
+        "std::bool::or", Some v,
+        "les deux arguments doivent être des booléens", v_pos, None
+      )))
   | _ -> raise(InterpretationError(InvalidArgument(
-      "std::bool::or", None, "please provide 2 booleans", pos, None
+      "std::bool::or", None, "2 arguments requis.", pos, None
     )))
 
 let create_module_bool () : value =

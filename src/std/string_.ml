@@ -13,38 +13,56 @@ let nth (l: value list) (pos: int) : value =
           "std::string::nth", Some (Integer i), "indice invalide", i_pos, None
         )))
       end
-  | _ -> raise (InterpretationError(InvalidArgument(
-      "std::string::nth", Some (List l),
-      "merci de donner une chaîne de caractères en argument",
-      pos, None
-    )))
+  | [(String _, _); (v, v_pos)]
+  | [(v, v_pos); (String _, _)] ->
+      raise (InterpretationError(InvalidArgument(
+        "std::string::nth", Some v, "entier attendu ici.", v_pos, None
+      )))
+  | [(Integer _, _); (v, v_pos)]
+  | [(v, v_pos); (Integer _, _)] ->
+      raise (InterpretationError(InvalidArgument(
+        "std::string::nth", Some v, "chaîne de caractère attendue ici.", v_pos,
+        None
+      )))
+  | _ ->
+      raise (InterpretationError(InvalidArgument(
+        "std::string::nth", None,
+        "deux arguments requis : une chaîne et un entier", pos, None
+      )))
 
 
 let len (l: value list) (pos: int) : value =
-  (* TODO: error msg *)
   match l with
   | [(String s, _)] -> Integer (String.length s), pos
-  | _ -> raise (InterpretationError(InvalidArgument(
-      "std::string::len", Some (List l),
-      "merci de donner une chaîne de caractères en argument",
-      pos, None
-    )))
+  | [v, v_pos] ->
+      raise (InterpretationError(InvalidArgument(
+        "std::string::len", Some v, "chaîne attendue", v_pos, None
+      )))
+  | _ ->
+      raise (InterpretationError(InvalidArgument(
+        "std::string::len", None,
+        "merci de donner une chaîne de caractères en argument",
+        pos, None
+      )))
 
 
 let is_empty (l: value list) (pos: int) : value =
-  (* TODO: error msg *)
   match l with
   | [(String "", _)] -> Boolean true, pos
   | [(String _, _)] -> Boolean false, pos
-  | _ -> raise (InterpretationError(InvalidArgument(
-      "std::string::is_empty", Some (List l),
-      "merci de donner une chaîne de caractères en argument",
-      pos, None
-    )))
+  | [v, v_pos] ->
+      raise (InterpretationError(InvalidArgument(
+        "std::string::is_empty", Some v, "chaîne attendue", v_pos, None
+      )))
+  | _ ->
+      raise (InterpretationError(InvalidArgument(
+        "std::string::is_empty", Some (List l),
+        "merci de donner une chaîne de caractères en argument",
+        pos, None
+      )))
 
 
 let concat_strings (l: value list) (pos: int) : value =
-  (* TODO: error msg *)
   let rec concat_strings_accu (l': value list) (accu: string) : value =
     match l' with
     | [] -> String accu, pos
@@ -55,7 +73,9 @@ let concat_strings (l: value list) (pos: int) : value =
         None
       )))
   in
-  concat_strings_accu l ""
+  match l with
+  | [(List l', _)]
+  | l' -> concat_strings_accu l' ""
 
 
 let split_on_char (l: value list) (pos: int) : value =
