@@ -54,6 +54,16 @@ l’entier `1`, la chaîne `"chocolatine"` et le flottant `3.14`. Pour les liste
 vides ou ne contenant qu’un seul élément, voir plus bas (`std::list`).
 À noter&nbsp;: **on peut insérer un retour-ligne après une virgule**.
 
+#### Exemple récapitulatif
+```huitr
+. ceci est un commentaire
+1 > n  . maintenant, n vaut 1
+"Hello, world!" > chaine
+1, "hello", 5, 12 > liste
+.. ceci est un commentaire qui tient sur plusieurs lignes
+   super ! ..
+```
+
 ### Déclarations de fonctions
 Pour déclarer une fonction, il suffit de mettre du code entre crochets. La
 valeur renvoyée est celle renvoyée par la dernière ligne. S’il n’y a rien
@@ -94,6 +104,15 @@ Lors de l’appel d’une fonction, une liste `args` est définie dans le *scope
 la fonction&nbsp;: elle contient la liste des arguments. Si aucun argument n’est
 donné, la liste `args` est vide.
 On pourra utiliser les fonctions de `std::list` sur `args` (cf. plus loin).
+
+#### Exemple
+```huitr
+[
+    0, args > std::list::nth > n
+    n, 1 > std::math::minus > f
+] > f
+```
+On définit une fonction `f` qui calcule *f(n-1)*.
 
 ## Bibliothèque standard
 
@@ -223,5 +242,8 @@ Ce module contient la fonction suivante&nbsp;:
   par le `> (...)`.
 
 ## Exemple
-
-<!-- TODO -->
+Des exemples d’utilisations des fonctions peuvent être consultés dans l’exemple
+*fizzbuzz*, qui est accessible en revenant dans l’onglet
+«&nbsp;Paramètres&nbsp;». Ce programme affiche tous les nombres de 1 à 100, et
+remplace les multiples de 3 par «&nbsp;fizz&nbsp;», les multiples de 5 par
+«&nbsp;buzz&nbsp;» et les multiples de 15 par «&nbsp;fizzbuzz&nbsp;».
