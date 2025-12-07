@@ -1,6 +1,6 @@
 (*
  * Huitr - a purely functional programming language.
- * Copyright (C) 2024-2025  3fxcf9, jd-develop, Hugo Vangilluwen
+ * Copyright (C) 2024-2025  3fxcf9, jd-develop, Hugo Vangilluwen, Erwan FB
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
@@ -29,6 +29,14 @@ let debug =
     ~doc:"print tokens structure"
   )
 
+let no_backtrace =
+  Arg.(
+    value &
+    flag &
+    info ["no-backtrace"]
+    ~doc:"prevents backtrace from being shown on error"
+  )
+
 let command =
   let version = "0.1.0" in
   let doc = "Huitr file interpreter" in
@@ -40,9 +48,17 @@ let command =
     `P "“Huitr” stands for “Huitr is tough to read”."
   ] in
 
+  let create_options (debug : bool) (backtrace : bool) :
+      Huitr_interpreter.Huitr.interpreter_options =
+    {debug; backtrace}
+  in
+
   Cmd.v
     (Cmd.info "huitr" ~version ~doc ~man)
-    Term.(const Execute.execute_file $ filename $ debug)
-
+    Term.(
+      const Execute.execute_file $ filename $ (
+        const create_options $ debug $ (const not $ no_backtrace)
+      )
+    )
 let main () = Cmd.eval command
 let () = if !Sys.interactive then () else exit (main ())

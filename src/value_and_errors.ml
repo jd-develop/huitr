@@ -17,6 +17,29 @@ and scope = {
   variables: (string, value) Hashtbl.t
 }
 
+type interpreter_state = {
+  recursion_depth : int;
+  call_stack : (int * int) list
+}
+
+let create_state () : interpreter_state =
+  {recursion_depth = 0; call_stack = []}
+
+let stack_call (idx' : int) (current_state : interpreter_state) :
+    interpreter_state =
+  let next_call_stack =
+    match current_state.call_stack with
+    | (x, n)::q ->
+        if x = idx' then
+          (x, n+1)::q
+        else
+          (idx', 1)::current_state.call_stack
+    | [] -> [(idx', 1)]
+  in
+  {
+    recursion_depth = current_state.recursion_depth + 1;
+    call_stack = next_call_stack
+  }
 
 let rec string_of_value (v: value) : string =
   match fst v with
@@ -55,24 +78,50 @@ let scope_copy (s: scope) : scope =
   {parent = s.parent; variables = Hashtbl.copy s.variables}
 
 
-exception Undefined of string * int
-exception IsNotModule of string * value * int
-exception NotCallable of value * int
-exception RecursionDepthExceeded of int
-exception SysError of string * int
-exception DivisionByZero of int
+type interpretation_error =
+| Undefined of string * int * interpreter_state option
+| IsNotModule of string * value * int * interpreter_state option
+| NotCallable of value * int * interpreter_state option
+| RecursionDepthExceeded of int * interpreter_state option
+| SysError of string * int * interpreter_state option
+| DivisionByZero of int * interpreter_state option
+  (*
+   * Nom de la fonction, valeur renvoyée, message d’erreur, indice dans le texte
+   *)
+| InvalidArgument of (
+  string * value_without_pos option * string * int * interpreter_state option
+)
 
-(*
- * Nom de la fonction, valeur renvoyée, message d’erreur, indice dans le texte
- *)
-exception InvalidArgument of (string * value_without_pos option * string * int)
+exception InterpretationError of interpretation_error
+
+(* affiche l'entièreté de l'arbre d'appel (sauf le dernier pour éviter la
+ * redondance) *)
+let print_call_tree (code : string) (error_state: interpreter_state) : unit =
+  let rec print_call_tree_aux (tree : (int*int) list) : unit =
+    match tree with
+    | (index, times_called)::q ->
+      let line, idx_in_line, line_number = get_line_from_idx code index in
+      Printf.eprintf "Dans \"%s\", ligne %d\n" line line_number;
+      if times_called > 1 then
+        Printf.eprintf "    ... %d fois de plus\n" (times_called-1);
+      print_call_tree_aux q
+    | _ -> ()
+  in
+  print_call_tree_aux (List.rev error_state.call_stack)
 
 let print_error
     (error_name: string)
     (error_message: string)
     (index: int)
-    (code: string) : unit =
+    (code: string)
+    (return_state : interpreter_state option) : unit =
   let line, idx_in_line, line_number = get_line_from_idx code index in
+  let error_state = 
+    match return_state with
+    | None -> create_state ()
+    | Some s -> s
+  in
+  print_call_tree code error_state;
   Printf.eprintf "Erreur à la ligne %d :\n" line_number;
   Printf.eprintf "%s%s\n" (String.make 4 ' ') line;
   Printf.eprintf "%s%s\n" (String.make (4+idx_in_line) ' ') "^";

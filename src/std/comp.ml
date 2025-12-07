@@ -20,8 +20,9 @@ let rec eq_ocaml_bool (l: value list) (pos: int) : bool =
       | Unit, Unit -> true
       | _ -> false
       end
-  | _ -> raise (InvalidArgument("std::comp::eq", None,
-                                "merci de donner deux arguments", pos))
+  | _ -> raise (InterpretationError(InvalidArgument(
+      "std::comp::eq", None, "merci de donner deux arguments", pos, None
+    )))
 
 let eq (l: value list) (pos: int) : value =
   Boolean (eq_ocaml_bool l pos), pos
@@ -43,18 +44,18 @@ let comp_nombres
   | [Float i, _; Integer j, _] -> Boolean (comp_float i (float_of_int j)), pos
   | [Float _, _; v, v_pos]
   | [Integer _, _; v, v_pos]
-  | [v, v_pos; _] -> raise (InvalidArgument(
+  | [v, v_pos; _] -> raise (InterpretationError(InvalidArgument(
       "std::comp::"^func_name,
       Some v,
       "merci de donner deux nombres en argument",
-      v_pos
-    ))
-  | _ -> raise (InvalidArgument(
+      v_pos, None
+    )))
+  | _ -> raise (InterpretationError(InvalidArgument(
     "std::comp::"^func_name,
     None,
     "merci de donner deux nombres en argument",
-    pos
-  ))
+    pos, None
+  )))
 
 
 let create_module_comp () : value =

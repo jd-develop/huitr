@@ -5,84 +5,117 @@ let true_nth_opt (l: 'a list) (i: int) : 'a option =
   else List.nth_opt l i
 
 let nth (l: value list) (pos: int) : value =
-  (* TODO: error msg *)
   match l with
   | [(List l', _); (Integer i, i_pos)]
   | [(Integer i, i_pos); (List l', _)] ->
       begin
       match true_nth_opt l' i with
-      | None -> raise (InvalidArgument(
-          "std::list::nth", Some (Integer i), "invalid index", i_pos
-        ))
+      | None -> raise (InterpretationError(InvalidArgument(
+          "std::list::nth", Some (Integer i), "indice invalide", i_pos, None
+        )))
       | Some x -> x
       end
-  | _ -> raise (InvalidArgument(
-      "std::list::nth", None, "the given argument is not a list",
-      pos
-    ))
+  | [(List _, _); (v, v_pos)]
+  | [(v, v_pos); (List _, _)] ->
+      raise (InterpretationError(InvalidArgument(
+        "std::list::nth", Some v, "entier attendu ici.", v_pos, None
+      )))
+  | [(Integer _, _); (v, v_pos)]
+  | [(v, v_pos); (Integer _, _)] ->
+      raise (InterpretationError(InvalidArgument(
+        "std::list::nth", Some v, "liste attendue ici.", v_pos, None
+      )))
+  | _ ->
+      raise (InterpretationError(InvalidArgument(
+        "std::list::nth", None,
+        "deux arguments requis : une liste et un entier", pos, None
+      )))
 
 
 let len (l: value list) (pos: int) : value =
-  (* TODO: error msg *)
   match l with
   | [List l', _] -> Integer (List.length l'), pos
-  | _ -> raise (InvalidArgument(
-      "std::list::len", None, "the given argument is not a list",
-      pos
-    ))
+  | [v, v_pos] ->
+      raise (InterpretationError(InvalidArgument(
+        "std::list::len", Some v, "liste attendue",
+        v_pos, None
+      )))
+  | _ -> raise (InterpretationError(InvalidArgument(
+      "std::list::len", None, "un seul argument attendu (liste)",
+      pos, None
+    )))
 
 
 let is_empty (l: value list) (pos: int) : value =
-  (* TODO: error msg *)
   match l with
   | [List l', _] -> begin
     match l' with
     | [] -> Boolean true, pos
     | _ -> Boolean false, pos
     end
-  | _ -> raise (InvalidArgument(
-      "std::list::is_empty", None, "the given argument is not a list",
-      pos
-    ))
+  | [v, v_pos] ->
+      raise (InterpretationError(InvalidArgument(
+        "std::list::is_empty", Some v, "liste attendue",
+        v_pos, None
+      )))
+  | _ -> raise (InterpretationError(InvalidArgument(
+      "std::list::is_empty", None, "un seul argument attendu (liste)",
+      pos, None
+    )))
+
 
 (* construire *)
 let cons (l: value list) (pos: int) : value =
-  (* TODO: error msg *)
   match l with
   | [v; (List l', list_pos)] -> List (v::l'), pos
-  | _ -> raise (InvalidArgument(
-      "std::list::cons", None, "second arg should be list", pos
-    ))
+  | [_; (v, v_pos)] ->
+      raise (InterpretationError(InvalidArgument(
+        "std::list::cons", Some v, "liste attendue ici", v_pos, None
+      )))
+  | _ ->
+      raise (InterpretationError(InvalidArgument(
+        "std::list::cons", None, "deux arguments attendus", pos, None
+      )))
 
 
 let head (l: value list) (pos: int) : value =
-  (* TODO: error msg *)
   match l with
   | [List l', _] -> begin
     match l' with
-    | [] -> raise (InvalidArgument(
-        "std::list::head", Some (List []), "empty list", pos
-      ))
+    | [] -> raise (InterpretationError(InvalidArgument(
+        "std::list::head", Some (List []), "empty list", pos, None
+      )))
     | x::q -> x
     end
-  | _ -> raise (InvalidArgument(
-      "std::list::head", None, "the given argument is not a list", pos
-    ))
+  | [v, v_pos] ->
+      raise (InterpretationError(InvalidArgument(
+        "std::list::head", Some v, "liste attendue",
+        v_pos, None
+      )))
+  | _ -> raise (InterpretationError(InvalidArgument(
+      "std::list::head", None, "un seul argument attendu (liste)",
+      pos, None
+    )))
 
 
 let tail (l: value list) (pos: int) : value =
-  (* TODO: error msg *)
   match l with
   | [List l', _] -> begin
     match l' with
     | x::q -> List q, pos
-    | [] -> raise (InvalidArgument(
-        "std::list::tail", Some (List []), "empty list", pos
-      ))
+    | [] -> raise (InterpretationError(InvalidArgument(
+        "std::list::tail", Some (List []), "empty list", pos, None
+      )))
     end
-  | _ -> raise (InvalidArgument(
-      "std::list::tail", None, "the given argument is not a list", pos
-    ))
+  | [v, v_pos] ->
+      raise (InterpretationError(InvalidArgument(
+        "std::list::tail", Some v, "liste attendue",
+        v_pos, None
+      )))
+  | _ -> raise (InterpretationError(InvalidArgument(
+      "std::list::tail", None, "un seul argument attendu (liste)",
+      pos, None
+    )))
 
 let create_module_list () : value =
   let list = Hashtbl.create 8 in

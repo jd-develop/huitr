@@ -21,28 +21,28 @@ let rec find_module_identifier
   match l with
   | [] -> (* On a déjà regardé tous les modules *)
       begin match scope_lookup variables s with
-      | None -> raise (Undefined (current_module_expression^s, pos))
+      | None -> raise (InterpretationError(Undefined (current_module_expression^s, pos, None)))
       | Some x -> fst x, pos
       end
   | x::q ->
       begin match scope_lookup variables x with
-      | None -> raise (Undefined (current_module_expression^x, pos))
+      | None -> raise (InterpretationError(Undefined (current_module_expression^x, pos, None)))
       | Some (Module (_, v), _) ->
           let new_scope = {parent = None; variables = v} in
           let new_module_expr = current_module_expression^x^"::" in
           find_module_identifier q s new_scope new_module_expr pos
-      | Some v -> raise (IsNotModule (current_module_expression^x, v, pos))
+      | Some v -> raise (InterpretationError(IsNotModule (current_module_expression^x, v, pos, None)))
       end
 
 
-(* Renvoie la valeur de s. Lève une excecption Undefined si s n’est pas définie
+(* Renvoie la valeur de s. Lève une exception Undefined si s n’est pas définie
  *)
 let find_variable (s: string) (variables: scope) (pos: int) : value =
   find_module_identifier [] s variables "" pos
 
 
 let rec interpreter_was_list (input_ast: ast) (variables: scope)
-    (recursion_depth: int) : value * bool =
+    (current_state: interpreter_state) : value * bool =
   match input_ast with
   | Vide(p) | Unit(p) -> (Unit, p), false
   | Integer(i, p) -> (Integer i, p), false
@@ -52,68 +52,85 @@ let rec interpreter_was_list (input_ast: ast) (variables: scope)
   | Identifier(s, p) -> (find_variable s variables p), false
   | ModuleIdentifier (l, s, p) ->
       (find_module_identifier l s variables "" p), false
-  | Statements(l, p) -> (interprete_statements l variables p recursion_depth), false
-  | List(l, p) -> (interprete_list l variables p recursion_depth), true
-  | Chain(l, p) -> interprete_chain l variables p recursion_depth, false
-  | InsideParenthesis(a, p) -> interpreter a variables recursion_depth, false
+  | Statements(l, p) ->
+      (interprete_statements l variables p current_state), false
+  | List(l, p) -> (interprete_list l variables p current_state), true
+  | Chain(l, p) -> interprete_chain l variables p current_state, false
+  | InsideParenthesis(a, p) -> interpreter a variables current_state, false
 
-
-and interpreter (input_ast: ast) (variables: scope) (recursion_depth: int)
-    : value =
-  fst (interpreter_was_list input_ast variables recursion_depth)
+and interpreter (input_ast: ast) (variables: scope)
+    (current_state: interpreter_state) : value =
+  try
+    fst (interpreter_was_list input_ast variables current_state)
+  with
+  | InterpretationError (Undefined (s, n, None)) ->
+      raise (InterpretationError (Undefined (s, n, Some current_state)))
+  | InterpretationError(IsNotModule (s, v, n, None)) ->
+      raise (InterpretationError (IsNotModule (s, v, n, Some current_state)))
+  | InterpretationError(NotCallable (v, n, None)) ->
+      raise (InterpretationError (NotCallable (v, n, Some current_state)))
+  | InterpretationError(RecursionDepthExceeded (n, None)) ->
+      raise (InterpretationError (RecursionDepthExceeded (n, Some current_state)))
+  | InterpretationError(SysError (s, n, None)) ->
+      raise (InterpretationError (SysError (s, n, Some current_state)))
+  | InterpretationError(InvalidArgument (s1, val_opt, s2, n, None)) ->
+      raise (InterpretationError(
+        InvalidArgument (s1, val_opt, s2, n, Some current_state)
+      ))
 
 and interprete_statements (l: ast list) (variables: scope)
-    (pos: int) (recursion_depth: int) : value =
+    (pos: int) (current_state: interpreter_state) : value =
   match l with
   | [] -> Unit, pos
-  | x::[] -> interpreter x variables recursion_depth
+  | x::[] -> interpreter x variables current_state
   | x::q ->
-      let _ = interpreter x variables recursion_depth in
-      interprete_statements q variables pos recursion_depth
+      let _ = interpreter x variables current_state in
+      interprete_statements q variables pos current_state
 
 and interprete_list (l: ast list) (variables: scope) (pos: int)
-    (recursion_depth: int): value =
-  List (List.map (fun t -> interpreter t variables recursion_depth) l), pos
+    (current_state: interpreter_state): value =
+  List (List.map (fun t -> interpreter t variables current_state) l), pos
 
 and interprete_chain (l: ast list) (variables: scope) (pos: int)
-    (recursion_depth: int) : value =
+    (current_state: interpreter_state) : value =
   match l with
   | [] -> Unit, pos
   | x::[] ->
       apply_function
-        (interpreter x variables recursion_depth) (List [], pos) variables true
-        (recursion_depth+1)
+        (interpreter x variables current_state) (List [], pos) variables true
+        current_state
   | Vide(v_pos)::(Identifier(s, id_pos))::[] -> begin
       match scope_lookup variables s with
-      | None -> raise (Undefined(s, id_pos))
+      | None -> raise (InterpretationError(Undefined(s, id_pos, None)))
       | Some f -> apply_function (fst f, id_pos) (List [], v_pos) variables
-                                 true (recursion_depth+1)
+                                 true current_state
     end
   | x::(Identifier(s, id_pos))::[] -> begin
-      let v, was_list = interpreter_was_list x variables recursion_depth in
+      let v, was_list = interpreter_was_list x variables current_state in
       match scope_lookup variables s with
       | None -> Hashtbl.add (variables.variables) s v; v
       | Some f -> apply_function (fst f, id_pos) v variables was_list
-                                 (recursion_depth+1)
+                                 current_state
     end
   | Vide(v_pos)::y::[] ->
       apply_function
-        (fst (interpreter y variables recursion_depth), pos_start y)
-        (List [], v_pos) variables true (recursion_depth+1)
+        (fst (interpreter y variables current_state), pos_start y)
+        (List [], v_pos) variables true current_state
   | x::y::[] ->
-      let args, was_list = interpreter_was_list x variables recursion_depth in
+      let args, was_list = interpreter_was_list x variables current_state in
       apply_function
-        (fst (interpreter y variables recursion_depth), pos_start y) args
-        variables was_list (recursion_depth+1)
+        (fst (interpreter y variables current_state), pos_start y) args
+        variables was_list current_state
   | x::y::q -> interprete_chain ((Chain([x; y], pos))::q) variables pos
-               recursion_depth
+               current_state
 
 (* Cette fonction s’occupe de créer un nouveau scope. recursion_depth est la
  * profondeur de *cet appel*. *)
 and apply_function (fv: value) (x: value) (variables: scope) (was_list: bool)
-    (recursion_depth: int) : value =
-  if recursion_depth = 60000 then
-    raise(RecursionDepthExceeded (snd fv));
+    (current_state: interpreter_state) : value =
+  let next_state = stack_call (snd x) current_state in
+  if next_state.recursion_depth = 60000 then
+    raise(InterpretationError(RecursionDepthExceeded (snd fv, None)));
   match fv with
   | Function (f, outer_scope), f_pos -> begin
       let new_scope = {
@@ -124,24 +141,24 @@ and apply_function (fv: value) (x: value) (variables: scope) (was_list: bool)
       | List l, list_pos ->
           apply_function_aux
             f (if was_list then l else [List l, list_pos])
-            new_scope f_pos list_pos recursion_depth
+            new_scope f_pos list_pos next_state
       | _, args_pos -> apply_function_aux f [x] new_scope f_pos args_pos
-                                          recursion_depth
+                                          next_state
     end
   | BuiltinFunction f, f_pos -> begin
       match x with
       | List l, list_pos -> f (if was_list then l else [List l, list_pos]) f_pos
       | _ -> f [x] f_pos
     end
-  | _, f_pos -> raise (NotCallable(fv, f_pos))
+  | _, f_pos -> raise (InterpretationError(NotCallable(fv, f_pos, None)))
 
 (* Le scope est supposé vide, avec le scope parent en parent. recursion_depth
  * est la profondeur de *cet appel*. *)
 and apply_function_aux
     (f: ast list) (x: value list) (variables: scope) (fun_pos: int)
-    (args_pos: int) (recursion_depth: int) : value =
+    (args_pos: int) (current_state: interpreter_state) : value =
   Hashtbl.add variables.variables "args" (List x, args_pos);
-  interpreter (Statements(f, fun_pos)) variables recursion_depth
+  interpreter (Statements(f, fun_pos)) variables current_state
 
 
 let create_scope () : scope =

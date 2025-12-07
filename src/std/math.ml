@@ -1,7 +1,6 @@
 open Value_and_errors
 
 let add (l: value list) (pos: int) : value =
-  (* TODO: error msg *)
   let rec add_accu (l': value list) (accu: value_without_pos) : value =
     match l', accu with
     | [], _ -> accu, pos
@@ -9,9 +8,10 @@ let add (l: value list) (pos: int) : value =
     | (Integer x, _)::q, (Float y)
     | (Float y, _)::q, (Integer x) -> add_accu q (Float ((float_of_int x) +. y))
     | (Float x, _)::q, (Float y) -> add_accu q (Float (x+.y))
-    | x::_, _ -> raise (InvalidArgument(
-        "std::math::add", Some (fst x), "entier ou flottant attendu", snd x
-      ))
+    | (x, x_pos)::_, _ -> raise (InterpretationError(InvalidArgument(
+        "std::math::add", Some x, "entier ou flottant attendu", x_pos,
+        None
+      )))
   in
   match l with
   | [(List l', _)]
@@ -19,7 +19,6 @@ let add (l: value list) (pos: int) : value =
 
 
 let prod (l: value list) (pos: int) : value =
-  (* TODO: error msg *)
   let rec prod_accu (l': value list) (accu: value_without_pos) : value =
     match l', accu with
     | [], _ -> accu, pos
@@ -27,9 +26,10 @@ let prod (l: value list) (pos: int) : value =
     | (Integer x, _)::q, (Float y)
     | (Float y, _)::q, (Integer x) -> prod_accu q (Float ((float_of_int x) *. y))
     | (Float x, _)::q, (Float y) -> prod_accu q (Float (x*.y))
-    | x::_, _ -> raise (InvalidArgument(
-        "std::math::prod", Some (fst x), "entier ou flottant attendu", snd x
-      ))
+    | (x, x_pos)::_, _ -> raise (InterpretationError(InvalidArgument(
+        "std::math::prod", Some x, "entier ou flottant attendu", x_pos,
+        None
+      )))
   in
   match l with
   | [(List l', _)]
@@ -37,27 +37,40 @@ let prod (l: value list) (pos: int) : value =
 
 
 let minus (l: value list) (pos: int) : value =
-  (* TODO: error msg *)
-  match List.map fst l with
-  | [Integer i; Integer j] -> Integer (i-j), pos
-  | [Integer i; Float j] -> Float ((float_of_int i) -. j), pos
-  | [Float i; Integer j] -> Float (i -. (float_of_int) j), pos
-  | [Float i; Float j] -> Float (i -. j), pos
-  | _ -> raise (InvalidArgument(
-      "std::math::minus", Some (List l), "deux nombres attendus", pos
-    ))
+  match l with
+  | [Integer i, _; Integer j, _] -> Integer (i-j), pos
+  | [Integer i, _; Float j, _] -> Float ((float_of_int i) -. j), pos
+  | [Float i, _; Integer j, _] -> Float (i -. (float_of_int) j), pos
+  | [Float i, _; Float j, _] -> Float (i -. j), pos
+  | [Integer _, _; v, v_pos]
+  | [Float _, _; v, v_pos]
+  | [v, v_pos; _] ->
+      raise (InterpretationError(InvalidArgument(
+        "std::math::minus", Some v, "entier ou flottant attendu", v_pos, None
+      )))
+  | _ ->
+      raise (InterpretationError(InvalidArgument(
+        "std::math::minus", None, "deux arguments attendus", pos, None
+      )))
 
 
 let div (l: value list) (pos: int) : value =
-  (* TODO: error msg *)
-  match List.map fst l with
-  | [Integer i; Integer j] -> Float (float_of_int i /. float_of_int j), pos
-  | [Integer i; Float j] -> Float ((float_of_int i) /. j), pos
-  | [Float i; Integer j] -> Float (i /. (float_of_int) j), pos
-  | [Float i; Float j] -> Float (i /. j), pos
-  | _ -> raise (InvalidArgument(
-      "std::math::div", Some (List l), "deux nombres attendus", pos
-    ))
+  match l with
+  | [Integer i, _; Integer j, _] ->
+      Float (float_of_int i /. float_of_int j), pos
+  | [Integer i, _; Float j, _] -> Float ((float_of_int i) /. j), pos
+  | [Float i, _; Integer j, _] -> Float (i /. (float_of_int) j), pos
+  | [Float i, _; Float j, _] -> Float (i /. j), pos
+  | [Integer _, _; v, v_pos]
+  | [Float _, _; v, v_pos]
+  | [v, v_pos; _] ->
+      raise (InterpretationError(InvalidArgument(
+        "std::math::div", Some v, "entier ou flottant attendu", v_pos, None
+      )))
+  | _ ->
+      raise (InterpretationError(InvalidArgument(
+        "std::math::div", None, "deux arguments attendus", pos, None
+      )))
 
 
 let (//) a b =
@@ -67,15 +80,20 @@ let (//) a b =
 
 
 let floordiv (l: value list) (pos: int) : value =
-  (* TODO: error msg *)
   match l with
   | [Integer i, _; Integer j, j_pos] ->
       if j = 0 then
-        raise (DivisionByZero j_pos);
+        raise (InterpretationError(DivisionByZero (j_pos, None)));
       Integer (i // j), pos
-  | _ -> raise (InvalidArgument(
-      "std::math::floordiv", Some (List l), "deux entiers attendus", pos
-    ))
+  | [Integer _, _; v, v_pos]
+  | [v, v_pos; _] ->
+      raise (InterpretationError(InvalidArgument(
+        "std::math::floordiv", Some v, "entier attendu", v_pos, None
+      )))
+  | _ ->
+      raise (InterpretationError(InvalidArgument(
+        "std::math::floordiv", None, "deux arguments attendus", pos, None
+      )))
 
 
 (* modulo mathématique (toujours positif) *)
@@ -83,12 +101,17 @@ let (%) a b = ((a mod b) + b) mod b
 
 
 let mod_ (l: value list) (pos: int) : value =
-  (* TODO: error msg *)
   match l with
   | (Integer a, _)::(Integer b, _)::[] -> Integer (a % b), pos
-  | _ -> raise (InvalidArgument(
-      "std::math::mod", None, "deux nombres entiers attendus", pos
-    ))
+  | [Integer _, _; v, v_pos]
+  | [v, v_pos; _] ->
+      raise (InterpretationError(InvalidArgument(
+        "std::math::mod", Some v, "entier attendu", v_pos, None
+      )))
+  | _ ->
+      raise (InterpretationError(InvalidArgument(
+        "std::math::mod", None, "deux arguments attendus", pos, None
+      )))
 
 
 let create_module_math () : value =
