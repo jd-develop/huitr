@@ -82,8 +82,6 @@ FUNCTION -> lsquare rsquare
 
 UNIT -> lparen rparen
 UNIT -> lparen ANY_AMOUNT_OF_NEWLINE rparen
-
-unrecognizable := [ -~]
 |}
 
 let token_rules, rules = parse_grammar huitr_grammar
@@ -92,7 +90,7 @@ let automaton = construit_automate_LR1 rules "STATEMENTS" "EOF"
 
 let parse_huitr (code: string): (string, string) syntax_tree =
   let tokens_with_comments =
-    tokenize token_rules "EOF" code
+    tokenize token_rules "EOF" "unrecognizable" code
     |> List.filter (fun t -> not (t.token_type = "whitespace")) in
   let rec filter_tokens l (in_simple_comment: bool) (in_multi_comment: bool) accu =
     let in_comment = in_simple_comment || in_multi_comment in
