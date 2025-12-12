@@ -7,8 +7,8 @@ dehors des littéraux&nbsp;:
 * Définir une fonction&nbsp;;
 * Appeler une fonction.
 
-En outre, il n’y a aucune opération relevant du sucre syntaxique, tel que `+` ou
-encore `&&`, il faudra donc utiliser des fonctions bien choisies de la STD
+En outre, il n’y a aucune opération relevant du sucre syntaxique, telle que `+`
+ou encore `&&`, il faudra donc utiliser des fonctions bien choisies de la STD
 (~~sexually transmitted disease~~ bibliothèque standard).
 
 Huitr signifie HUitr Is Tough to Read.
