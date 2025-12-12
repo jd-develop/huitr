@@ -117,6 +117,34 @@ let tail (l: value list) (pos: int) : value =
       pos, None
     )))
 
+
+let map (l: value list) (pos: int) : value =
+  match l with
+  (*
+  | [Function f, _; List l', _] ->
+      List (List.map (fun x -> f x) l'), pos
+      *)
+  | [BuiltinFunction f, f_pos; List l', _] ->
+      List (List.map (Fun.flip f f_pos) (List.map (Fun.flip List.cons []) l')), pos
+      (*
+  | [Function _, _; v, v_pos]
+  *)
+  | [BuiltinFunction _, _; v, v_pos] ->
+      raise (InterpretationError(InvalidArgument(
+        "std::list::map", Some v, "liste attendue",
+        v_pos, None
+      )))
+  | [v, v_pos; _] ->
+      raise (InterpretationError(InvalidArgument(
+        "std::list::map", Some v, "fonction attendue",
+        v_pos, None
+      )))
+  | _ -> raise (InterpretationError(InvalidArgument(
+      "std::list::map", None, "deux arguments attendus (fonction et liste)",
+      pos, None
+    )))
+
+
 let create_module_list () : value =
   let list = Hashtbl.create 8 in
   Hashtbl.add list "nth" (BuiltinFunction nth, 0);
@@ -125,6 +153,7 @@ let create_module_list () : value =
   Hashtbl.add list "cons" (BuiltinFunction cons, 0);
   Hashtbl.add list "head" (BuiltinFunction head, 0);
   Hashtbl.add list "tail" (BuiltinFunction tail, 0);
+  Hashtbl.add list "map" (BuiltinFunction map, 0);
 
   (* CONSTANTES *)
   Hashtbl.add list "empty" (List [], 0);

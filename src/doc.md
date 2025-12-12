@@ -179,6 +179,10 @@ Ce module contient les fonctions suivantes&nbsp;:
   Plante si la liste est vide.
 * `std::list::tail` prend une liste en entrée et renvoie une liste contenant
   tous ses éléments sauf le premier. Plante si la liste est vide.
+* `std::list::map` prenant une fonction `f` et une liste
+  `(elt1, elt2, ..., eltn)` en argument, et renvoie la liste contenant
+  `(elt1 > f, elt2 > f, ..., eltn > f)`. ATTENTION : pour l’instant, cette
+  fonction ne marche que pour les fonction built-in.
 
 Note&nbsp;: pour faire une liste contenant un seul élément `x`, il suffit de
 faire `x, std::list::empty > std::list::cons`.
@@ -203,6 +207,18 @@ Ce module contient les fonctions suivantes&nbsp;:
 * `std::math::mod` prenant deux entiers `a` et `b` en entrée et renvoyant
   le reste de la division euclidienne de `a` par `b`. La sortie est toujours
   positive.
+* `std::math::sqrt` prenant un nombre positif et renvoyant sa racine carrée
+  (de type float).
+* `std::math::loge` prenant un nombre strictement négatif et renvoyant son
+  logarithme népérien (de type float).
+* `std::math::log10` prenant un nombre strictement négatif et renvoyant son
+  logarithme en base 10 (de type float).
+* `std::math::log2` prenant un nombre strictement négatif et renvoyant son
+  logarithme en base 2 (de type float).
+* `std::math::exp` prenant un nombre et renvoyant son exponentielle base e
+  (de type float).
+* `std::math::sin` prenant un nombre et renvoyant son sinus (de type float).
+* `std::math::cos` prenant un nombre et renvoyant son cosinus (de type float).
 
 ### `std::string`
 Ce module contient les fonctions suivantes&nbsp;:

@@ -114,6 +114,152 @@ let mod_ (l: value list) (pos: int) : value =
       )))
 
 
+let sqrt_ (l: value list) (pos: int) : value =
+  match l with
+  | [Float a, a_pos] ->
+      if a < 0. then
+        raise (InterpretationError(InvalidArgument(
+          "std::math::sqrt", Some (Float a),
+          "valeur positive attendue", a_pos, None
+        )));
+      Float (sqrt a), pos
+  | [Integer a, a_pos] ->
+      if a < 0 then
+        raise (InterpretationError(InvalidArgument(
+          "std::math::sqrt", Some (Integer a),
+          "valeur positive attendue", a_pos, None
+        )));
+      Float (sqrt (float_of_int a)), pos
+  | [v, v_pos] ->
+      raise (InterpretationError(InvalidArgument(
+        "std::math::sqrt", Some v, "entier ou flottant attendu",
+        v_pos, None
+      )))
+  | _ ->
+      raise (InterpretationError(InvalidArgument(
+        "std::math::sqrt", None, "un argument attendu", pos, None
+      )))
+
+let loge (l: value list) (pos: int) : value =
+  match l with
+  | [Float a, a_pos] ->
+      if a <= 0. then
+        raise (InterpretationError(InvalidArgument(
+          "std::math::loge", Some (Float a),
+          "valeur strictement positive attendue", a_pos, None
+        )));
+      Float (log a), pos
+  | [Integer a, a_pos] ->
+      if a <= 0 then
+        raise (InterpretationError(InvalidArgument(
+          "std::math::loge", Some (Integer a),
+          "valeur strictement positive attendue", a_pos, None
+        )));
+      Float (log (float_of_int a)), pos
+  | [v, v_pos] ->
+      raise (InterpretationError(InvalidArgument(
+        "std::math::loge", Some v, "entier ou flottant attendu",
+        v_pos, None
+      )))
+  | _ ->
+      raise (InterpretationError(InvalidArgument(
+        "std::math::loge", None, "un argument attendu", pos, None
+      )))
+
+let log10_ (l: value list) (pos: int) : value =
+  match l with
+  | [Float a, a_pos] ->
+      if a <= 0. then
+        raise (InterpretationError(InvalidArgument(
+          "std::math::log10", Some (Float a),
+          "valeur strictement positive attendue", a_pos, None
+        )));
+      Float (log10 a), pos
+  | [Integer a, a_pos] ->
+      if a <= 0 then
+        raise (InterpretationError(InvalidArgument(
+          "std::math::log10", Some (Integer a),
+          "valeur strictement positive attendue", a_pos, None
+        )));
+      Float (log10 (float_of_int a)), pos
+  | [v, v_pos] ->
+      raise (InterpretationError(InvalidArgument(
+        "std::math::log10", Some v, "entier ou flottant attendu",
+        v_pos, None
+      )))
+  | _ ->
+      raise (InterpretationError(InvalidArgument(
+        "std::math::log10", None, "un argument attendu", pos, None
+      )))
+
+let log2_ (l: value list) (pos: int) : value =
+  match l with
+  | [Float a, a_pos] ->
+      if a <= 0. then
+        raise (InterpretationError(InvalidArgument(
+          "std::math::log2", Some (Float a),
+          "valeur strictement positive attendue", a_pos, None
+        )));
+      Float (Float.log2 a), pos
+  | [Integer a, a_pos] ->
+      if a <= 0 then
+        raise (InterpretationError(InvalidArgument(
+          "std::math::log2", Some (Integer a),
+          "valeur strictement positive attendue", a_pos, None
+        )));
+      Float (Float.log2 (float_of_int a)), pos
+  | [v, v_pos] ->
+      raise (InterpretationError(InvalidArgument(
+        "std::math::log2", Some v, "entier ou flottant attendu",
+        v_pos, None
+      )))
+  | _ ->
+      raise (InterpretationError(InvalidArgument(
+        "std::math::log2", None, "un argument attendu", pos, None
+      )))
+
+let exp_ (l: value list) (pos: int) : value =
+  match l with
+  | [Float a, _] -> Float (exp a), pos
+  | [Integer a, _] -> Float (a |> float_of_int |> exp), pos
+  | [v, v_pos] ->
+      raise (InterpretationError(InvalidArgument(
+        "std::math::exp", Some v, "entier ou flottant attendu",
+        v_pos, None
+      )))
+  | _ ->
+      raise (InterpretationError(InvalidArgument(
+        "std::math::exp", None, "un argument attendu", pos, None
+      )))
+
+let sin_ (l: value list) (pos: int) : value =
+  match l with
+  | [Float a, _] -> Float (sin a), pos
+  | [Integer a, _] -> Float (a |> float_of_int |> sin), pos
+  | [v, v_pos] ->
+      raise (InterpretationError(InvalidArgument(
+        "std::math::sin", Some v, "entier ou flottant attendu",
+        v_pos, None
+      )))
+  | _ ->
+      raise (InterpretationError(InvalidArgument(
+        "std::math::sin", None, "un argument attendu", pos, None
+      )))
+
+let cos_ (l: value list) (pos: int) : value =
+  match l with
+  | [Float a, _] -> Float (cos a), pos
+  | [Integer a, _] -> Float (a |> float_of_int |> cos), pos
+  | [v, v_pos] ->
+      raise (InterpretationError(InvalidArgument(
+        "std::math::cos", Some v, "entier ou flottant attendu",
+        v_pos, None
+      )))
+  | _ ->
+      raise (InterpretationError(InvalidArgument(
+        "std::math::cos", None, "un argument attendu", pos, None
+      )))
+
 let create_module_math () : value =
   let math = Hashtbl.create 8 in
   Hashtbl.add math "add" (BuiltinFunction add, 0);
@@ -122,6 +268,14 @@ let create_module_math () : value =
   Hashtbl.add math "div" (BuiltinFunction div, 0);
   Hashtbl.add math "floordiv" (BuiltinFunction floordiv, 0);
   Hashtbl.add math "mod" (BuiltinFunction mod_, 0);
+  Hashtbl.add math "sqrt" (BuiltinFunction sqrt_, 0);
+  Hashtbl.add math "loge" (BuiltinFunction loge, 0);
+  Hashtbl.add math "log10" (BuiltinFunction log10_, 0);
+  Hashtbl.add math "log2" (BuiltinFunction log2_, 0);
+  Hashtbl.add math "exp" (BuiltinFunction exp_, 0);
+  Hashtbl.add math "sin" (BuiltinFunction sin_, 0);
+  Hashtbl.add math "cos" (BuiltinFunction cos_, 0);
+
   Hashtbl.add math "tau" (Float 6.283185307179586, 0);
   Hashtbl.add math "e" (Float (exp 1.0), 0);
   Module("math", math), 0
