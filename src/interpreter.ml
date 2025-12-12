@@ -97,36 +97,35 @@ and interprete_chain (l: ast list) (variables: scope) (pos: int)
   | [] -> Unit, pos
   | x::[] ->
       apply_function
-        (interpreter x variables current_state) (List [], pos) variables true
+        (interpreter x variables current_state) (List [], pos) true
         current_state
   | Vide(v_pos)::(Identifier(s, id_pos))::[] -> begin
       match scope_lookup variables s with
       | None -> raise (InterpretationError(Undefined(s, id_pos, None)))
-      | Some f -> apply_function (fst f, id_pos) (List [], v_pos) variables
-                                 true current_state
+      | Some f -> apply_function (fst f, id_pos) (List [], v_pos) true
+                                 current_state
     end
   | x::(Identifier(s, id_pos))::[] -> begin
       let v, was_list = interpreter_was_list x variables current_state in
       match scope_lookup variables s with
       | None -> Hashtbl.add (variables.variables) s v; v
-      | Some f -> apply_function (fst f, id_pos) v variables was_list
-                                 current_state
+      | Some f -> apply_function (fst f, id_pos) v was_list current_state
     end
   | Vide(v_pos)::y::[] ->
       apply_function
         (fst (interpreter y variables current_state), pos_start y)
-        (List [], v_pos) variables true current_state
+        (List [], v_pos) true current_state
   | x::y::[] ->
       let args, was_list = interpreter_was_list x variables current_state in
       apply_function
         (fst (interpreter y variables current_state), pos_start y) args
-        variables was_list current_state
+        was_list current_state
   | x::y::q -> interprete_chain ((Chain([x; y], pos))::q) variables pos
                current_state
 
 (* Cette fonction s’occupe de créer un nouveau scope. recursion_depth est la
  * profondeur de *cet appel*. *)
-and apply_function (fv: value) (x: value) (variables: scope) (was_list: bool)
+and apply_function (fv: value) (x: value) (was_list: bool)
     (current_state: interpreter_state) : value =
   let next_state = stack_call (snd x) current_state in
   if next_state.recursion_depth = 60000 then
@@ -149,6 +148,13 @@ and apply_function (fv: value) (x: value) (variables: scope) (was_list: bool)
       match x with
       | List l, list_pos -> f (if was_list then l else [List l, list_pos]) f_pos
       | _ -> f [x] f_pos
+    end
+  | BuiltinFunctionInterpreter f, f_pos -> begin
+      match x with
+      | List l, list_pos ->
+          f (if was_list then l else [List l, list_pos]) f_pos
+          (fun a b -> apply_function a b false current_state)
+      | _ -> f [x] f_pos (fun a b -> apply_function a b false current_state)
     end
   | _, f_pos -> raise (InterpretationError(NotCallable(fv, f_pos, None)))
 

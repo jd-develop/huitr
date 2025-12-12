@@ -1,22 +1,6 @@
 open Ast
 open Huitr_utils
 
-type value_without_pos =
-  | Integer of int
-  | Float of float
-  | String of string
-  | Boolean of bool
-  | List of value list
-  | Function of (ast list * scope)
-  | BuiltinFunction of (value list -> int -> value)  (* start pos *)
-  | Module of string * (string, value) Hashtbl.t
-  | Unit
-and value = value_without_pos * int
-and scope = {
-  parent: scope option;
-  variables: (string, value) Hashtbl.t
-}
-
 type interpreter_state = {
   recursion_depth : int;
   call_stack : (int * int) list
@@ -41,6 +25,25 @@ let stack_call (idx' : int) (current_state : interpreter_state) :
     call_stack = next_call_stack
   }
 
+type value_without_pos =
+  | Integer of int
+  | Float of float
+  | String of string
+  | Boolean of bool
+  | List of value list
+  | Function of (ast list * scope)
+  | BuiltinFunction of (value list -> int -> value)  (* start pos *)
+  | BuiltinFunctionInterpreter of (
+      value list -> int -> (value -> value -> value) -> value
+    )
+  | Module of string * (string, value) Hashtbl.t
+  | Unit
+and value = value_without_pos * int
+and scope = {
+  parent: scope option;
+  variables: (string, value) Hashtbl.t
+}
+
 let rec string_of_value (v: value) : string =
   match fst v with
   | Integer i -> string_of_int i
@@ -50,6 +53,7 @@ let rec string_of_value (v: value) : string =
   | List l -> string_of_list l string_of_value
   | Function _ -> "(function)"
   | BuiltinFunction _ -> "(built-in function)"
+  | BuiltinFunctionInterpreter _ -> "(built-in function)"
   | Module (s, _) -> "(module "^s^")"
   | Unit -> "()"
 

@@ -181,8 +181,7 @@ Ce module contient les fonctions suivantes&nbsp;:
   tous ses éléments sauf le premier. Plante si la liste est vide.
 * `std::list::map` prenant une fonction `f` et une liste
   `(elt1, elt2, ..., eltn)` en argument, et renvoie la liste contenant
-  `(elt1 > f, elt2 > f, ..., eltn > f)`. ATTENTION : pour l’instant, cette
-  fonction ne marche que pour les fonction built-in.
+  `(elt1 > f, elt2 > f, ..., eltn > f)`.
 
 Note&nbsp;: pour faire une liste contenant un seul élément `x`, il suffit de
 faire `x, std::list::empty > std::list::cons`.

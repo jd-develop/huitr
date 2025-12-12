@@ -16,6 +16,7 @@ let rec eq_ocaml_bool (l: value list) (pos: int) : bool =
           else List.for_all2 (fun a b -> eq_ocaml_bool [a; b] (snd a)) l l'
       | Function (f, _), Function (f', _) -> f = f'
       | BuiltinFunction f, BuiltinFunction f' -> f = f'
+      | BuiltinFunctionInterpreter f, BuiltinFunctionInterpreter f' -> f = f'
       | Module (s1, _), Module (s2, _) -> s1 = s2
       | Unit, Unit -> true
       | _ -> false
