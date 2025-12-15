@@ -146,6 +146,16 @@ Ce module contient les fonctions suivantes&nbsp;:
 * `std::comp::ge` : idem avec `>=`.
 * `std::comp::gt` : idem avec `>`.
 
+### `std::conv`
+Ce module contient les fonctions suivantes&nbsp;:
+* `std::string::to_string` prend en argument n’importe quelle valeur et
+  renvoyant une chaîne de caractères la représentant. Par exemple
+  `(1, 2, 3) > std::string::to_string` renvoie `"(1, 2, 3)"`.
+* `std::string::to_int` prend en argument une chaîne de caractère contenant un
+  littéral d’entier et la convertit en entier.
+* `std::string::to_float` prend en argument une chaîne de caractère contenant un
+  littéral de flottant et la convertit en flottant.
+
 ### `std::io`
 Ce module contient les fonctions suivantes&nbsp;:
 * `std::io::print` prenant une valeur en entrée et l’affichant **avec retour
@@ -218,6 +228,10 @@ Ce module contient les fonctions suivantes&nbsp;:
   (de type float).
 * `std::math::sin` prenant un nombre et renvoyant son sinus (de type float).
 * `std::math::cos` prenant un nombre et renvoyant son cosinus (de type float).
+* `std::math::floor` prenant un nombre et renvoyant sa partie entière
+  inférieure.
+* `std::math::ceil` prenant un nombre et renvoyant sa partie entière
+  supérieure.
 
 ### `std::string`
 Ce module contient les fonctions suivantes&nbsp;:

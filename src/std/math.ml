@@ -260,6 +260,35 @@ let cos_ (l: value list) (pos: int) : value =
         "std::math::cos", None, "un argument attendu", pos, None
       )))
 
+
+let floor_ (l: value list) (pos: int) : value =
+  match l with
+  | [Float f, _] -> Integer (int_of_float @@ floor f), pos
+  | [Integer i, _] -> Integer i, pos
+  | [v, v_pos] ->
+      raise (InterpretationError(InvalidArgument(
+        "std::math::floor", Some v, "nombre attendu",
+        v_pos, None
+      )))
+  | _ ->
+      raise (InterpretationError(InvalidArgument(
+        "std::math::floor", None, "un argument attendu", pos, None
+      )))
+
+let ceil_ (l: value list) (pos: int) : value =
+  match l with
+  | [Float f, _] -> Integer (int_of_float @@ ceil f), pos
+  | [Integer i, _] -> Integer i, pos
+  | [v, v_pos] ->
+      raise (InterpretationError(InvalidArgument(
+        "std::math::ceil", Some v, "nombre attendu",
+        v_pos, None
+      )))
+  | _ ->
+      raise (InterpretationError(InvalidArgument(
+        "std::math::ceil", None, "un argument attendu", pos, None
+      )))
+
 let create_module_math () : value =
   let math = Hashtbl.create 8 in
   Hashtbl.add math "add" (BuiltinFunction add, 0);
@@ -275,6 +304,8 @@ let create_module_math () : value =
   Hashtbl.add math "exp" (BuiltinFunction exp_, 0);
   Hashtbl.add math "sin" (BuiltinFunction sin_, 0);
   Hashtbl.add math "cos" (BuiltinFunction cos_, 0);
+  Hashtbl.add math "floor" (BuiltinFunction floor_, 0);
+  Hashtbl.add math "ceil" (BuiltinFunction ceil_, 0);
 
   Hashtbl.add math "tau" (Float 6.283185307179586, 0);
   Hashtbl.add math "e" (Float (exp 1.0), 0);

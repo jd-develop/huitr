@@ -8,6 +8,7 @@ open Test_
 open Io
 open List_
 open String_
+open Conv
 
 (* Renvoie la valeur l1::l2::…::ln::s, ou lève IsNotModule si l’un des li
  * n’est pas un module. Lève Undefined si s n’est pas définie dans ln.
@@ -179,6 +180,7 @@ let create_scope () : scope =
   Hashtbl.add std "io" (create_module_io ());
   Hashtbl.add std "list" (create_module_list ());
   Hashtbl.add std "string" (create_module_string ());
+  Hashtbl.add std "conv" (create_module_conv ());
   Hashtbl.add variables.variables "std" (Module ("std", std), 0);
   variables
 
