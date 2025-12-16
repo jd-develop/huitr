@@ -200,6 +200,7 @@ faire `x, std::list::empty > std::list::cons`.
 Ce module contient les constantes suivantes&nbsp;:
 * `std::math::tau` : `6.283185307179586` (π=τ/2).
 * `std::math::e` : `2.71828182845904509`.
+
 Ce module contient les fonctions suivantes&nbsp;:
 * `std::math::add` prenant un nombre arbitraire de nombres (ou une liste de
   nombres) et renvoyant la somme des nombres. La somme d’une liste vide est 0.
