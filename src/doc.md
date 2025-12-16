@@ -129,7 +129,7 @@ Ce module contient les fonctions suivantes&nbsp;:
 * `std::bool::not` prenant un booléen `b` en entrée, et renvoyant la négation
   de `b`.
 * `std::bool::or` prenant deux booléens `b1` et `b2` en entrée, et renvoyant
-  la disjoction de `b1` et `b2`.
+  la disjonction de `b1` et `b2`.
 
 ### `std::comp`
 Ce module contient les fonctions suivantes&nbsp;:
