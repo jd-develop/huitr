@@ -36,7 +36,7 @@ significatifs**).
   *Les littéraux de chaîne supportent les caractères d’échappement `\n`
   (retour-ligne), `\t` (tabulation), `\b` (retour arrière) et `\r`
   (retour-charriot)*
-* Littéral «&nbsp;unit&nbsp;»&nbsp;: `()`. Correspond au `None` en Python.
+* Littéral «&nbsp;unit&nbsp;»&nbsp;: `()`. (correspond au `None` en Python)
 
 ### Constantes
 En Huitr, il n’y a pas de variables mais uniquement des constantes.
@@ -106,13 +106,13 @@ donné, la liste `args` est vide.
 On pourra utiliser les fonctions de `std::list` sur `args` (cf. plus loin).
 
 #### Exemple
+Le code suivant définit une fonction `f` qui calcule f(n-1).
 ```huitr
 [
     0, args > std::list::nth > n
     n, 1 > std::math::minus > f
 ] > f
 ```
-On définit une fonction `f` qui calcule *f(n-1)*.
 
 ## Bibliothèque standard
 
@@ -141,20 +141,20 @@ Ce module contient les fonctions suivantes&nbsp;:
   indiquant si elles sont différentes. Note&nbsp;: `v1, v2 > std::comp::ne` est
   équivalent à `v1, v2 > std::comp::eq > std::bool::not`.
 * `std::comp::le` prenant deux nombres (entiers ou flottants) `a` et `b` en
-  entrée et renvoyant Vrai si `a <= b` et Faux sinon.
-* `std::comp::lt` : idem avec `<`.
-* `std::comp::ge` : idem avec `>=`.
-* `std::comp::gt` : idem avec `>`.
+  entrée et renvoyant Vrai si `a` ⩽ `b` et Faux sinon.
+* `std::comp::lt` : idem avec <.
+* `std::comp::ge` : idem avec ⩾.
+* `std::comp::gt` : idem avec >.
 
 ### `std::conv`
 Ce module contient les fonctions suivantes&nbsp;:
-* `std::string::to_string` prend en argument n’importe quelle valeur et
-  renvoyant une chaîne de caractères la représentant. Par exemple
+* `std::string::to_string` prenant en argument n’importe quelle valeur et
+  renvoyant une chaîne de caractères la représentant. Par exemple,
   `(1, 2, 3) > std::string::to_string` renvoie `"(1, 2, 3)"`.
-* `std::string::to_int` prend en argument une chaîne de caractère contenant un
-  littéral d’entier et la convertit en entier.
-* `std::string::to_float` prend en argument une chaîne de caractère contenant un
-  littéral de flottant et la convertit en flottant.
+* `std::string::to_int` prenant en argument une chaîne de caractère contenant un
+  littéral d’entier et la convertissant en entier.
+* `std::string::to_float` prenant en argument une chaîne de caractère contenant un
+  littéral de flottant et la convertissant en flottant.
 
 ### `std::io`
 Ce module contient les fonctions suivantes&nbsp;:
@@ -164,8 +164,8 @@ Ce module contient les fonctions suivantes&nbsp;:
   Renvoie également la valeur donnée en entrée.
 * `std::io::input` affichant son entrée sans retour ligne et renvoyant une ligne
   lue dans l’entrée standard.
-* `std::io::read` prend en entrée une chaîne de caractère contenant un nom de
-  fichier, puis renvoie le contenu du fichier en question.
+* `std::io::read` prenant en entrée une chaîne de caractère contenant un nom de
+  fichier, puis renvoyant le contenu du fichier en question.
 
 ### `std::list`
 Ce module contient la constante suivante&nbsp;:
@@ -177,20 +177,21 @@ Ce module contient les fonctions suivantes&nbsp;:
   (*note&nbsp;: cette fonction est utile pour récupérer les arguments dans les
   fonctions&nbsp;: le premier argument pouvant être récupéré avec
   `args, 0 > std::list::nth`.*)
-* `std::list::len` prend une liste `l` en entrée et renvoie sa longueur.
-* `std::list::is_empty` prend une liste `l` en entrée et renvoie Vrai si elle
-  est vide et Faux sinon (raccourci de `l > std::list::len, 0 > std::comp::eq`
-  avec une meilleure complexité).
-* `std::list::cons` (*cons*truire) prend un élément `x` en entrée et une liste
-  `l` et renvoie une liste ayant comme premier élément `x` puis les éléments de
-  la liste `l`. Par exemple, `3, (4, 2, 9.2, "chocolatine") > std::list::cons`
-  vaut `3, 4, 2, 9.2, "chocolatine"`.
-* `std::list::head` prend une liste en entrée et renvoie son premier élément.
-  Plante si la liste est vide.
-* `std::list::tail` prend une liste en entrée et renvoie une liste contenant
+* `std::list::len` prenant une liste `l` en entrée et renvoyant sa longueur.
+* `std::list::is_empty` prenant une liste `l` en entrée et renvoyant Vrai si
+  elle est vide et Faux sinon (raccourci de
+  `l > std::list::len, 0 > std::comp::eq` avec une meilleure complexité).
+* `std::list::cons` (*cons*truire) prenant en entrée un élément `x` et une liste
+  `l` et renvoyant une liste ayant comme premier élément `x` puis les éléments
+  de la liste `l`. Par exemple,
+  `3, (4, 2, 9.2, "chocolatine") > std::list::cons` vaut
+  `3, 4, 2, 9.2, "chocolatine"`.
+* `std::list::head` prenant une liste en entrée et renvoyant son premier
+  élément. Plante si la liste est vide.
+* `std::list::tail` prenant une liste en entrée et renvoyant une liste contenant
   tous ses éléments sauf le premier. Plante si la liste est vide.
 * `std::list::map` prenant une fonction `f` et une liste
-  `(elt1, elt2, ..., eltn)` en argument, et renvoie la liste contenant
+  `(elt1, elt2, ..., eltn)` en argument, et renvoyant la liste contenant
   `(elt1 > f, elt2 > f, ..., eltn > f)`.
 
 Note&nbsp;: pour faire une liste contenant un seul élément `x`, il suffit de
@@ -243,7 +244,7 @@ Ce module contient les fonctions suivantes&nbsp;:
   vide, `false` sinon.
 * `std::string::concat_strings` renvoyant la concaténation de toutes les chaînes
   données en argument.
-* `std::string::split_on_char` prend en arguments une chaîne de carcatères `s`
+* `std::string::split_on_char` prenant en arguments une chaîne de carcatères `s`
   et un caractère `c` (i.e. une chaîne de caractères de longueur 1) et renvoie
   une liste contenant les facteurs de `s` délimités par `c`. Par exemple,
   `"hello world", "o" > std::string::split_on_char` renvoie
@@ -251,8 +252,8 @@ Ce module contient les fonctions suivantes&nbsp;:
   renvoie `"hello world", std::list::empty > std::list::cons`.
   `"", "." > std::string::split_on_char` renvoie
   `"", std::list::empty > std::list::cons`.
-* `std::string::sub` prend en argument une chaîne de caractères `s`, un indice
-  de début `i` et une longueur `l` et renvoie le facteur de `s` commençant à
+* `std::string::sub` prenant en argument une chaîne de caractères `s`, un indice
+  de début `i` et une longueur `l` et renvoyant le facteur de `s` commençant à
   l’indice `i` et ayant une longueur `l`. Par exemple
   `"abcd", 1, 2 > std::string::sub` renvoie `"bc"`.
 
