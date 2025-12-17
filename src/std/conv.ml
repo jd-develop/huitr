@@ -38,6 +38,26 @@ let to_int (l: value list) (pos: int) =
       pos, None
     )))
 
+let to_int_opt (l: value list) (pos: int) =
+  match l with
+  | [String s, s_pos] ->
+      begin match int_of_string_opt s with
+      | None -> Unit, pos
+      | Some i -> Integer(i), pos
+      end
+  | [v, v_pos] ->
+    raise (InterpretationError(InvalidArgument (
+      "std::string::to_int_opt", Some v,
+      "chaîne de caractères attendue",
+      v_pos, None
+    )))
+  | _ ->
+    raise (InterpretationError(InvalidArgument (
+      "std::string::to_int_opt", None,
+      "un argument attendu",
+      pos, None
+    )))
+
 let to_float (l: value list) (pos: int) =
   match l with
   | [String s, s_pos] ->
@@ -63,12 +83,34 @@ let to_float (l: value list) (pos: int) =
       pos, None
     )))
 
+let to_float_opt (l: value list) (pos: int) =
+  match l with
+  | [String s, s_pos] ->
+      begin match float_of_string_opt s with
+      | None -> Unit, pos
+      | Some i -> Float(i), pos
+      end
+  | [v, v_pos] ->
+    raise (InterpretationError(InvalidArgument (
+      "std::string::to_float_opt", Some v,
+      "chaîne de caractères attendue",
+      v_pos, None
+    )))
+  | _ ->
+    raise (InterpretationError(InvalidArgument (
+      "std::string::to_float_opt", None,
+      "un argument attendu",
+      pos, None
+    )))
+
 
 let create_module_conv () : value =
   let conv = Hashtbl.create 8 in
   Hashtbl.add conv "to_string" (BuiltinFunction to_string, 0);
   Hashtbl.add conv "to_int" (BuiltinFunction to_int, 0);
   Hashtbl.add conv "to_float" (BuiltinFunction to_float, 0);
+  Hashtbl.add conv "to_int_opt" (BuiltinFunction to_int_opt, 0);
+  Hashtbl.add conv "to_float_opt" (BuiltinFunction to_float_opt, 0);
 
   Module("conv", conv), 0
 

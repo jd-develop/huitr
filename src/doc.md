@@ -155,6 +155,10 @@ Ce module contient les fonctions suivantes&nbsp;:
   littéral d’entier et la convertissant en entier.
 * `std::string::to_float` prenant en argument une chaîne de caractère contenant un
   littéral de flottant et la convertissant en flottant.
+* `std::string::to_int_opt` faisant la même chose que `to_int` mais renvoyant
+  `()` si la chaîne ne représente pas un littéral d’entier.
+* `std::string::to_float_opt` faisant la même chose que `to_float` mais
+  renvoyant `()` si la chaîne ne représente pas un littéral de flottant.
 
 ### `std::io`
 Ce module contient les fonctions suivantes&nbsp;:
