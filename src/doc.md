@@ -36,6 +36,13 @@ significatifs**).
   *Les littéraux de chaîne supportent les caractères d’échappement `\n`
   (retour-ligne), `\t` (tabulation), `\b` (retour arrière) et `\r`
   (retour-charriot)*
+* Littéral de chaîne multi-lignes. Exemples:
+  ```huitr
+  """Du texte
+  sur plusieurs
+  lignes."""
+  ```
+  *Attention, les guillemets seuls doivent être échappés.*
 * Littéral «&nbsp;unit&nbsp;»&nbsp;: `()`. (correspond au `None` en Python)
 
 ### Constantes
