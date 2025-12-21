@@ -9,6 +9,9 @@ let remove_first_and_last_char (s: string) : string =
   else
     String.sub s 1 (n-2)
 
+let remove_n_chars_symmetric (s: string) (n: int) : string =
+  String.sub s n (String.length s - n * 2)
+
 
 (* Renvoie la chaîne en remplaçant les séquences d’échappement par les
  * caractères qu’elles représentent. *)

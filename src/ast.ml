@@ -105,6 +105,8 @@ and atom (t: (string, string) syntax_tree) : ast =
   match t with
   | Node("ATOM", [Leaf {token_type = "string_literal"; value; start}]) ->
       String (parse_string_literal (remove_first_and_last_char value), start)
+  | Node("ATOM", [Leaf {token_type = "multiline_string_literal"; value; start}]) ->
+      String (parse_string_literal (remove_n_chars_symmetric value 3), start)
   | Node("ATOM", [Leaf {token_type = "integer_literal"; value; start}]) ->
       Integer (int_of_string value, start)
   | Node("ATOM", [Leaf {token_type = "float_literal"; value; start}]) ->

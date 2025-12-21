@@ -12,6 +12,7 @@ integer_literal := -?([0-9]+|(0[xX][0-9A-Fa-f]+)|(0[oO][0-7]+)|(0[bB][0-1]+))
 float_literal := -?[0-9]+(.[0-9]*)?([eE][\+-]?[0-9]+)?
 
 string_literal := "([ !$-\[\]-~]|(\\[\\"ntbr]))*"
+multiline_string_literal := """([ !$-\[\]-~\n]|(\\[\\"ntbr]))*"""
 
 whitespace := ( |\t)+
 
@@ -57,6 +58,7 @@ CHAIN -> ATOM CHAINOPATOM
 CHAIN -> ATOM
 
 ATOM -> string_literal
+ATOM -> multiline_string_literal
 ATOM -> integer_literal
 ATOM -> float_literal
 ATOM -> IDENTIFIER
