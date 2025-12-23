@@ -45,7 +45,7 @@ significatifs**).
   *Attention, les guillemets seuls doivent être échappés.*
 * Littéral «&nbsp;unit&nbsp;»&nbsp;: `()`. (correspond au `None` en Python)
 
-*Note pour les chaînes de caractères : un support basique des lettres
+*Note pour les chaînes de caractères&nbsp;: un support basique des lettres
 accentées utilisées en français est présent mais une limitation technique
 empêche d’inclure tous les caractères UNICODE. Les caractères supportés sont
 les caractères affichables de la table ASCII, auquels sont ajoutés à, â, ç, é,
