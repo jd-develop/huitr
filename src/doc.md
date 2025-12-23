@@ -48,9 +48,10 @@ significatifs**).
 *Note pour les chaînes de caractères : un support basique des lettres
 accentées utilisées en français est présent mais une limitation technique
 empêche d’inclure tous les caractères UNICODE. Les caractères supportés sont
-ceux de la table ASCII, auquels sont ajoutés à, â, ç, é, è, ê, ë, î, ï, ô, ö, ù,
-û, ü, ÿ, æ, œ, À, Â, Ç, É, È, Ê, Ë, Î, Ï, Ô, Ö, Ù, Û, Ü, Ÿ, Æ, Œ, ’ (apostrophe
-courbe), l’espace insécable et l’espace fine insécable.*
+les caractères affichables de la table ASCII, auquels sont ajoutés à, â, ç, é,
+è, ê, ë, î, ï, ô, ö, ù, û, ü, ÿ, æ, œ, À, Â, Ç, É, È, Ê, Ë, Î, Ï, Ô, Ö, Ù, Û,
+Ü, Ÿ, Æ, Œ, ’ (apostrophe courbe), l’espace insécable et l’espace fine
+insécable.*
 
 ### Constantes
 En Huitr, il n’y a pas de variables mais uniquement des constantes.
