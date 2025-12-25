@@ -100,10 +100,12 @@ let parse_huitr (code: string): (string, string) syntax_tree =
     match l with
     | [] ->
         begin match accu with
-        | [] -> [{token_type="newline"; value="\n"; start=0};
-                 {token_type="EOF"; value=""; start=1}]
+        | [] -> [{token_type="newline"; value="\n"; start=0; length=1};
+                 {token_type="EOF"; value=""; start=1; length=0}]
         | t::q when t.token_type <> "EOF" ->
-            List.rev ({token_type="EOF"; value=""; start=t.start+1}::accu)
+            List.rev (
+              {token_type="EOF"; value=""; start=t.start+1; length=0}::accu
+            )
         | _ -> List.rev accu
         end
     | t::q when t.token_type = "simple_comment_start" && not in_comment ->
