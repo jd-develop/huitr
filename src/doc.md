@@ -163,16 +163,16 @@ Ce module contient les fonctions suivantes&nbsp;:
 
 ### `std::conv`
 Ce module contient les fonctions suivantes&nbsp;:
-* `std::string::to_string` prenant en argument n’importe quelle valeur et
+* `std::conv::to_string` prenant en argument n’importe quelle valeur et
   renvoyant une chaîne de caractères la représentant. Par exemple,
   `(1, 2, 3) > std::string::to_string` renvoie `"(1, 2, 3)"`.
-* `std::string::to_int` prenant en argument une chaîne de caractère contenant un
+* `std::conv::to_int` prenant en argument une chaîne de caractère contenant un
   littéral d’entier et la convertissant en entier.
-* `std::string::to_float` prenant en argument une chaîne de caractère contenant un
+* `std::conv::to_float` prenant en argument une chaîne de caractère contenant un
   littéral de flottant et la convertissant en flottant.
-* `std::string::to_int_opt` faisant la même chose que `to_int` mais renvoyant
+* `std::conv::to_int_opt` faisant la même chose que `to_int` mais renvoyant
   `()` si la chaîne ne représente pas un littéral d’entier.
-* `std::string::to_float_opt` faisant la même chose que `to_float` mais
+* `std::conv::to_float_opt` faisant la même chose que `to_float` mais
   renvoyant `()` si la chaîne ne représente pas un littéral de flottant.
 
 ### `std::io`
