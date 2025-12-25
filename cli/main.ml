@@ -26,7 +26,7 @@ let debug =
     value &
     flag &
     info ["d"; "debug"]
-    ~doc:"print tokens structure"
+    ~doc:"internal debug info (positions in errors)"
   )
 
 let no_backtrace =

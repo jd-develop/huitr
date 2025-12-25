@@ -118,9 +118,10 @@ let print_error
     (error_message: string)
     (index: int)
     (code: string)
+    (debug: bool)
     (return_state : interpreter_state option) : unit =
   let line, idx_in_line, line_number = get_line_from_idx code index in
-  let error_state = 
+  let error_state =
     match return_state with
     | None -> create_state ()
     | Some s -> s
@@ -129,6 +130,9 @@ let print_error
   Printf.eprintf "Erreur à la ligne %d :\n" line_number;
   Printf.eprintf "%s%s\n" (String.make 4 ' ') line;
   Printf.eprintf "%s%s\n" (String.make (4+idx_in_line) ' ') "^";
-  (* Note : %! sert à flush *)
-  Printf.eprintf "%s : %s (%d)\n%!" error_name error_message index;
+  if debug then
+    (* Note : %! sert à flush *)
+    Printf.eprintf "%s : %s (%d)\n%!" error_name error_message index
+  else
+    Printf.eprintf "%s : %s\n%!" error_name error_message
 
