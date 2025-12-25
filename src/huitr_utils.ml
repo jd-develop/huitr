@@ -61,10 +61,12 @@ let get_line_from_idx (text: string) (idx: int) : string * int * int =
       : string * int * int =
     match text' with
     | [] -> "", 0, line_nbr
-    | x::q -> if String.length x < idx' then
-                get_line_aux q (idx'-(String.length x + 1)) (line_nbr+1)
-              else
-                x, idx', line_nbr
+    | x::q ->
+        let line_length = Tipe.Utils.unicode_aware_length x in
+        if line_length < idx' then
+            get_line_aux q (idx'-(line_length + 1)) (line_nbr+1)
+        else
+            x, idx', line_nbr
   in
   get_line_aux text_split idx 1
 
