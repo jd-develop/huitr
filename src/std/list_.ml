@@ -124,9 +124,13 @@ let map (l: value list) (pos: int) (apply_func: value -> value -> value) :
   | [Function f, f_pos; List l', _] ->
       List (List.map (apply_func (Function f, f_pos)) l'), pos
   | [BuiltinFunction f, f_pos; List l', _] ->
-      List (List.map (Fun.flip f f_pos) (List.map (Fun.flip List.cons []) l')), pos
+      List (List.map (Fun.flip f f_pos) (List.map (Fun.flip List.cons []) l')),
+      pos
+  | [BuiltinFunctionInterpreter f, f_pos; List l', _] ->
+      List (List.map (fun x -> f [x] f_pos apply_func) l'), pos
   | [Function _, _; v, v_pos]
-  | [BuiltinFunction _, _; v, v_pos] ->
+  | [BuiltinFunction _, _; v, v_pos]
+  | [BuiltinFunctionInterpreter _, _; v, v_pos] ->
       raise (InterpretationError(InvalidArgument(
         "std::list::map", Some v, "liste attendue",
         v_pos, None
@@ -142,6 +146,50 @@ let map (l: value list) (pos: int) (apply_func: value -> value -> value) :
     )))
 
 
+let filter (l: value list) (pos: int) (apply_func: value -> value -> value) :
+    value =
+  match l with
+  | [Function f, f_pos; List l', _] ->
+      List (l' |> List.filter
+        (fun v ->
+          match apply_func (Function f, f_pos) v with
+          | Boolean b, _ -> b
+          | fv -> false
+        )
+      ), pos
+  | [BuiltinFunction f, f_pos; List l', _] ->
+      List (l' |> List.filter
+        (fun v ->
+          match f [v] f_pos with
+          | Boolean b, _ -> b
+          | fv -> false
+        )
+      ), pos
+  | [BuiltinFunctionInterpreter f, f_pos; List l', _] ->
+      List (l' |> List.filter
+        (fun v ->
+          match f [v] f_pos apply_func with
+          | Boolean b, _ -> b
+          | fv -> false
+        )
+      ), pos
+  | [Function _, _; v, v_pos]
+  | [BuiltinFunction _, _; v, v_pos]
+  | [BuiltinFunctionInterpreter _, _; v, v_pos] ->
+      raise (InterpretationError(InvalidArgument(
+        "std::list::filter", Some v, "liste attendue",
+        v_pos, None
+      )))
+  | [v, v_pos; _] ->
+      raise (InterpretationError(InvalidArgument(
+        "std::list::filter", Some v, "fonction attendue",
+        v_pos, None
+      )))
+  | _ -> raise (InterpretationError(InvalidArgument(
+      "std::list::filter", None, "deux arguments attendus (fonction et liste)",
+      pos, None
+    )))
+
 let create_module_list () : value =
   let list = Hashtbl.create 8 in
   Hashtbl.add list "nth" (BuiltinFunction nth, 0);
@@ -151,6 +199,7 @@ let create_module_list () : value =
   Hashtbl.add list "head" (BuiltinFunction head, 0);
   Hashtbl.add list "tail" (BuiltinFunction tail, 0);
   Hashtbl.add list "map" (BuiltinFunctionInterpreter map, 0);
+  Hashtbl.add list "filter" (BuiltinFunctionInterpreter filter, 0);
 
   (* CONSTANTES *)
   Hashtbl.add list "empty" (List [], 0);

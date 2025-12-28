@@ -212,14 +212,19 @@ Ce module contient les fonctions suivantes&nbsp;:
 * `std::list::map` prenant une fonction `f` et une liste
   `(elt1, elt2, ..., eltn)` en argument, et renvoyant la liste contenant
   `(elt1 > f, elt2 > f, ..., eltn > f)`.
+* `std::list::filter` prenant une fonction `f` et une liste
+  `(elt1, elt2, ..., eltn)` en argument, et renvoyant la liste contenant les
+  `elti` pour lesquels `elti > f` a renvoyé `std::bool::true`. *Par exemple,
+  si `x > f` ne renvoie vrai que si `x` est positif,
+  `f, (9, 0.2, -4, -12, 0, 14) > std::list::filter` renvoie `(9, 0.2, 0, 14)`.*
 
 Note&nbsp;: pour faire une liste contenant un seul élément `x`, il suffit de
 faire `x, std::list::empty > std::list::cons`.
 
 ### `std::math`
 Ce module contient les constantes suivantes&nbsp;:
-* `std::math::tau` : `6.283185307179586` (π=τ/2).
-* `std::math::e` : `2.71828182845904509`.
+* `std::math::tau` : `6.283185307179586` (π=τ/2).
+* `std::math::e` : `2.71828182845904509`.
 
 Ce module contient les fonctions suivantes&nbsp;:
 * `std::math::add` prenant un nombre arbitraire de nombres (ou une liste de
