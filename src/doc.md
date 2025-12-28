@@ -52,7 +52,7 @@ empêche d’inclure tous les caractères UNICODE. Les caractères supportés so
 les caractères affichables de la table ASCII, auquels sont ajoutés à, â, ç, é,
 è, ê, ë, î, ï, ô, ö, ù, û, ü, ÿ, æ, œ, À, Â, Ç, É, È, Ê, Ë, Î, Ï, Ô, Ö, Ù, Û,
 Ü, Ÿ, Æ, Œ, ’ (apostrophe courbe), l’espace insécable et l’espace fine
-insécable.*
+insécable. Pour les autres caractères, utilisez `\uXXXX`.*
 
 ### Constantes
 En Huitr, il n’y a pas de variables mais uniquement des constantes.
