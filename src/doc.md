@@ -34,8 +34,9 @@ significatifs**).
 * Littéral de flottant. Exemples&nbsp;: `0.0`, `3.1415`, `-6e12`, `4e-3`.
 * Littéral de chaîne de caractères. Exemples&nbsp; : `""`, `"Hello, world!"`.
   *Les littéraux de chaîne supportent les caractères d’échappement `\n`
-  (retour-ligne), `\t` (tabulation), `\b` (retour arrière) et `\r`
-  (retour-charriot)*
+  (retour-ligne), `\t` (tabulation), `\b` (retour arrière), `\r`
+  (retour-charriot) et `\uXXXX` où `XXXX` est le code (hexadécimal) d’un
+  caractère UNICODE valide (i.e. non compris entre `0xD800` et `0xDFFF`).*
 * Littéral de chaîne multi-lignes. Exemple&nbsp;:
   ```huitr
   """Du texte

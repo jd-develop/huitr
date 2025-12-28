@@ -5,6 +5,7 @@ open Parse_huitr
 open Ast
 open Interpreter
 open Value_and_errors
+open Huitr_utils
 
 type interpreter_options =
 {
@@ -30,9 +31,13 @@ let wrapper (code: string) (variables: scope option)
   | Tokenize_failure {current_pos} ->
       print_error "SyntaxError" "Syntaxe invalide." current_pos code dbg None
   | SyntaxError(message, pos) ->
-    print_error "SyntaxError" message pos code dbg None
+      print_error "SyntaxError" message pos code dbg None
+  | InvalidCodepoint(pos, c) ->
+      print_error "InvalidCodepoint"
+      ("Code UNICODE invalide : U+"^(hex_of_int c)^".")
+      pos code dbg None
   | InterpretationError(DivisionByZero(pos, state)) ->
-      print_error "DivisionByZero" "division par zéro." pos code dbg
+      print_error "DivisionByZero" "Division par zéro." pos code dbg
         (if options.backtrace then state else None)
   | InterpretationError(SysError(s, pos, state)) ->
       print_error "SysError" s pos code dbg
@@ -52,7 +57,7 @@ let wrapper (code: string) (variables: scope option)
       pos code dbg (if options.backtrace then state else None)
   | InterpretationError(RecursionDepthExceeded(pos, state)) ->
       print_error "RecursionDepthExceeded"
-        "trop d’appels récursifs (max 60000)" pos code dbg
+        "Trop d’appels récursifs (max 60000)." pos code dbg
         (if options.backtrace then state else None)
   | InterpretationError(InvalidArgument(func, value, errmsg, pos, state)) ->
       print_error "InvalidArgument"

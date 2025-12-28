@@ -20,6 +20,9 @@ m > std::io::print
 > [()] > std::io::print  . ()
 > std::io::print  . ()
 
+
+"Newline\nTab\t\nLinefeed\ra\nBack\ba">std::io::print
+
 2, 3, 4 > [args, 1 > std::list::nth] > std::io::print  . 3
 
 "test", ["hello" > std::io::print] > [args, 0 > std::list::nth > mavariable ; > (args, 1 > std::list::nth) ; mavariable] > std::io::print  . hello puis test

@@ -104,9 +104,17 @@ and chain (t: (string, string) syntax_tree) : ast =
 and atom (t: (string, string) syntax_tree) : ast =
   match t with
   | Node("ATOM", [Leaf {token_type = "string_literal"; value; start}]) ->
-      String (parse_string_literal (remove_first_and_last_char value), start)
+      begin try
+        String (parse_string_literal (remove_first_and_last_char value), start)
+      with
+      | InvalidCodepoint(i, c) -> raise (InvalidCodepoint(start+1+i, c))
+      end
   | Node("ATOM", [Leaf {token_type = "multiline_string_literal"; value; start}]) ->
-      String (parse_string_literal (remove_n_chars_symmetric value 3), start)
+      begin try
+        String (parse_string_literal (remove_n_chars_symmetric value 3), start)
+      with
+      | InvalidCodepoint(i, c) -> raise (InvalidCodepoint(start+1+i, c))
+      end
   | Node("ATOM", [Leaf {token_type = "integer_literal"; value; start}]) ->
       Integer (int_of_string value, start)
   | Node("ATOM", [Leaf {token_type = "float_literal"; value; start}]) ->
@@ -173,14 +181,7 @@ and function_ (t: (string, string) syntax_tree) : ast =
 and ast_of_syntax_tree (t: (string, string) syntax_tree) : ast =
   match t with
   | Leaf t ->
-      begin match t.token_type with
-      | "ident" -> Identifier (t.value, t.start)
-      | "integer_literal" -> Integer (int_of_string t.value, t.start)
-      | "float_literal" -> Float (float_of_string t.value, t.start)
-      | "string_literal" -> String (parse_string_literal (remove_first_and_last_char t.value), t.start)
-      | "newline" -> Vide t.start
-      | _ -> failwith "Invalid token"
-      end
+      failwith "Please call ast_of_syntax_tree only on nodes"
   | Node("STATEMENTS", _) ->
       let l, p = statements t in
       Statements(l, p)

@@ -13,6 +13,8 @@ let remove_n_chars_symmetric (s: string) (n: int) : string =
   String.sub s n (String.length s - n * 2)
 
 
+exception InvalidCodepoint of int * int  (* index in string, codepoint *)
+
 (* Renvoie la chaîne en remplaçant les séquences d’échappement par les
  * caractères qu’elles représentent. *)
 let parse_string_literal (literal: string) : string =
@@ -26,16 +28,24 @@ let parse_string_literal (literal: string) : string =
     else if literal.[i] <> '\\' then
       parse_string_literal_accu (i+1) (literal.[i]::accu)
     else
-      let new_char = match literal.[i+1] with
-      | '\\' -> '\\'
-      | '"' -> '"'
-      | 'n' -> '\n'
-      | 't' -> '\t'
-      | 'b' -> '\b'
-      | 'r' -> '\r'
-      | _   -> failwith "Pas une séquence d’échappement valide"
+      let new_chars, new_index = match literal.[i+1] with
+      | '\\' -> ['\\'], i+2
+      | '"' -> ['"'], i+2
+      | 'n' -> ['\n'], i+2
+      | 't' -> ['\t'], i+2
+      | 'b' -> ['\b'], i+2
+      | 'r' -> ['\r'], i+2
+      | 'u' ->
+          let codepoint = String.sub literal (i+2) 4 in
+          let codepoint_int = int_of_string ("0x"^codepoint) in
+          if Uchar.is_valid codepoint_int then
+            Tipe.Utils.char_list_of_uchar (Uchar.of_int codepoint_int)
+            |> List.rev, (i+6)
+          else
+            raise (InvalidCodepoint ((i+2), codepoint_int))
+      | _ -> failwith "Pas une séquence d’échappement valide"
       in
-      parse_string_literal_accu (i+2) (new_char::accu)
+      parse_string_literal_accu new_index (new_chars@accu)
   in
   parse_string_literal_accu 0 []
 
@@ -69,4 +79,25 @@ let get_line_from_idx (text: string) (idx: int) : string * int * int =
             x, idx', line_nbr
   in
   get_line_aux text_split idx 1
+
+
+let hex_char_of_int (i: int) : char =
+  if 0 <= i && i <= 9 then char_of_int (0x30+i)
+  else if i = 10 then 'A'
+  else if i = 11 then 'B'
+  else if i = 12 then 'C'
+  else if i = 13 then 'D'
+  else if i = 14 then 'E'
+  else if i = 15 then 'F'
+  else failwith "Not an hexadecimal digit"
+
+
+(* Renvoie la chaîne de caractères représentant i en hexadécimal, sans le 0x *)
+let hex_of_int (i: int) : string =
+  let rec hex_of_int_acc (n: int) (acc: char list) =
+    if n = 0 then Tipe.Utils.implode acc
+    else
+      hex_of_int_acc (n/16) ((n mod 16 |> hex_char_of_int)::acc)
+  in
+  hex_of_int_acc i []
 
