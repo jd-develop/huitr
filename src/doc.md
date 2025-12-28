@@ -135,12 +135,19 @@ donné, la liste `args` est vide.
 On pourra utiliser les fonctions de `std::list` sur `args` (cf. plus loin).
 
 #### Exemple
-Le code suivant définit une fonction `f` qui calcule f(n-1).
+Le code suivant définit une fonction `fact` qui calcule la factorielle de
+l’entier passé en argument.
 ```huitr
 [
     0, args > std::list::nth > n
-    n, 1 > std::math::minus > f
-] > f
+    > (
+        n, 0 > std::comp::eq,  . condition
+        [1],  . si n = 0, on renvoie 1
+        [  . sinon, on renvoie n * fact(n-1)
+            n, 1 > std::math::minus > fact, n > std::math::prod
+        ] > std::test::if
+    )
+] > fact
 ```
 
 Note&nbsp;: **on peut insérer des retour-ligne après un crochet ouvrant et

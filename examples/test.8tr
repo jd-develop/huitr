@@ -57,3 +57,18 @@ std::bool::false, std::bool::false > std::comp::eq > std::io::print
   ("hello", "world"),
   (4, 5, (6, 7))
 ) > std::io::print
+
+[
+    0, args > std::list::nth > entier
+    > (
+        entier, 0 > std::comp::eq,  . condition
+        [1],  . si n = 0, on renvoie 1
+        [  . sinon, on renvoie n * fact(n-1)
+            entier, 1 > std::math::minus > fact, entier > std::math::prod
+        ] > std::test::if
+    )
+] > fact
+
+3>fact>std::io::print
+4>fact>std::io::print
+5>fact>std::io::print
