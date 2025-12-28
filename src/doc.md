@@ -108,9 +108,9 @@ une variable&nbsp;: `arg1, arg2, …, argn > fonction`. Cela appelle la fonction
 `fonction` avec les arguments `arg1, …, argn`. Une fonction peut être appelée
 sur 0 arguments. Pour récupérer les arguments, voir plus loin.
 
-À noter&nbsp;: le parenthésage se fait de la gauche vers la droite. Par exemple,
+À noter&nbsp;: la priorité se fait de la gauche vers la droite. Par exemple,
 `arg1, arg2 > fonction1, arg3, arg4 > fonction2, arg5 > fonction3` sera
-parenthésé comme suit&nbsp;:
+interprété comme suit&nbsp;:
 `((arg1, arg2 > fonction1), arg3, arg4 > fonction2), arg5 > fonction3`.
 
 À noter&nbsp;: l’usage des parenthèses est possible pour modifier la priorité.
