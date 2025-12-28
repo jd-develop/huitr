@@ -51,3 +51,9 @@ std::bool::false, std::bool::false > std::comp::eq > std::io::print
 0, 1 > std::comp::gt > std::io::print
 
 > [] > std::io::print
+
+(
+  (1, 2, 3),
+  ("hello", "world"),
+  (4, 5, (6, 7))
+) > std::io::print

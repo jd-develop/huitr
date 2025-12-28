@@ -69,6 +69,20 @@ l’entier `1`, la chaîne `"chocolatine"` et le flottant `3.14`. Pour les liste
 vides ou ne contenant qu’un seul élément, voir plus bas (`std::list`).
 À noter&nbsp;: **on peut insérer un retour-ligne après une virgule**.
 
+Pour faire des listes dans des expressions plus complexes, il est possible de
+mettre les listes entre parenthèses. En particulier, on peut faire des listes
+de listes&nbsp;:
+```huitr
+(
+  (1, 2, 3),
+  ("hello", "world"),
+  (4, 5, (6, 7))
+)
+```
+
+Note&nbsp;: **on peut insérer un retour-ligne après une parenthèse ouvrante et
+avant une parenthèse fermante**.
+
 #### Exemple récapitulatif
 ```huitr
 . ceci est un commentaire
@@ -128,6 +142,9 @@ Le code suivant définit une fonction `f` qui calcule f(n-1).
     n, 1 > std::math::minus > f
 ] > f
 ```
+
+Note&nbsp;: **on peut insérer des retour-ligne après un crochet ouvrant et
+avant un crochet fermant**.
 
 ## Bibliothèque standard
 
