@@ -14,7 +14,8 @@ let console (options: Huitr.interpreter_options) =
     while true do
       print_string "huitr> ";
       let line = read_line () in
-      Huitr.wrapper line (Some scope) options
+      let _ = Huitr.wrapper line (Some scope) options in
+      ()
     done
   with
   | End_of_file -> print_endline "EOF"
@@ -27,5 +28,5 @@ let execute_file (filename: string) (options: Huitr.interpreter_options) :
   else
     let code_fp = open_in filename in
     let code = really_input_string code_fp (in_channel_length code_fp) in
-    Huitr.wrapper code None options
+    Huitr.wrapper code None options |> exit
 

@@ -15,9 +15,21 @@ type interpreter_options =
 
 (* Exécute le code avec l’environnement `variables` (qui est modifié par effet
  * de bord) sachant les options d’interprétation `options`. Si le code renvoie
- * une erreur, affiche correctement l’erreur. *)
+ * une erreur, affiche correctement l’erreur. Valeur de retour :
+ * * 0 si tout s’est bien passé
+ * * 3 en cas d’erreur de tokenisation (SyntaxError au niveau du lexer)
+ * * 4 en cas d’erreur de syntaxe (SyntaxError au niveau du parser)
+ * * 5 en cas de codepoint unicode invalide lors de la lecture d’un string
+ *   (InvalidCodepoint)
+ * * 6 : DivisionByZero
+ * * 7 : SysError
+ * * 8 : NotCallable
+ * * 9 : Undefined
+ * * 10 : IsNotModule
+ * * 11 : RecursionDepthExceeded
+ * * 12 : InvalidArgument *)
 let wrapper (code: string) (variables: scope option)
-    (options : interpreter_options) : unit =
+    (options : interpreter_options) : int =
   let dbg = options.debug in
   try
     let syntax_tree = parse_huitr code in
@@ -26,40 +38,49 @@ let wrapper (code: string) (variables: scope option)
     | None -> interpreter ast (create_scope ()) (create_state ())
     | Some scope -> interpreter ast scope (create_state ())
     in
-    ()
+    0
   with
-  | EmptyFile -> ()
+  | EmptyFile -> 0
   | Tokenize_failure {current_pos} ->
-      print_error "SyntaxError" "Syntaxe invalide." current_pos code dbg None
+      print_error "SyntaxError" "Syntaxe invalide." current_pos code dbg None;
+      3
   | SyntaxError(message, pos) ->
-      print_error "SyntaxError" message pos code dbg None
+      print_error "SyntaxError" message pos code dbg None;
+      4
   | InvalidCodepoint(pos, c) ->
       print_error "InvalidCodepoint"
-      ("Code UNICODE invalide : U+"^(hex_of_int c)^".")
-      pos code dbg None
+        ("Code UNICODE invalide : U+"^(hex_of_int c)^".")
+        pos code dbg None;
+      5
   | InterpretationError(DivisionByZero(pos, state)) ->
       print_error "DivisionByZero" "Division par zéro." pos code dbg
-        (if options.backtrace then state else None)
+        (if options.backtrace then state else None);
+      6
   | InterpretationError(SysError(s, pos, state)) ->
       print_error "SysError" s pos code dbg
-        (if options.backtrace then state else None)
+        (if options.backtrace then state else None);
+      7
   | InterpretationError(NotCallable(f, pos, state)) ->
       print_error
         "NotCallable"
         ("La valeur "^(string_of_value f)^" n’est pas appelable.")
-        pos code dbg (if options.backtrace then state else None)
+        pos code dbg (if options.backtrace then state else None);
+      8
   | InterpretationError(Undefined(name, pos, state)) ->
       print_error "Undefined" ("Le nom "^name^" n’est pas défini") pos
-      code dbg (if options.backtrace then state else None)
+      code dbg (if options.backtrace then state else None);
+      9
   | InterpretationError(IsNotModule(name, v, pos, state)) ->
       print_error "IsNotModule"
       ("Le nom "^name^" n’est pas un module (il s’agit de la valeur "^
        (string_of_value v)^").")
-      pos code dbg (if options.backtrace then state else None)
+      pos code dbg (if options.backtrace then state else None);
+      10
   | InterpretationError(RecursionDepthExceeded(pos, state)) ->
       print_error "RecursionDepthExceeded"
         "Trop d’appels récursifs (max 60000)." pos code dbg
-        (if options.backtrace then state else None)
+        (if options.backtrace then state else None);
+      11
   | InterpretationError(InvalidArgument(func, value, errmsg, pos, state)) ->
       print_error "InvalidArgument"
         begin match value with
@@ -71,5 +92,6 @@ let wrapper (code: string) (variables: scope option)
           ("Argument invalide dans la fonction " ^ func ^ ", avec le message " ^
            " « " ^ errmsg ^ " ».")
         end
-      pos code dbg (if options.backtrace then state else None)
+        pos code dbg (if options.backtrace then state else None);
+      12
 
