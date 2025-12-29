@@ -28,6 +28,7 @@ let wrapper (code: string) (variables: scope option)
     in
     ()
   with
+  | EmptyFile -> ()
   | Tokenize_failure {current_pos} ->
       print_error "SyntaxError" "Syntaxe invalide." current_pos code dbg None
   | SyntaxError(message, pos) ->
