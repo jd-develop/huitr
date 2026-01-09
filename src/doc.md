@@ -89,7 +89,7 @@ avant une parenthèse fermante**.
 . ceci est un commentaire
 1 > n  . maintenant, n vaut 1
 "Hello, world!" > chaine
-1, "hello", 5, 12 > liste
+1, "hello", n, 12 > liste  . liste valant (1, "hello", 1, 12)
 .. ceci est un commentaire qui tient sur plusieurs lignes
    super ! ..
 ```
