@@ -176,7 +176,8 @@ Ce module contient les fonctions suivantes&nbsp;:
 * `std::comp::eq` prenant deux valeurs en entrée et renvoyant un booléen
   indiquant si elles sont égales (en valeur, et non en mémoire). Les flottants
   et les entiers peuvent être comparés entre eux. Deux fonctions sont égales si
-  elles contiennent les mêmes instructions (caractère pour caractère).
+  elles contiennent les mêmes instructions (caractère pour caractère, aux
+  espaces près).
 * `std::comp::ne` prenant deux valeurs en entrée et renvoyant un booléen
   indiquant si elles sont différentes. Note&nbsp;: `v1, v2 > std::comp::ne` est
   équivalent à `v1, v2 > std::comp::eq > std::bool::not`.
