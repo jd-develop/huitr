@@ -47,7 +47,7 @@ significatifs**).
 * Littéral «&nbsp;unit&nbsp;»&nbsp;: `()`. (correspond au `None` en Python)
 
 *Note pour les chaînes de caractères&nbsp;: un support basique des lettres
-accentées utilisées en français est présent mais une limitation technique
+accentuées utilisées en français est présent mais une limitation technique
 empêche d’inclure tous les caractères UNICODE. Les caractères supportés sont
 les caractères affichables de la table ASCII, auquels sont ajoutés à, â, ç, é,
 è, ê, ë, î, ï, ô, ö, ù, û, ü, ÿ, æ, œ, À, Â, Ç, É, È, Ê, Ë, Î, Ï, Ô, Ö, Ù, Û,
