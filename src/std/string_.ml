@@ -126,7 +126,7 @@ let sub (l: value list) (pos: int) : value =
           "la longueur est invalide",
           len_pos, None
         )));
-      if debut+len >= n then
+      if debut+len > n then
         raise (InterpretationError(InvalidArgument (
           "std::string::sub", Some (Integer len),
           ("l’indice de fin (qui vaut " ^
