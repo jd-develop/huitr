@@ -13,7 +13,7 @@ ou encore `&&`, il faudra donc utiliser des fonctions bien choisies de la STD
 
 Huitr signifie HUitr Is Tough to Read.
 
-Cette documentation présente tout d’abord les éléments de syntaxes basiques,
+Cette documentation présente tout d’abord les éléments de syntaxe basiques,
 puis liste les fonctions disponibles dans la STD.
 
 ## Syntaxe
