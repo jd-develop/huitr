@@ -43,7 +43,6 @@ significatifs**).
   sur plusieurs
   lignes."""
   ```
-  *Attention, les guillemets seuls doivent être échappés.*
 * Littéral «&nbsp;unit&nbsp;»&nbsp;: `()`. (correspond au `None` en Python)
 
 *Note pour les chaînes de caractères&nbsp;: un support basique des lettres
