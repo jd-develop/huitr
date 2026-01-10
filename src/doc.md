@@ -315,11 +315,19 @@ Ce module contient la fonction suivante&nbsp;:
   ***ATTENTION***&nbsp;: `v1` et `v2` sont évalués AVANT l’exécution du
   `if`. Si vous souhaitez les évaluer après (par exemple pour faire un appel
   récursif coûteux), `v1` et `v2` peuvent être des fonctions, et le
-  résultat peut être appelé en-dehors du `if`. Par exemple&nbsp;:
-  `> (condition, [3 > appel_tres_long], [4 > appel_tres_long] > std::test::if)`.
+  résultat peut être appelé en-dehors du `if`.
+  
+  Par exemple&nbsp;:
+  `> (condition, [3 > std::io::print], [4 > std::io::print] > std::test::if)`.
   Dans cet exemple, le `if` n’appelle rien&nbsp;: il renvoie une des deux
   fonctions en fonction de la condition, et la fonction renvoyée est appelée
-  par le `> (...)`.
+  par le `> (...)`. On n'observe alors que `3` _ou_ `4` dans la sortie du
+  programme. En revanche,
+  `condition, (3 > std::io::print), (4 > std::io::print) > std::test::if`
+  afficherait `3` _et_ `4`, et
+  `condition, [3 > std::io::print], [4 > std::io::print] > std::test::if`
+  n'afficherait _rien_ (les fonctions qui appellent `std::io::print` ne sont
+  jamais appelées).
 
 ## Exemple
 Des exemples d’utilisations des fonctions peuvent être consultés dans l’exemple
