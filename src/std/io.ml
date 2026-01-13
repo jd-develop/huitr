@@ -4,7 +4,7 @@ open Huitr_utils
 
 let rec print_no_newline (l: value list) (pos: int) : value =
   match l with
-  | [] -> print_no_newline [List [], pos] pos
+  | [] -> Unit, pos
   | [value] -> begin
       let () = print_string (string_of_value_for_printing value) in
       value
