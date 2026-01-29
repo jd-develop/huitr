@@ -123,11 +123,16 @@ let map (l: value list) (pos: int) (apply_func: value -> value -> value) :
   match l with
   | [Function f, f_pos; List l', _] ->
       List (List.map (apply_func (Function f, f_pos)) l'), pos
-  | [BuiltinFunction f, f_pos; List l', _] ->
-      List (List.map (Fun.flip f f_pos) (List.map (Fun.flip List.cons []) l')),
+  | [BuiltinFunction (f, first_arguments), f_pos; List l', _] ->
+      List (List.map (Fun.flip f f_pos)
+                     (List.map (fun x -> List.rev (x::first_arguments)) l')),
       pos
-  | [BuiltinFunctionInterpreter f, f_pos; List l', _] ->
-      List (List.map (fun x -> f [x] f_pos apply_func) l'), pos
+  | [BuiltinFunctionInterpreter (f, first_arguments), f_pos; List l', _] ->
+      List (
+        List.map
+          (fun x -> f (List.rev (x::first_arguments)) f_pos apply_func)
+          l'
+      ), pos
   | [Function _, _; v, v_pos]
   | [BuiltinFunction _, _; v, v_pos]
   | [BuiltinFunctionInterpreter _, _; v, v_pos] ->
@@ -157,18 +162,18 @@ let filter (l: value list) (pos: int) (apply_func: value -> value -> value) :
           | fv -> false
         )
       ), pos
-  | [BuiltinFunction f, f_pos; List l', _] ->
+  | [BuiltinFunction (f, first_arguments), f_pos; List l', _] ->
       List (l' |> List.filter
         (fun v ->
-          match f [v] f_pos with
+          match f (List.rev (v::first_arguments)) f_pos with
           | Boolean b, _ -> b
           | fv -> false
         )
       ), pos
-  | [BuiltinFunctionInterpreter f, f_pos; List l', _] ->
+  | [BuiltinFunctionInterpreter (f, first_arguments), f_pos; List l', _] ->
       List (l' |> List.filter
         (fun v ->
-          match f [v] f_pos apply_func with
+          match f (List.rev (v::first_arguments)) f_pos apply_func with
           | Boolean b, _ -> b
           | fv -> false
         )
@@ -192,14 +197,14 @@ let filter (l: value list) (pos: int) (apply_func: value -> value -> value) :
 
 let create_module_list () : value =
   let list = Hashtbl.create 8 in
-  Hashtbl.add list "nth" (BuiltinFunction nth, 0);
-  Hashtbl.add list "len" (BuiltinFunction len, 0);
-  Hashtbl.add list "is_empty" (BuiltinFunction is_empty, 0);
-  Hashtbl.add list "cons" (BuiltinFunction cons, 0);
-  Hashtbl.add list "head" (BuiltinFunction head, 0);
-  Hashtbl.add list "tail" (BuiltinFunction tail, 0);
-  Hashtbl.add list "map" (BuiltinFunctionInterpreter map, 0);
-  Hashtbl.add list "filter" (BuiltinFunctionInterpreter filter, 0);
+  Hashtbl.add list "nth" (BuiltinFunction (nth, []), 0);
+  Hashtbl.add list "len" (BuiltinFunction (len, []), 0);
+  Hashtbl.add list "is_empty" (BuiltinFunction (is_empty, []), 0);
+  Hashtbl.add list "cons" (BuiltinFunction (cons, []), 0);
+  Hashtbl.add list "head" (BuiltinFunction (head, []), 0);
+  Hashtbl.add list "tail" (BuiltinFunction (tail, []), 0);
+  Hashtbl.add list "map" (BuiltinFunctionInterpreter (map, []), 0);
+  Hashtbl.add list "filter" (BuiltinFunctionInterpreter (filter, []), 0);
 
   (* CONSTANTES *)
   Hashtbl.add list "empty" (List [], 0);

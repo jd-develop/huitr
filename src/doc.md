@@ -200,6 +200,12 @@ Ce module contient les fonctions suivantes&nbsp;:
 * `std::conv::to_float_opt` faisant la même chose que `to_float` mais
   renvoyant `()` si la chaîne ne représente pas un littéral de flottant.
 
+### `std::fun`
+Ce module contient la fonction suivante&nbsp;:
+* `std::fun::partial_apply` prenant en argument une fonction `f` et une valeur
+  `v` et renvoyant la fonction qui à des arguments `args1, args2, ..., argsn`
+  renvoie `v, args1, args2, ..., argsn > f`.
+
 ### `std::io`
 Ce module contient les fonctions suivantes&nbsp;:
 * `std::io::print` prenant une valeur en entrée et l’affichant **avec retour

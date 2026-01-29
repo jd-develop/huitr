@@ -42,8 +42,8 @@ let create_module_bool () : value =
   let bool_ = Hashtbl.create 8 in
   Hashtbl.add bool_ "true" (Boolean true, 0);
   Hashtbl.add bool_ "false" (Boolean false, 0);
-  Hashtbl.add bool_ "not" (BuiltinFunction not_, 0);
-  Hashtbl.add bool_ "and" (BuiltinFunction and_, 0);
-  Hashtbl.add bool_ "or" (BuiltinFunction or_, 0);
+  Hashtbl.add bool_ "not" (BuiltinFunction (not_, []), 0);
+  Hashtbl.add bool_ "and" (BuiltinFunction (and_, []), 0);
+  Hashtbl.add bool_ "or" (BuiltinFunction (or_, []), 0);
   Module("bool", bool_), 0
 

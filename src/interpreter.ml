@@ -9,6 +9,7 @@ open Io
 open List_
 open String_
 open Conv
+open Fun_
 
 (* Renvoie la valeur l1::l2::…::ln::s, ou lève IsNotModule si l’un des li
  * n’est pas un module. Lève Undefined si s n’est pas définie dans ln.
@@ -49,7 +50,7 @@ let rec interpreter_was_list (input_ast: ast) (variables: scope)
   | Integer(i, p) -> (Integer i, p), false
   | Float(f, p) -> (Float f, p), false
   | String(s, p) -> (String s, p), false
-  | Function(f, p) -> (Function (f, variables), p), false
+  | Function(f, p) -> (Function (f, variables, []), p), false
   | Identifier(s, p) -> (find_variable s variables p), false
   | ModuleIdentifier (l, s, p) ->
       (find_module_identifier l s variables "" p), false
@@ -131,32 +132,29 @@ and apply_function (fv: value) (x: value) (was_list: bool)
   let next_state = stack_call (snd x) current_state in
   if next_state.recursion_depth = 60000 then
     raise(InterpretationError(RecursionDepthExceeded (snd fv, None)));
+  let build_list_of_args (first_arguments: value list) =
+    match x with
+    | List l, list_pos ->
+        if was_list then
+          (List.rev first_arguments)@l
+        else
+          (List.rev ((List l, list_pos)::first_arguments))
+    | _ -> (List.rev (x::first_arguments))
+  in
   match fv with
-  | Function (f, outer_scope), f_pos -> begin
+  | Function (f, outer_scope, first_arguments), f_pos -> begin
       let new_scope = {
         parent = Some outer_scope;
         variables = Hashtbl.create 8
       } in
-      match x with
-      | List l, list_pos ->
-          apply_function_aux
-            f (if was_list then l else [List l, list_pos])
-            new_scope f_pos list_pos next_state
-      | _, args_pos -> apply_function_aux f [x] new_scope f_pos args_pos
-                                          next_state
+      apply_function_aux f (build_list_of_args first_arguments) new_scope f_pos
+        (snd x) next_state
     end
-  | BuiltinFunction f, f_pos -> begin
-      match x with
-      | List l, list_pos -> f (if was_list then l else [List l, list_pos]) f_pos
-      | _ -> f [x] f_pos
-    end
-  | BuiltinFunctionInterpreter f, f_pos -> begin
-      match x with
-      | List l, list_pos ->
-          f (if was_list then l else [List l, list_pos]) f_pos
-          (fun a b -> apply_function a b false current_state)
-      | _ -> f [x] f_pos (fun a b -> apply_function a b false current_state)
-    end
+  | BuiltinFunction (f, first_arguments), f_pos ->
+    f (build_list_of_args first_arguments) f_pos
+  | BuiltinFunctionInterpreter (f, first_arguments), f_pos ->
+      f (build_list_of_args first_arguments) f_pos
+        (fun a b -> apply_function a b false current_state)
   | _, f_pos -> raise (InterpretationError(NotCallable(fv, f_pos, None)))
 
 (* Le scope est supposé vide, avec le scope parent en parent. recursion_depth
@@ -181,6 +179,7 @@ let create_scope () : scope =
   Hashtbl.add std "list" (create_module_list ());
   Hashtbl.add std "string" (create_module_string ());
   Hashtbl.add std "conv" (create_module_conv ());
+  Hashtbl.add std "fun" (create_module_fun ());
   Hashtbl.add variables.variables "std" (Module ("std", std), 0);
   variables
 

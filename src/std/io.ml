@@ -48,9 +48,9 @@ let read (l: value list) (pos: int) : value =
 
 let create_module_io () : value =
   let io = Hashtbl.create 8 in
-  Hashtbl.add io "print" (BuiltinFunction print, 0);
-  Hashtbl.add io "print_no_newline" (BuiltinFunction print_no_newline, 0);
-  Hashtbl.add io "input" (BuiltinFunction input, 0);
-  Hashtbl.add io "read" (BuiltinFunction read, 0);
+  Hashtbl.add io "print" (BuiltinFunction (print, []), 0);
+  Hashtbl.add io "print_no_newline" (BuiltinFunction (print_no_newline, []), 0);
+  Hashtbl.add io "input" (BuiltinFunction (input, []), 0);
+  Hashtbl.add io "read" (BuiltinFunction (read, []), 0);
   Module("io", io), 0
 

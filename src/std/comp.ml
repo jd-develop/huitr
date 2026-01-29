@@ -14,9 +14,25 @@ let rec eq_ocaml_bool (l: value list) (pos: int) : bool =
       | List l, List l' ->
           if List.length l <> List.length l' then false
           else List.for_all2 (fun a b -> eq_ocaml_bool [a; b] (snd a)) l l'
-      | Function (f, _), Function (f', _) -> f = f'
-      | BuiltinFunction f, BuiltinFunction f' -> f = f'
-      | BuiltinFunctionInterpreter f, BuiltinFunctionInterpreter f' -> f = f'
+      | Function (f, _, l), Function (f', _, l') ->
+          f = f' &&
+          List.length l = List.length l' &&
+          List.combine l l'
+          |> List.map (fun (x, y) -> [x; y])
+          |> List.for_all ((Fun.flip eq_ocaml_bool) pos)
+      | BuiltinFunction (f, l), BuiltinFunction (f', l') ->
+          f = f' &&
+          List.length l = List.length l' &&
+          List.combine l l'
+          |> List.map (fun (x, y) -> [x; y])
+          |> List.for_all ((Fun.flip eq_ocaml_bool) pos)
+      | BuiltinFunctionInterpreter (f, l),
+        BuiltinFunctionInterpreter (f', l') ->
+          f = f' &&
+          List.length l = List.length l' &&
+          List.combine l l'
+          |> List.map (fun (x, y) -> [x; y])
+          |> List.for_all ((Fun.flip eq_ocaml_bool) pos)
       | Module (s1, _), Module (s2, _) -> s1 = s2
       | Unit, Unit -> true
       | _ -> false
@@ -61,11 +77,11 @@ let comp_nombres
 
 let create_module_comp () : value =
   let comp = Hashtbl.create 8 in
-  Hashtbl.add comp "eq" (BuiltinFunction eq, 0);
-  Hashtbl.add comp "ne" (BuiltinFunction ne, 0);
-  Hashtbl.add comp "le" (BuiltinFunction (comp_nombres "le" (<=) (<=)), 0);
-  Hashtbl.add comp "lt" (BuiltinFunction (comp_nombres "lt" (<) (<)), 0);
-  Hashtbl.add comp "ge" (BuiltinFunction (comp_nombres "ge" (>=) (>=)), 0);
-  Hashtbl.add comp "gt" (BuiltinFunction (comp_nombres "gt" (>) (>)), 0);
+  Hashtbl.add comp "eq" (BuiltinFunction (eq, []), 0);
+  Hashtbl.add comp "ne" (BuiltinFunction (ne, []), 0);
+  Hashtbl.add comp "le" (BuiltinFunction (comp_nombres "le" (<=) (<=), []), 0);
+  Hashtbl.add comp "lt" (BuiltinFunction (comp_nombres "lt" (<) (<), []), 0);
+  Hashtbl.add comp "ge" (BuiltinFunction (comp_nombres "ge" (>=) (>=), []), 0);
+  Hashtbl.add comp "gt" (BuiltinFunction (comp_nombres "gt" (>) (>), []), 0);
   Module("comp", comp), 0
 

@@ -31,10 +31,11 @@ type value_without_pos =
   | String of string
   | Boolean of bool
   | List of value list
-  | Function of (ast list * scope)
-  | BuiltinFunction of (value list -> int -> value)  (* start pos *)
+  | Function of (ast list * scope * (value list))
+  (* the int is start pos *)
+  | BuiltinFunction of ((value list -> int -> value) * (value list))
   | BuiltinFunctionInterpreter of (
-      value list -> int -> (value -> value -> value) -> value
+      (value list -> int -> (value -> value -> value) -> value) * (value list)
     )
   | Module of string * (string, value) Hashtbl.t
   | Unit

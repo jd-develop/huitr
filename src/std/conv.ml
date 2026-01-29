@@ -106,11 +106,11 @@ let to_float_opt (l: value list) (pos: int) =
 
 let create_module_conv () : value =
   let conv = Hashtbl.create 8 in
-  Hashtbl.add conv "to_string" (BuiltinFunction to_string, 0);
-  Hashtbl.add conv "to_int" (BuiltinFunction to_int, 0);
-  Hashtbl.add conv "to_float" (BuiltinFunction to_float, 0);
-  Hashtbl.add conv "to_int_opt" (BuiltinFunction to_int_opt, 0);
-  Hashtbl.add conv "to_float_opt" (BuiltinFunction to_float_opt, 0);
+  Hashtbl.add conv "to_string" (BuiltinFunction (to_string, []), 0);
+  Hashtbl.add conv "to_int" (BuiltinFunction (to_int, []), 0);
+  Hashtbl.add conv "to_float" (BuiltinFunction (to_float, []), 0);
+  Hashtbl.add conv "to_int_opt" (BuiltinFunction (to_int_opt, []), 0);
+  Hashtbl.add conv "to_float_opt" (BuiltinFunction (to_float_opt, []), 0);
 
   Module("conv", conv), 0
 

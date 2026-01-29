@@ -156,12 +156,12 @@ let sub (l: value list) (pos: int) : value =
 
 let create_module_string () : value =
   let string = Hashtbl.create 8 in
-  Hashtbl.add string "nth" (BuiltinFunction nth, 0);
-  Hashtbl.add string "len" (BuiltinFunction len, 0);
-  Hashtbl.add string "is_empty" (BuiltinFunction is_empty, 0);
-  Hashtbl.add string "concat_strings" (BuiltinFunction concat_strings, 0);
-  Hashtbl.add string "split_on_char" (BuiltinFunction split_on_char, 0);
-  Hashtbl.add string "sub" (BuiltinFunction sub, 0);
+  Hashtbl.add string "nth" (BuiltinFunction (nth, []), 0);
+  Hashtbl.add string "len" (BuiltinFunction (len, []), 0);
+  Hashtbl.add string "is_empty" (BuiltinFunction (is_empty, []), 0);
+  Hashtbl.add string "concat_strings" (BuiltinFunction (concat_strings, []), 0);
+  Hashtbl.add string "split_on_char" (BuiltinFunction (split_on_char, []), 0);
+  Hashtbl.add string "sub" (BuiltinFunction (sub, []), 0);
 
   (* CONSTANTES *)
   Hashtbl.add string "empty" (String "", 0);

@@ -16,6 +16,6 @@ let if_ (l: value list) (pos: int) : value =
 
 let create_module_test () : value =
   let test = Hashtbl.create 8 in
-  Hashtbl.add test "if" (BuiltinFunction if_, 0);
+  Hashtbl.add test "if" (BuiltinFunction (if_, []), 0);
   Module("test", test), 0
 

@@ -291,21 +291,21 @@ let ceil_ (l: value list) (pos: int) : value =
 
 let create_module_math () : value =
   let math = Hashtbl.create 8 in
-  Hashtbl.add math "add" (BuiltinFunction add, 0);
-  Hashtbl.add math "prod" (BuiltinFunction prod, 0);
-  Hashtbl.add math "minus" (BuiltinFunction minus, 0);
-  Hashtbl.add math "div" (BuiltinFunction div, 0);
-  Hashtbl.add math "floordiv" (BuiltinFunction floordiv, 0);
-  Hashtbl.add math "mod" (BuiltinFunction mod_, 0);
-  Hashtbl.add math "sqrt" (BuiltinFunction sqrt_, 0);
-  Hashtbl.add math "loge" (BuiltinFunction loge, 0);
-  Hashtbl.add math "log10" (BuiltinFunction log10_, 0);
-  Hashtbl.add math "log2" (BuiltinFunction log2_, 0);
-  Hashtbl.add math "exp" (BuiltinFunction exp_, 0);
-  Hashtbl.add math "sin" (BuiltinFunction sin_, 0);
-  Hashtbl.add math "cos" (BuiltinFunction cos_, 0);
-  Hashtbl.add math "floor" (BuiltinFunction floor_, 0);
-  Hashtbl.add math "ceil" (BuiltinFunction ceil_, 0);
+  Hashtbl.add math "add" (BuiltinFunction (add, []), 0);
+  Hashtbl.add math "prod" (BuiltinFunction (prod, []), 0);
+  Hashtbl.add math "minus" (BuiltinFunction (minus, []), 0);
+  Hashtbl.add math "div" (BuiltinFunction (div, []), 0);
+  Hashtbl.add math "floordiv" (BuiltinFunction (floordiv, []), 0);
+  Hashtbl.add math "mod" (BuiltinFunction (mod_, []), 0);
+  Hashtbl.add math "sqrt" (BuiltinFunction (sqrt_, []), 0);
+  Hashtbl.add math "loge" (BuiltinFunction (loge, []), 0);
+  Hashtbl.add math "log10" (BuiltinFunction (log10_, []), 0);
+  Hashtbl.add math "log2" (BuiltinFunction (log2_, []), 0);
+  Hashtbl.add math "exp" (BuiltinFunction (exp_, []), 0);
+  Hashtbl.add math "sin" (BuiltinFunction (sin_, []), 0);
+  Hashtbl.add math "cos" (BuiltinFunction (cos_, []), 0);
+  Hashtbl.add math "floor" (BuiltinFunction (floor_, []), 0);
+  Hashtbl.add math "ceil" (BuiltinFunction (ceil_, []), 0);
 
   Hashtbl.add math "tau" (Float 6.283185307179586, 0);
   Hashtbl.add math "e" (Float (exp 1.0), 0);
