@@ -275,11 +275,11 @@ Ce module contient les fonctions suivantes&nbsp;:
   positive.
 * `std::math::sqrt` prenant un nombre positif et renvoyant sa racine carrée
   (de type float).
-* `std::math::loge` prenant un nombre strictement négatif et renvoyant son
+* `std::math::loge` prenant un nombre strictement positif et renvoyant son
   logarithme népérien (de type float).
-* `std::math::log10` prenant un nombre strictement négatif et renvoyant son
+* `std::math::log10` prenant un nombre strictement positif et renvoyant son
   logarithme en base 10 (de type float).
-* `std::math::log2` prenant un nombre strictement négatif et renvoyant son
+* `std::math::log2` prenant un nombre strictement positif et renvoyant son
   logarithme en base 2 (de type float).
 * `std::math::exp` prenant un nombre et renvoyant son exponentielle base e
   (de type float).
